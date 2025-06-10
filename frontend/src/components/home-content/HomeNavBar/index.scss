@@ -1,0 +1,57 @@
+@import '../../../variables';
+
+.home-nav-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    max-width: 100vw;
+}
+
+.left-nav {
+    display: flex;
+    flex-direction: row;
+    gap: 25px;
+    font-size: 20px;
+    font-weight: 500;
+    text-align: left;
+    line-height: 28px;
+    left: 5px;
+}
+
+.home-nav-bar h1 {
+    font-family: 'Publica Play Bold', sans-serif;
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 37px;
+    text-align: left;
+}
+
+.right-nav {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    font-size: 18px;
+    font-weight: 700;
+    text-align: left;
+    line-height: 28px;
+}
+
+.home-nav-bar a {
+    text-decoration: none;
+    // top side bottom side
+    padding: 2px 5px 2px 5px;
+    border-radius: 5px;
+    border: 1px solid black;
+}
+
+#log-in {
+    color: white; 
+    background-color: $light-blue;
+}
+
+.home-nav-bar #sign-up {
+    color: black;
+    background-color: $light-grey;
+}

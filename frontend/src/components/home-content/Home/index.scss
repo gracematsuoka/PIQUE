@@ -1,0 +1,76 @@
+.home {
+    height: 100vh;
+}
+
+.home-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    gap: 50px;
+    padding: 20px;
+    box-sizing: border-box
+}
+
+.home hr {
+    margin: 0;
+}
+
+.left-home {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.bg-text {
+    color: rgba(0, 0, 0, 0.03);
+    font-size: 320px;
+    font-family: 'Publica Play Bold';
+    text-align: left;
+    max-width: 620px;
+    word-break: break-all;
+    line-height: 280px;
+    position: absolute;
+    z-index: 0;
+    left: 0;
+}
+
+.front-text {
+    position: absolute;
+}
+
+.main-text {
+    color: rgb(0, 0, 0);
+    font-size: 60px;
+    font-weight: 700;
+    line-height: 85px;
+    max-width: 570px;
+    line-height: normal;
+}
+
+.sub-text a{
+    font-size: 20px;
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 10px;
+    color: black;
+}
+
+.right-home {
+    flex: 1;
+}
+
+.tops {
+    display: flex;
+    flex-direction: row;
+}
+
+img {
+    width: 200px;
+    filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.2)); 
+}
