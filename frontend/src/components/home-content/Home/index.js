@@ -15,7 +15,7 @@ const Home = () => {
             <hr></hr>
             <div className="home-container">
                 <div className="left-home">
-                    <p className="bg-text">PIQ<br></br>IUE</p>
+                    <p className="bg-text">PIQ<br/>.UE</p>
                     <div className="front-text">
                         <p className="main-text">Your personal stylist, planner & look book...<br></br>all in one.</p>
                         <div className="sub-text">

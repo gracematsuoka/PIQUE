@@ -5,8 +5,9 @@
 .home-container {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: spac;
     width: 100vw;
+    height: 100vh;
     gap: 50px;
     padding: 20px;
     box-sizing: border-box
@@ -24,17 +25,18 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
+    min-width: 300px;
 }
 
 .bg-text {
     color: rgba(0, 0, 0, 0.03);
-    font-size: 320px;
+    font-size: clamp(150px, 20vw, 320px);
     font-family: 'Publica Play Bold';
     text-align: left;
     max-width: 620px;
     word-break: break-all;
-    line-height: 280px;
     position: absolute;
+    line-height: clamp(150px, 20vw, 320px);
     z-index: 0;
     left: 0;
 }
@@ -45,7 +47,7 @@
 
 .main-text {
     color: rgb(0, 0, 0);
-    font-size: 60px;
+    font-size: clamp(40px, 5vw, 60px);
     font-weight: 700;
     line-height: 85px;
     max-width: 570px;
@@ -53,7 +55,7 @@
 }
 
 .sub-text a{
-    font-size: 20px;
+    font-size: clamp(10px, 2vw, 20px);
     font-weight: 500;
     text-decoration: underline;
     text-decoration-thickness: 1px;
@@ -63,14 +65,22 @@
 
 .right-home {
     flex: 1;
+    overflow: hidden;
 }
 
 .tops {
     display: flex;
     flex-direction: row;
+    overflow: hidden;
 }
 
-img {
+.bottoms {
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+}
+
+.home img {
     width: 200px;
     filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.2)); 
 }
