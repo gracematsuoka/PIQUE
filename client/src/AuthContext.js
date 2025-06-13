@@ -52,11 +52,9 @@ export function AuthProvider({ children }) {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            console.log('firebase user:', user)
             setFirebaseUser(user);
             if (user) {
                 const token = await getIdToken(user, true);
-                console.log('token:', token)
 
                 try {
                     const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/me`, {
@@ -65,7 +63,6 @@ export function AuthProvider({ children }) {
                         }
                     });
                     const data = await res.json();
-                    console.log('backend user:', data)
                     setMongoUser(data);
                 } catch (err) {
                     console.error('Failed to fetch user from backend:', err);

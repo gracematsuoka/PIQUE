@@ -7,8 +7,7 @@ const verifyToken = async (req, res, next) => {
     if (!token) return res.status(401).json({ error: "No token provided" });
 
     try {
-        const decodedToken = await admin.auth().verifyIdToken(token);
-        console.log('Decoded token:', decodedToken);
+        const decodedToken = await admin.auth().verifyIdToken(token); 
         req.user = decodedToken; // access to Firebase user ID
         next();
     } catch (err) {

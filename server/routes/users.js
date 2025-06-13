@@ -3,9 +3,6 @@ const router = express.Router();
 const User = require("../models/User");
 const verifyToken = require("../middleware/auth");
 const authenticateUser = require("../middleware/authenticateUser");
-// const multer = require("multer");
-// const storage = multer.memoryStorage();
-// const upload = multer({ storage });
 
 router.get("/", verifyToken, async (req, res) => {
     const users = await User.find();
@@ -54,25 +51,40 @@ router.post("/check-username", async (req, res) => {
     }
 });
 
-// router.post("/upload-profile-pic", upload.single("file", async (req, res) => {
-//     try {
-//         const fileBuffer = req.file.buffer;
+router.post('/update-user', authenticateUser, async (req, res) => {
+    try {
+        const {name, username, profileURL} = req.body;
 
-//         const imageUrl = await uploadToStorage(fileBuffer);
-//         const userId = req.user.Id;
-//         await User.findByIdAndUpdate(userId, { profileURL: imageUrl });
-        
-//         res.status(200).json(imageUrl)
+        if (name) req.user.name = name;
+        if (username) req.user.username = username;
+        if (profileURL) req.user.profileURL = profileURL;
+
+        await req.user.save();
+
+        res.status(200).json({message: 'User updated', user: req.user});
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({message: 'Failed to update user'});
+    }
+})
+
+// router.put('/profile-pic', authenticateUser, async (req, res) => {
+//     try {
+//         req.user.profileURL = req.body.profileURL;
+//         await req.user.save();
+//         res.status(200).json({message: 'Profile picture updated', profileURL: req.user.profileURL})
 //     } catch (err) {
-//         console.log('Error in uploading profile pic');
-//         res.status(500).json({error: 'Server error'});
+//         console.log('Failed to update profile pic:', err);
+//         res.status(500).json({error: 'Failed to update profile pic'})
 //     }
-// }));
+// })
 
 router.get('/me', authenticateUser, async (req, res) => {
-    console.log('user:', req.user)
-    const user = await User.findById(req.user.id);
-    res.json({name: user.name, username: user.username, profileURL: user.profileURL});
+    res.json({
+        name: req.user.name,
+        username: req.user.username,
+        profileURL: req.user.profileURL
+    });
 })
 
 module.exports = router;

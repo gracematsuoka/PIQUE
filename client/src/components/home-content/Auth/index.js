@@ -50,8 +50,8 @@ const Auth = ({ mode }) => {
             const { firebaseUser, mongoUser } = await googleLogin();
             setFirebaseUser(firebaseUser);
             setMongoUser(mongoUser);
-            
-            navigate(isLogin ? '/explore' : '/account-setup');
+
+            navigate(isLogin ? '/' : '/account-setup');
         } catch (e){
             console.error('Google sign in failed: ', e.message)
             setError('Failed to sign in with Google')

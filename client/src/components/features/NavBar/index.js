@@ -8,11 +8,6 @@ import {ReactComponent as HeartTagIcon} from '../../../assets/images/icons/heart
 import {ReactComponent as ExploreIcon} from '../../../assets/images/icons/explore.svg'
 import {ReactComponent as CreateIcon} from '../../../assets/images/icons/edit.svg'
 import { Link, useLocation } from "react-router-dom"
-import Explore from "../Explore"
-import Outfits from "../Outfits"
-import Closet from "../Closet"
-import Create from "../Create"
-import Style from "../Style"
 
 const NavBar = () => {
     const location = useLocation();

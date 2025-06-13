@@ -20,15 +20,7 @@ const authenticateUser = async (req, res, next) => {
         return res.status(404).json({ message: 'User not found in database' });
     }
 
-    console.log("Setting req.user to:", {
-        id: mongoUser._id,
-        email: mongoUser.email
-    });
-
-    req.user = {
-      id: mongoUser._id,
-      email: mongoUser.email,
-    };
+    req.user = mongoUser;
 
     next();
   } catch (error) {
