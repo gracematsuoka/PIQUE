@@ -1,0 +1,36 @@
+.account-setup .auth-content {
+    gap: 35px
+}
+
+.edit-pic-icon {
+    display: flex;
+    position: relative;
+    gap: 0;
+    cursor: pointer;
+}
+.edit-pic-icon .edit-icon {
+    position: absolute;
+    bottom: 0px;
+    left: 90%;
+}
+
+.profile-pic {
+    position: relative;
+    width: 100px;
+    border-radius: 50%;
+    outline: 3px solid black;
+}
+
+.live-validate {
+    font-size: 13px;
+    padding: 3px 10px 3px 10px;
+    width: fit-content;
+    border-radius: 7px;
+}
+
+.live-validate.valid {
+    background-color: rgba(0, 128, 0, 0.3);
+}
+.live-validate.invalid {
+    background-color: rgba(128, 19, 0, 0.3);
+}

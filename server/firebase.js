@@ -1,4 +1,6 @@
 var admin = require("firebase-admin");
+const { v4: uuidv4 } = require("uuid");
+const path = require("path");
 
 admin.initializeApp({
     credential: admin.credential.cert({
@@ -12,7 +14,8 @@ admin.initializeApp({
       tokenUri: "https://oauth2.googleapis.com/token",
       authProviderX509CertUrl: "https://www.googleapis.com/oauth2/v1/certs",
       clientC509CertUrl: process.env.FIREBASE_CLIENT_CERT_URL
-    })
+    }),
+    // storageBucket: 
   });
 
 module.exports = admin;

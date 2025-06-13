@@ -7,8 +7,12 @@ import AccountSetup from './components/home-content/AccountSetup';
 import PrivateRoute from './PrivateRoute';
 import Profile from './components/features/Profile';
 import ForgotPassword from './components/home-content/ForgotPassword';
-import { useAuth } from './components/contexts/AuthContext';
-import { Navigate } from 'react-router-dom';
+import Closet from './components/features/Closet';
+import Create from './components/features/Create';
+import Style from './components/features/Style';
+import Outfits from './components/features/Outfits';
+import Settings from './components/features/Settings';
+import { useAuth } from './AuthContext';
 
 function App() {
   const { currentUser, loading } = useAuth();
@@ -25,7 +29,7 @@ function App() {
           <Route
             path="/"
             element={
-              currentUser ? <Navigate to="/explore" /> : <Home/> 
+              currentUser ? <Explore/> : <Home/> 
             }
           />
           <Route path='/log-in' element={<Auth mode="login"/>}/>
@@ -39,12 +43,20 @@ function App() {
               </PrivateRoute>
             }
           />
-          <Route
+          {/* <Route
             path="/explore"
             element={
               <PrivateRoute>
                 <Explore />
-              </PrivateRoute>
+              </PrivateRoute> 
+            }
+          /> */}
+          <Route
+            path="/settings"
+            element={
+              <PrivateRoute>
+                <Settings />
+              </PrivateRoute> 
             }
           />
           <Route
@@ -52,6 +64,38 @@ function App() {
             element={
               <PrivateRoute>
                 <Profile />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/closet"
+            element={
+              <PrivateRoute>
+                <Closet />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/create"
+            element={
+              <PrivateRoute>
+                <Create />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/style"
+            element={
+              <PrivateRoute>
+                <Style />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/outfits"
+            element={
+              <PrivateRoute>
+                <Outfits />
               </PrivateRoute>
             }
           />

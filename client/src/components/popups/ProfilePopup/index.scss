@@ -1,0 +1,56 @@
+.profile-popup .popup-name {
+    font-size: 25px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.profile-popup .popup-username {
+    font-size: 13px;
+    color: grey;
+    text-align: center;
+}
+
+.profile-popup p{
+    margin: 0
+}
+
+.profile-popup .follow {
+    display: flex;
+    font-size: 13px;
+    white-space: nowrap;
+    font-weight: 500;
+    gap: 20px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.profile-popup hr {
+    width: 90%
+}
+
+.sub-btn {
+    display: flex;
+    white-space: nowrap;
+    gap: 5px;
+    font-size: 15px;
+    cursor: pointer;
+    padding: 5px;
+    text-align: left;
+}
+
+.sub-btn a {
+    text-decoration: none;
+    color: black;
+    display: flex;
+    gap: 5px
+}
+
+.sub-btn:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+.sub-btn svg {
+    fill: black;
+    width: 15px;
+}

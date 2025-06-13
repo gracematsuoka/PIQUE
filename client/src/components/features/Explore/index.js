@@ -1,4 +1,5 @@
 import TopBar from "../TopBar"
+import NavBar from "../NavBar"
 import { useEffect } from "react"
 import { auth } from "../../../firebase"
 
@@ -9,7 +10,6 @@ const Explore = () => {
 
             if (user) {
                 const token = await user.getIdToken();
-                console.log('Firebase ID Token:', token);
             } else {
                 console.log('No user is signed in')
             }
@@ -21,6 +21,7 @@ const Explore = () => {
     return (
         <div className="explore">
             <TopBar/>
+            <NavBar/>
         </div>
     )
 } 

@@ -1,7 +1,7 @@
 import './index.scss'
 import { Link } from 'react-router-dom'
 import GoogleIcon from '../../../assets/images/icons/googleicon.png'
-import { useAuth } from '../../contexts/AuthContext'
+import { useAuth } from '../../../AuthContext'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -10,6 +10,8 @@ const Auth = ({ mode }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [firebaseUser, setFirebaseUser] = useState('');
+    const [mongoUser, setMongoUser] = useState('');
     const [loading, setLoading] = useState(false);
     const { signup, login, googleLogin } = useAuth();
     const navigate = useNavigate();
@@ -45,8 +47,11 @@ const Auth = ({ mode }) => {
 
     const handleGoogleSignIn = async () => {
         try {
-            await googleLogin();
-            navigate('/explore');
+            const { firebaseUser, mongoUser } = await googleLogin();
+            setFirebaseUser(firebaseUser);
+            setMongoUser(mongoUser);
+            
+            navigate(isLogin ? '/explore' : '/account-setup');
         } catch (e){
             console.error('Google sign in failed: ', e.message)
             setError('Failed to sign in with Google')

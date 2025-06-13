@@ -1,8 +1,11 @@
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
+    firebaseUid: {type: String, required: true, unique: true},
     name: String,
     username: String,
-})
+    email: {type: String, required: true, unique: true},
+    profileURL: String
+}, { timestamps: true })
 
 module.exports = mongoose.model("User", UserSchema);
