@@ -1,10 +1,11 @@
 import Home from './components/home-content/Home';
 import './App.scss';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Auth from './components/home-content/Auth';
 import Explore from './components/features/Explore';
 import AccountSetup from './components/home-content/AccountSetup';
-import PrivateRoute from './PrivateRoute';
+import PrivateRoute from './routing/PrivateRoute';
+import PublicRoute from './routing/PublicRoute';
 import Profile from './components/features/Profile';
 import ForgotPassword from './components/home-content/ForgotPassword';
 import Closet from './components/features/Closet';
@@ -26,31 +27,42 @@ function App() {
           <section id='browse'></section>
         </div>
         <Routes>
-          <Route
-            path="/"
+          <Route path="/"
             element={
-              currentUser ? <Explore/> : <Home/> 
+              <PublicRoute>
+                <Home/>
+              </PublicRoute>
             }
           />
-          <Route path='/log-in' element={<Auth mode="login"/>}/>
-          <Route path='/sign-up' element={<Auth mode="signup"/>}/>
+          <Route path='/log-in' 
+            element={
+              <PublicRoute>
+                <Auth mode="login"/>
+              </PublicRoute>
+            }/>
+          <Route path='/sign-up' 
+            element={
+              <PublicRoute>
+                <Auth mode="signup"/>
+              </PublicRoute>
+            }/>
           <Route path='/forgot-password' element={<ForgotPassword/>}/>
           <Route
             path="/account-setup"
             element={
               <PrivateRoute>
-                <AccountSetup />
+                <AccountSetup mode='setup'/>
               </PrivateRoute>
             }
           />
-          {/* <Route
+          <Route
             path="/explore"
             element={
               <PrivateRoute>
                 <Explore />
               </PrivateRoute> 
             }
-          /> */}
+          />
           <Route
             path="/settings"
             element={

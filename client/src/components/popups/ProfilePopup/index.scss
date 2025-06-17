@@ -1,20 +1,33 @@
-.profile-popup .popup-name {
+.popup-container {
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    outline: 1px black solid;
+    border-radius: 30px;
+    padding: 15px;
+    gap: 7px;
+    z-index: 98;
+}
+
+.popup-name {
     font-size: 25px;
     font-weight: 600;
     text-align: center;
 }
 
-.profile-popup .popup-username {
+.popup-username {
     font-size: 13px;
     color: grey;
     text-align: center;
 }
 
-.profile-popup p{
+.popup-container p{
     margin: 0
 }
 
-.profile-popup .follow {
+.follow {
     display: flex;
     font-size: 13px;
     white-space: nowrap;
@@ -24,7 +37,7 @@
     margin-bottom: 5px;
 }
 
-.profile-popup hr {
+.popup-container hr {
     width: 90%
 }
 
@@ -36,6 +49,8 @@
     cursor: pointer;
     padding: 5px;
     text-align: left;
+    border-radius: 5px;
+    border: none;
 }
 
 .sub-btn a {
@@ -47,7 +62,6 @@
 
 .sub-btn:hover {
     background-color: rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
 }
 
 .sub-btn svg {

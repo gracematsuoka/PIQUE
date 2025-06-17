@@ -1,0 +1,55 @@
+.welcome-header {
+    font-size: 30px;
+    font-weight: 500;
+}
+
+.closet .nav-content-wrapper {
+    gap: 30px
+}
+
+.closet p {
+    margin: 0
+}
+
+.add img {
+    width: 35px;
+}
+
+.add {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    position: absolute;
+    z-index: 3;
+    right: 20px;
+    bottom: 30px;
+    cursor: pointer;
+}
+
+.basic-nav.sub {
+    font-size: 12px;
+    gap: 35px;
+}
+
+.filter {
+    display: flex;
+    gap: 5px;
+}
+
+.filter svg {
+    width: 17px;
+}
+
+.filter p {
+    font-size: 14px;
+}
+
+.nav-filter-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}

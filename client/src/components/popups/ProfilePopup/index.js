@@ -13,7 +13,11 @@ const ProfilePopup = () => {
     const {mongoUser, logout} = useAuth();
     const navigate = useNavigate();
     let username = (mongoUser?.username || 'Username').toLowerCase();
-   
+    const [isPopupVisible, setIsPopupVisible] = useState(false);
+
+    const togglePopup = () => {
+        setIsPopupVisible(!isPopupVisible);
+    }
     
     async function handleLogout() {
         setError('');
@@ -25,9 +29,9 @@ const ProfilePopup = () => {
             setError('Failed to log out');
         }
     }
-
+    
     return (
-        <div className="profile-popup">
+        <div className="popup-container">
             <p className='popup-name'>{mongoUser?.name || 'Name'}</p>
             <p className='popup-username'>@{username}</p>
             <div className='follow'>

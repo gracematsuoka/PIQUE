@@ -1,15 +1,17 @@
 import TopBar from "../TopBar"
 import NavBar from "../NavBar"
+import AccountSetup from "../../home-content/AccountSetup"
 
 const Settings = () => {
     return (
         <div className="settings">
             <TopBar/>
-            <NavBar/>
-            <div className="settings-content">
-                {/* content from account setup  */}
+            <div className="nav-content">
+                <NavBar/>
 
-                
+                <div className="nav-content-wrapper">
+                    <AccountSetup mode='update'/>
+                </div>
             </div>
         </div>
     )

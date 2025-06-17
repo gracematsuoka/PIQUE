@@ -16,23 +16,15 @@
 }
 
 .top-bar .profile-pic:hover {
-    box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.2);;
+    box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.2);
 }
 
 .profile-wrapper {
     position: relative
 }
 
-.profile-popup {
+.top-bar .popup-container{
     position: absolute;
     right: 0;
     top: 50px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    outline: 1px black solid;
-    border-radius: 30px;
-    padding: 15px;
-    gap: 7px;
 }

@@ -1,4 +1,4 @@
-const admin = require('firebase-admin');
+const admin = require('../firebase');
 const User = require('../models/User'); 
 
 const authenticateUser = async (req, res, next) => {
@@ -13,14 +13,24 @@ const authenticateUser = async (req, res, next) => {
   try {
     const decodedToken = await admin.auth().verifyIdToken(idToken);
     const firebaseUid = decodedToken.uid;
+    const email = decodedToken.email;
 
     const mongoUser = await User.findOne({ firebaseUid });
-    if (!mongoUser) {
-        console.error("User not found for firebase UID:", firebaseUid);
-        return res.status(404).json({ message: 'User not found in database' });
+    if (mongoUser) {
+        req.user = {
+            firebaseUid,
+            email,
+            mongoId: mongoUser._id,
+            name: mongoUser.name,
+            username: mongoUser.username,
+            profileURL: mongoUser.profileURL
+        };
+    } else {
+        req.user = {
+            firebaseUid,
+            email
+        }
     }
-
-    req.user = mongoUser;
 
     next();
   } catch (error) {

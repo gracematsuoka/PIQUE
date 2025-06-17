@@ -1,0 +1,189 @@
+.close svg {
+    position: absolute;
+    fill: black;
+    width: 15px;
+    top: 50%;
+    transform: translateY((-50%));
+    right: 10px;
+    top: 10px;
+    cursor: pointer;
+}
+
+hr {
+    border: none;
+    border-top: 0.5px solid black;
+}
+
+.item-details .popup-title {
+    padding-bottom: 0;
+} 
+
+.item-details img {
+    width: 120px
+}
+
+.basic-btn {
+    border-radius: 100px;
+    border: none;
+    padding: 5px 20px 5px 20px;
+    cursor: pointer;
+}
+
+.basic-btn:hover {
+    background-color: rgba(0, 0, 0, 0.145);
+}
+
+.item-details .popup-content.bottom {
+    flex-direction: row;
+}
+
+.item-field-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 3px
+}
+
+.item-field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%
+}
+
+.item-field input {
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.item-field select {
+    border: none;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.item-field.category select {
+    width: 100%;
+    padding: 4px 0 4px 0
+}
+
+.item-field input:focus, .item-field select:focus{
+    outline: 0.5px solid rgba(128, 128, 128, 0.433);
+}
+
+.item-field h1 {
+    font-size: 15px;
+}
+
+.item-field .color-input {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 25px; 
+    height: 25px; 
+    border-radius: 50%; 
+    border: 1px solid #ccc; 
+    padding: 0; 
+    cursor: pointer;
+    background-color: transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.item-field .color-input::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+  .item-field .color-input::-webkit-color-swatch {
+    border: none;
+    border-radius: 50%;
+  }
+  
+  .item-field .color-input::-moz-color-swatch {
+    border: none;
+    border-radius: 50%;
+  }
+
+.item-field svg {
+    fill: black;
+    width: 15px;
+    cursor: pointer;
+}
+
+.right-icon {
+    position: absolute;
+    right: 0px;
+    padding-top: 4px
+}
+
+.edit-color-field {
+    display: flex;
+    margin: 0;
+    padding-bottom: 0;
+}
+
+.edit-color-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-self: flex-start;
+}
+
+.edit-color-field svg {
+    padding-left: 67px
+}
+
+.item-field.color {
+    align-items: flex-start;
+    position: relative;
+}
+
+.item-field.color h1, .item-field.tags h1 {
+    align-self: flex-start;
+    margin: 0;
+    padding-top: 4px
+}
+
+.item-field.tags {
+    width: 100%;
+    position: relative;
+    align-items: flex-start;
+}
+
+.tag p {
+    font-size: 14px;
+}
+
+.tag {
+    background-color: antiquewhite;
+    padding: 2px 12px 2px 12px;
+    border-radius: 10px;
+}
+
+.add-tag {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+}
+
+.tags-wrapper {
+    display: flex;
+    gap: 5px;
+    width: 70%;
+    flex-wrap: wrap;
+}
+
+.dollar {
+    font-size: 12px;
+    padding-left: 5px;
+    padding-right: 0;
+    margin: 0
+}
+
+.item-field.price {
+    margin: 0;
+    padding-left: 0;
+}
+
+.price-wrapper {
+    display: flex;
+    align-items: center;
+}

@@ -2,6 +2,22 @@
     gap: 35px
 }
 
+.account-setup .sub-btn {
+    background-color: rgba(0, 0, 0, 0.062);
+    border-radius: 5px;
+    padding: 7px;
+}
+
+.account-setup .sub-btn p {
+    margin: 0
+}
+
+.sub-btn.alert {
+    background-color: rgba(209, 27, 27, 0.511);
+    border-radius: 5px;
+    color: rgb(108, 17, 17);
+}
+
 .edit-pic-icon {
     display: flex;
     position: relative;
@@ -33,5 +49,5 @@
     background-color: rgba(0, 128, 0, 0.3);
 }
 .live-validate.invalid {
-    background-color: rgba(128, 19, 0, 0.3);
+    background-color: rgba(151, 23, 0, 0.3);
 }

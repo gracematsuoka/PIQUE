@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import GoogleIcon from '../../../assets/images/icons/googleicon.png'
 import { useAuth } from '../../../AuthContext'
 import { useEffect, useState } from 'react'
+import {getAuth} from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
 
 const Auth = ({ mode }) => {
@@ -35,14 +36,25 @@ const Auth = ({ mode }) => {
             if (isLogin) {
                 login(email, password);
             } else {
-                signup(email, password);
+                await signup(email, password);
+                
+                const auth = getAuth();
+                const token = await auth.currentUser.getIdToken();
+
+                await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/create-user`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    },
+                })
             }
         } catch {
-            setError('Failed to create an account')
+            setError('Failed to create an account');
         }
 
         setLoading(false);
-        navigate('/account-setup'); // CHANGE
+        redirectSignIn();
     }
 
     const handleGoogleSignIn = async () => {
@@ -50,11 +62,33 @@ const Auth = ({ mode }) => {
             const { firebaseUser, mongoUser } = await googleLogin();
             setFirebaseUser(firebaseUser);
             setMongoUser(mongoUser);
-
-            navigate(isLogin ? '/' : '/account-setup');
         } catch (e){
             console.error('Google sign in failed: ', e.message)
             setError('Failed to sign in with Google')
+        }
+
+        redirectSignIn();
+    }
+
+    const redirectSignIn = async () => {
+        const currentUser = getAuth().currentUser;
+
+        if (!currentUser) return;
+
+        const token = await currentUser.getIdToken();
+
+        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/me`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        const data = await res.json();
+        if (data.username) {
+            navigate('/explore');
+        } else {
+            navigate('/account-setup');
         }
     }
 

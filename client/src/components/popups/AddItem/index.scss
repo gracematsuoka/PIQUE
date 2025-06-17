@@ -1,0 +1,61 @@
+@import '../../../variables';
+
+.popup-header {
+    width: 100%;
+    height: fit-content;
+    position: relative;
+}
+
+.popup-title {
+    flex: 1;
+    box-sizing: border-box;
+    width: 100%;
+    padding-top: 8px;
+    padding-left: 150px;
+    padding-right: 150px;
+    padding-bottom: 10px;
+    font-family: 'Publica Play Bold';
+    white-space: nowrap;
+    font-size: 18px;
+}
+
+.back svg {
+    position: absolute;
+    fill: black;
+    width: 15px;
+    top: 50%;
+    transform: translateY((-50%));
+    left: 10px;
+    cursor: pointer;
+}
+
+.clothes-upload {
+    fill: $light-blue;
+    fill-opacity: 0.7;
+    background-color: #3d4d6620;
+    padding: 15px;
+    width: 80px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+.sub-btn button {
+    border: none;
+    cursor: pointer;
+}
+
+.or {
+    font-size: 12px;
+}
+
+.popup-content.bottom {
+    padding: 30px;
+}
+
+.basic-nav.popup {
+    gap: 0;
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+}
+

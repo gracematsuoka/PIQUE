@@ -1,0 +1,42 @@
+.popup-container.add-tag {
+    border-radius: 10px;
+}
+
+.popup-container.add-tag input {
+    outline: 0.5px solid rgba(128, 128, 128, 0.433);
+}
+
+.tag-detail {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+.tag-details {
+    position: absolute;
+    bottom: 100%;
+}
+
+.tag-detail-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    // gap: 5px;
+    position: relative;
+}
+
+.create-tag {
+    display: flex;
+    gap: 5px;
+}
+
+.more-details {
+    position: relative;
+}
+
+.tag-detail .sub-btn {
+    width: 90%;
+}

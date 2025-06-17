@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react'
 import {auth, googleProvider} from './firebase'
-import {getIdToken, setPersistence, browserLocalPersistence} from 'firebase/auth'
-import { createUserWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword, signOut, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import {getIdToken, setPersistence, browserLocalPersistence, getAuth} from 'firebase/auth'
+import { createUserWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword, signOut, signInWithPopup } from 'firebase/auth';
 
 const AuthContext = React.createContext();
 
@@ -34,16 +34,14 @@ export function AuthProvider({ children }) {
         await setPersistence(auth, browserLocalPersistence);
         const res = await signInWithPopup(auth, googleProvider);
         const user = res.user;
+        const token = await getAuth().currentUser.getIdToken();
         
         const backendRes = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/google-signin`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                uid: user.uid,
-                name: user.displayName,
-                email: user.email,
-                profileURL: user.photoURL
-            })
+            headers: { 
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
         });
 
         const backendUser = await backendRes.json();

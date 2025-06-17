@@ -1,0 +1,61 @@
+.popup-container.add-tag.td {
+    width: 90px;
+    align-items: unset;
+}
+
+.popup-container.add-tag.td input {
+    width: 90%
+}
+
+.popup-container.add-tag.td .sub-btn {
+    padding: 1px 4px 1px 4px
+}
+
+.popup-container.add-tag.td .sub-btn:hover {
+    background-color: rgba(0, 0, 0, 0.034);
+}
+
+.td-delete {
+    display: flex;
+    gap: 5px;
+    padding-top: 5px;
+    font-size: 13px;
+}
+
+.td-line {
+    margin: 3px 0 3px 0;
+}
+
+.td-color {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
+    gap: 7px;
+}
+
+.td-color .colorsP {
+    margin-bottom: 3px;
+    font-size: 11px;
+}
+
+.td-color-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    // width: 90%;
+    // padding-left: 10px;
+    // padding-right: 10px;
+}
+
+.td-color-option circle {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+}
+
+.td-color-option p {
+    font-size: 13px
+}

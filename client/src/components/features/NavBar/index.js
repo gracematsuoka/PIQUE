@@ -14,8 +14,8 @@ const NavBar = () => {
 
     return (
         <div className="navbar">
-            <div className={`icon-wrapper ${location.pathname === '/' ? 'active' : ''}`}>
-                <Link to='/'>
+            <div className={`icon-wrapper ${location.pathname === '/explore' ? 'active' : ''}`}>
+                <Link to='/explore'>
                     <ExploreIcon/>
                     <p>Explore</p>
                 </Link>

@@ -33,7 +33,6 @@ const ForgotPassword = () => {
                 <div className='bg-text-large'>PIQUE</div>
                 <div className='auth-title'>
                     <h1>Password Reset</h1>
-                    {/* <sub>{isLogin ? 'Log in to your account' : 'Create your account'}</sub>     */}
                 </div>
                 <div className='auth-fields'>
                     <form onSubmit={handleSubmit}>

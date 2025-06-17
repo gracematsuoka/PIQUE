@@ -1,0 +1,67 @@
+.profile {
+    height: 100vh;
+}
+
+.nav-content {
+    display: flex;
+}
+
+.profile .nav-content-wrapper p {
+    margin: 0;
+    text-align: left;
+}
+
+.nav-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    gap: 20px;
+    margin-top: 20px;
+    margin-left: 120px;
+    margin-right: 50px;
+    // background-color: antiquewhite;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.profile-text {
+    display: flex;
+    flex-direction: column;
+    gap: 5px
+}
+
+.profile .popup-name {
+    font-size: 32px
+}
+
+.profile hr {
+    width: 100%;
+}
+
+.basic-nav {
+    display: flex;
+    gap: 50px;
+    font-size: 13px
+}
+
+.basic-nav p {
+    cursor: pointer;
+}
+
+.basic-nav .active {
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 7px;
+}
+
+.profile .profile-text .popup-username {
+    font-size: 15px;
+}
+
+.profile .profile-text .follow {
+    font-size: 16px;
+}

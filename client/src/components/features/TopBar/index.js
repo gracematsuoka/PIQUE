@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom"
-import Explore from "../Explore"
 import "./index.scss"
 import { useAuth } from "../../../AuthContext"
 import defaultProfilePic from '../../../assets/images/icons/default-profile-pic.png'
@@ -16,7 +15,7 @@ const TopBar = () => {
 
     return (
         <div className="top-bar">
-            <div className="logo"><Link to={Explore}>PIQUE</Link></div>   
+            <div className="logo"><Link to='/explore'>PIQUE</Link></div>   
             <div className="profile-wrapper">
                 <img 
                     className='profile-pic' 

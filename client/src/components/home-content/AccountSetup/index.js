@@ -2,15 +2,25 @@ import './index.scss'
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { getAuth } from "firebase/auth"
+import { useAuth } from '../../../AuthContext';
 import UploadProfilePic from '../../image-upload/UploadProfilePic/UploadProfilePic';
+import WarningPopup from '../../popups/WarningPopup';
 
-const AccountSetup = () => {
+const AccountSetup = ({ mode }) => {
+    const isSetup = mode === 'setup';
     const auth = getAuth();
     const user = auth.currentUser;
+    const {mongoUser, resetPassword} = useAuth();
+    const email = mongoUser?.email || '';
+    const [loading, setLoading] = useState('');
+    const [message, setMessage] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
     const [error, setError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
     const [usernameValid, setUsernameValid] = useState('');
-    const [name, setName] = useState(user?.displayName || '');
-    const [username, setUsername] = useState('');
+    const [name, setName] = useState(mongoUser?.name || '');
+    const [username, setUsername] = useState(mongoUser?.username || '');
+    const [isWarningVisible, setIsWarningVisible] = useState(false);
     
     const navigate = useNavigate();
 
@@ -21,6 +31,7 @@ const AccountSetup = () => {
             setError('Please fill in all fields');
             return;
         }
+        
         if (usernameValid.includes('☓')) {
             setError('Please choose another username');
             return;
@@ -35,7 +46,13 @@ const AccountSetup = () => {
             body: JSON.stringify({name, username})
         })
 
-        navigate('/'); 
+        if (isSetup) {
+            navigate('/'); 
+        } else {
+            setUsernameValid('');
+            setSuccessMessage('Information Saved ✓');
+        }
+        
     }
 
     const validateUsername = async (username) => {
@@ -50,10 +67,10 @@ const AccountSetup = () => {
 
             const data = await res.json();
 
-            if (data.exists) {
-                setUsernameValid('☓ Username already exists');
-            } else {
+            if (!data.exists || username == mongoUser.username) {
                 setUsernameValid('✓ Username is available');
+            } else {
+                setUsernameValid('☓ Username already exists');
             }
         } catch (err) {
             console.error('Error checking username:', error);
@@ -61,33 +78,55 @@ const AccountSetup = () => {
         }
     }
 
+    const handleResetPassword = async (e) => {
+        e.preventDefault();
+        
+        try {
+            setMessage('');
+            setPasswordError('');
+            setLoading(true);
+            await resetPassword(email);
+            setMessage('✓ Check your inbox for further instructions')
+        } catch {
+            setPasswordError('Failed to reset password')
+        }
+
+        setLoading(false);
+    }
+
+    const toggleIsWarningVisible = () => {
+        setIsWarningVisible(!isWarningVisible);
+    }
 
     return (
         <div className="account-setup">
-            <div className='logo'>PIQUE</div>
-            <div className='auth-content'>
-                <div className='bg-text-large'>PIQUE</div>
+            {isSetup && (
+                <>
+                    <div className='logo'>PIQUE</div>
+                </>
+            )}
+            <div className={isSetup ? 'auth-content' : ''}>
+                {isSetup && (
+                    <>
+                        <div className='bg-text-large'>PIQUE</div>
+                        
+                    </>
+                )}
                 <div className='auth-title'>
-                    <h1>Let's get you set up!</h1>
-                </div>
+                            <h1>{isSetup ? "Let's get you set up!" : "Settings"}</h1>
+                        </div>
                 <div className='auth-fields'>
                     <form onSubmit={handleSubmit}>
                         <UploadProfilePic/>
-                        {/* <div className='profile-pic' onClick={() => document.getElementById('profileFile').click()}>
-                            <div className='edit-pic-icon'>
-                                <img className='profile-pic' 
-                                    src={profileURL}
-                                />
-                                <svg className='edit-icon' xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000" ><path d="M120-120v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm584-528 56-56-56-56-56 56 56 56Z"/></svg>
-                            </div>
-                        </div>
-                        <input type='file' id='profileFile' style={{ display: 'none' }} onClick={e => handleUpload(e)}/> */}
                         {error && <p className='error'>{error}</p>}
                         <div className='auth-field'>
                             <label htmlFor='name'>Name</label>
                             <input type='text' id='name' name='name' placeholder='Enter your name' 
                                 value={name}
-                                onChange={e => setName(e.target.value)}
+                                onChange={e => {
+                                    setName(e.target.value)
+                                    setSuccessMessage('');
+                                }}
                             />
                         </div>
                         <div className='auth-field'>
@@ -97,19 +136,34 @@ const AccountSetup = () => {
                                 onChange={e => {
                                     setUsername(e.target.value);
                                     validateUsername(e.target.value);
+                                    setSuccessMessage('');
                                 }}
                             />
                             {usernameValid && <p className={`live-validate ${
                                 usernameValid.includes('☓') ? 'invalid' : 'valid'
-                             }`}>
+                                }`}>
                                 {usernameValid}
                             </p>
                             }
                         </div>
-                        <button className='submit' type='submit'>Continue</button>
+                        <button className='submit' type='submit'>{isSetup ? 'Continue' : 'Save'}</button>
+                        {successMessage && <p className='success'>{successMessage}</p>}
+                        {!isSetup && (
+                            <>
+                                <div className='sub-btn' onClick={handleResetPassword}>
+                                    <p>Reset Password</p>
+                                </div>
+                                {message && <p className='success'>{message}</p>}
+                                {passwordError && <p className='error'>{passwordError}</p>}
+                                <div className='sub-btn alert' onClick={toggleIsWarningVisible}>
+                                    Delete Account
+                                </div>
+                            </>
+                        )}
                     </form>
                 </div>
             </div>
+            {isWarningVisible && <WarningPopup onClose={toggleIsWarningVisible}/>}
         </div>
     )
 }
