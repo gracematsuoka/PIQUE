@@ -131,34 +131,24 @@ const ItemDetails = ({ onClose }) => {
         setColorDivs(prev => prev.filter(colorDiv => colorDiv.id !== id))
     }
 
+    const colorOptions = {
+        Red: '#F35050',
+        Orange: '#EEA34E',
+        Yellow: '#F5D928',
+        Green: '#91D58C',
+        Blue: '#81AAEA',
+        Purple: '#BE9FE5',
+        Pink: '#F1AFD6',
+        Black: '#000000',
+        White: '#FFFFFF',
+        Grey: '#868585',
+        Beige: '#E9E0B6',
+        Brown: '#A26D2C',
+    }
+
     // user selects color from drop down, color picker changes accordingly
     const handleCPChange = (id, colorGroup) => {
-        let colorPick = '';
-        if (colorGroup === 'red') {
-            colorPick = '#F35050';
-        } else if (colorGroup === 'orange') {
-            colorPick = '#EEA34E';
-        } else if (colorGroup === 'yellow') {
-            colorPick = '#F5D928';
-        } else if (colorGroup === 'green') {
-            colorPick = '#91D58C';
-        } else if (colorGroup === 'blue') {
-            colorPick = '#81AAEA';
-        } else if (colorGroup === 'purple') {
-            colorPick = '#BE9FE5';
-        } else if (colorGroup === 'pink') {
-            colorPick = '#F1AFD6';
-        } else if (colorGroup === 'black') {
-            colorPick = '#000000';
-        } else if (colorGroup === 'white') {
-            colorPick = '#FFFFFF';
-        } else if (colorGroup === 'grey') {
-            colorPick = '#868585';
-        } else if (colorGroup === 'beige') {
-            colorPick = '#E9E0B6';
-        } else if (colorGroup === 'brown') {
-            colorPick = '#A26D2C';
-        } 
+        let colorPick = colorOptions[colorGroup];
 
         setColorDivs(prev => prev.map(colorDiv => 
             colorDiv.id === id ? {
@@ -253,12 +243,12 @@ const ItemDetails = ({ onClose }) => {
                             <img src={blueTank}/>
                             <div className='item-field-wrapper'>
                                 <div className='item-field'>
-                                    <h1>NAME</h1>
+                                    <h1 className='field-name'>NAME</h1>
                                     <input type='text' value={name} id='name' onChange={e => setName(e.target.value)} placeholder='Empty'/>
                                     <label htmlFor='name'><Edit/></label>
                                 </div>
                                 <div className='item-field color'>
-                                    <h1 className='color-h1'>COLOR</h1>
+                                    <h1 className='field-name'>COLOR</h1>
                                     <div className='edit-color-wrapper'>
                                         {colorDivs.map(colorDiv => (
                                         <div className='edit-color-field'>
@@ -266,18 +256,9 @@ const ItemDetails = ({ onClose }) => {
                                                 <input type='color' id='colorPicker' className='color-input' value={colorDiv.color} onChange={e => handleCGChange(colorDiv.id, e.target.value)}/>
                                             </div>
                                             <select name='colors' id='colorGroup' value={colorDiv.colorGroup} onChange={e => handleCPChange(colorDiv.id, e.target.value)}>
-                                                <option value='red'>Red</option>
-                                                <option value='orange'>Orange</option>
-                                                <option value='yellow'>Yellow</option>
-                                                <option value='green'>Green</option>
-                                                <option value='blue'>Blue</option>
-                                                <option value='purple'>Purple</option>
-                                                <option value='pink'>Pink</option>
-                                                <option value='black'>Black</option>
-                                                <option value='white'>White</option>
-                                                <option value='grey'>Grey</option>
-                                                <option value='beige'>Beige</option>
-                                                <option value='brown'>Brown</option>
+                                                {Object.keys(colorOptions).map(color => 
+                                                    <option value={color}>{color}</option>
+                                                )}
                                             </select>
                                             <Remove style={{display: colorDiv.displayRem}} onClick={e => handleDeleteColorDiv(colorDiv.id)}/>
                                         </div>
@@ -286,7 +267,7 @@ const ItemDetails = ({ onClose }) => {
                                     <Add className='right-icon' onClick={addColorDiv}/>
                                 </div>
                                 <div className='item-field category'>
-                                    <h1>CATEG.</h1>
+                                    <h1 className='field-name'>CATEG.</h1>
                                     <select name='category' value={category} onChange={e => setCategory(e.target.value)}>
                                         <option value='tops'>Tops</option>
                                         <option value='bottoms'>Bottoms</option>
@@ -299,12 +280,12 @@ const ItemDetails = ({ onClose }) => {
                                     </select>
                                 </div>
                                 <div className='item-field'>
-                                    <h1>BRAND</h1>
+                                    <h1 className='field-name'>BRAND</h1>
                                     <input type='text' value={brand} id='brand' onChange={e => setBrand(e.target.value)} placeholder='Empty'/>
                                     <label htmlFor='brand'><Edit/></label>
                                 </div>
                                 <div className='item-field tags'>
-                                    <h1>TAGS</h1>
+                                    <h1 className='field-name'>TAGS</h1>
                                     <div className='tags-wrapper'>
                                         {addedTags.map(div => 
                                                 <div className='tag' key={div.id} style={{backgroundColor: div.color}}>
@@ -323,15 +304,15 @@ const ItemDetails = ({ onClose }) => {
                                     {showAddTag && <Remove className='right-icon' onClick={e => setShowAddTag(!showAddTag)}/>}
                                 </div>
                                 <div className='item-field price'>
-                                    <h1>PRICE</h1>
+                                    <h1 className='field-name'>PRICE</h1>
                                     <div className='price-wrapper'>
                                         <p className='dollar'>$</p>
                                         <input type='number' value={price} id='price' onChange={e => setPrice(e.target.value)} placeholder='0.00'/>
+                                        <label htmlFor='price'><Edit/></label>
                                     </div>
-                                    <label htmlFor='price'><Edit/></label>
                                 </div>
                                 <div className='item-field'>
-                                    <h1>LINK</h1>
+                                    <h1 className='field-name'>LINK</h1>
                                     <input type='url' value={link} id='link' onChange={e => setLink(e.target.value)} placeholder='Empty'/>
                                     <label htmlFor='link'><Edit/></label>
                                 </div>

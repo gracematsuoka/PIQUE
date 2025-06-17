@@ -39,8 +39,12 @@
     margin-bottom: 10px;
 }
 
-.sub-btn button {
+.sub-btn  {
     border: none;
+    cursor: pointer;
+}
+
+.sub-btn label {
     cursor: pointer;
 }
 
@@ -57,5 +61,9 @@
     display: flex;
     width: 100%;
     justify-content: space-around;
+}
+
+#image-upload {
+    display: none
 }
 

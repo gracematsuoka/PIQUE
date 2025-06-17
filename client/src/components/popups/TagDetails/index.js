@@ -80,7 +80,7 @@ const TagDetails = forwardRef(({name, setTagDivs, setAddedTags, id, mongoId}, re
                 <p className='colorsP'>Colors</p>
                 {Object.entries(colors).map(([color, hex]) => (
                     <div className='sub-btn td-color-option' onClick={e => handleChangeColor(hex)}>
-                        <circle style={{backgroundColor: hex}}/>
+                        <div className='circle' style={{backgroundColor: hex}}/>
                         <p>{color}</p>
                     </div>
                 ))}

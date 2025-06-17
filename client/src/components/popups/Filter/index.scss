@@ -1,0 +1,71 @@
+.popup-container.filter {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    height: 65%;
+    width: 30%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    justify-content: flex-start;
+    align-items: flex-start;
+    cursor: default;
+}
+
+.popup-container.filter .close {
+    width: 100%;
+    position: relative;
+}
+
+.filter-choices {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 5px
+}
+
+.circle {
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+}
+
+.color-filter {
+    background-color: rgba(128, 128, 128, 0.114);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 7px 5px 7px;
+    border-radius: 50px;
+    cursor: pointer;
+}
+
+.color-filter:hover {
+    background-color: rgba(128, 128, 128, 0.2);;
+}
+
+.filter-title {
+    font-family: 'Publica Play Bold';
+    padding-left: 10px;
+    padding-bottom: 8px;
+    padding-top: 13px;
+}
+
+.popup-container.filter .tag p{
+    font-size: 15px;
+}
+
+.popup-container.filter .tag {
+    padding: 5px 10px 5px 10px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.check {
+    fill: black;
+    width: 15px;
+    height: 15px;
+}

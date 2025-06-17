@@ -153,7 +153,7 @@ hr {
 }
 
 .tag {
-    background-color: antiquewhite;
+    // background-color: antiquewhite;
     padding: 2px 12px 2px 12px;
     border-radius: 10px;
 }
@@ -173,17 +173,14 @@ hr {
 
 .dollar {
     font-size: 12px;
-    padding-left: 5px;
-    padding-right: 0;
-    margin: 0
-}
-
-.item-field.price {
-    margin: 0;
-    padding-left: 0;
 }
 
 .price-wrapper {
     display: flex;
     align-items: center;
+}
+
+.field-name {
+    width: 60px;
+    text-align: left;
 }

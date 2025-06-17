@@ -9,6 +9,20 @@ const AddItem = ({ onClose }) => {
     const [isFromDevice, setIsFromDevice] = useState(true);
     const [tab, setTab] = useState('upload');
 
+    const handleUpload = async (e) => {
+        const files = e.target.files;
+        const formData = new FormData();
+
+        for (let i = 0; i < files.length; i++) {
+            formData.append('files', files[i]);
+        }
+
+        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/images/upload-multiple`, {
+            method: 'POST',
+            body: formData
+        })
+    }
+
     return (
         <>
             <div className="popup-overlay"></div>
@@ -35,7 +49,8 @@ const AddItem = ({ onClose }) => {
                             <p className='or'>OR</p>
                             <button className='sub-btn'>
                                 <UploadIcon/>
-                                <p>Upload from device</p>
+                                <label htmlFor='image-upload'>Upload from device</label> */
+                                <input type='file' multiple id='image-upload' accept='image/*' onClick={handleUpload}/>
                             </button>
                         </div>
                     )}

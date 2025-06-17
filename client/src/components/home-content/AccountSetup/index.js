@@ -108,8 +108,7 @@ const AccountSetup = ({ mode }) => {
             <div className={isSetup ? 'auth-content' : ''}>
                 {isSetup && (
                     <>
-                        <div className='bg-text-large'>PIQUE</div>
-                        
+                        <div className='bg-text-large'>PIQUE</div>  
                     </>
                 )}
                 <div className='auth-title'>
