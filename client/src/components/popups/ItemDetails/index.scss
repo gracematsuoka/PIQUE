@@ -19,7 +19,7 @@ hr {
 } 
 
 .item-details img {
-    width: 120px
+    width: 145px
 }
 
 .basic-btn {
@@ -35,6 +35,7 @@ hr {
 
 .item-details .popup-content.bottom {
     flex-direction: row;
+    gap: 20px
 }
 
 .item-field-wrapper {
@@ -128,7 +129,7 @@ hr {
 }
 
 .edit-color-field svg {
-    padding-left: 67px
+    margin-left: 74px
 }
 
 .item-field.color {

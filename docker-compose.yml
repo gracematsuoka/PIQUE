@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  server:
+    build: 
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - python
+    environment:
+      - PYTHON_SERVICE_URL=http://python:5001
+    volumes:
+      - ./server:/app
+
+  python:
+    platform: linux/amd64
+    build: 
+      context: ./bgrem
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./bgrem:/app

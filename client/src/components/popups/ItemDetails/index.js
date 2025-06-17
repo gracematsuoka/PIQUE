@@ -3,16 +3,17 @@ import {ReactComponent as CloseIcon} from '../../../assets/images/icons/close.sv
 import {ReactComponent as Edit} from '../../../assets/images/icons/edit.svg'
 import {ReactComponent as Add} from '../../../assets/images/icons/add.svg'
 import {ReactComponent as Remove} from '../../../assets/images/icons/remove.svg'
-import blueTank from '../../../assets/images/home/bluetank.png'
 import AddTag from '../AddTag'
 import { useState, useEffect, useRef } from 'react'
 import { getAuth } from 'firebase/auth'
 
-const ItemDetails = ({ onClose }) => {
-    const [name, setName] = useState('Tank');
-    const [category, setCategory] = useState('tops');
-    const [brand, setBrand] = useState('Old Navy');
-    const [price, setPrice] = useState(20);
+const ItemDetails = ({ props }) => {
+    const {setShowAddPopup, setShowItemDetails, processedUrl, setProcessedUrl} = props;
+
+    const [name, setName] = useState('');
+    const [category, setCategory] = useState('');
+    const [brand, setBrand] = useState('');
+    const [price, setPrice] = useState();
     const [link, setLink] = useState('');
     const [colorDivs, setColorDivs] = useState([createColorDiv('none')]);
     const [showAddTag, setShowAddTag] = useState(false);
@@ -60,6 +61,7 @@ const ItemDetails = ({ onClose }) => {
 
     const handleSaveData = async () => {
         try {
+            // save tags to mongo
             const auth = getAuth();
             const token = await auth.currentUser.getIdToken();
             const tagsCreate = [];
@@ -93,6 +95,24 @@ const ItemDetails = ({ onClose }) => {
                     body: JSON.stringify({tags: tagsUpdate})
                 });
             }
+
+            // save image to cf
+            const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/get-upload-url`);
+            const {uploadURL} = await res.json();
+            const blob = await fetch(processedUrl).then(res => res.blob());
+
+            const formData = new FormData();
+            formData.append('file', blob);
+
+            const uploadRes = await fetch(uploadURL, {
+                method: 'POST',
+                body: formData
+            })
+
+            const data = await uploadRes.json();
+            
+
+            setShowItemDetails(false);
         } catch (err) {
             console.log('Failed to update/create tags:', err);
         }
@@ -176,25 +196,25 @@ const ItemDetails = ({ onClose }) => {
         const {h, s, l} = rgbToHsl(r, g, b);
 
         if (r === g && g === b) {
-            if (r < 30) return 'black';
-            if (r > 225) return 'white';
-            return 'grey';
+            if (r < 30) return 'Black';
+            if (r > 225) return 'White';
+            return 'Grey';
         }
 
         if (h >= 20 && h <= 60 && 
             s >= 5 && s <= 35 &&  
             l >= 70     
-        ) return 'beige';
+        ) return 'Beige';
 
         if (h >= 15 && h <= 45 && s > 30 && l < 50) return 'brown';
 
-        if (h < 15 || h >= 345) return 'red';
-        if (h < 45) return 'orange';
-        if (h < 70) return 'yellow';
-        if (h < 170) return 'green';
-        if (h < 250) return 'blue';
-        if (h < 290) return 'purple';
-        if (h < 345) return 'pink';
+        if (h < 15 || h >= 345) return 'Red';
+        if (h < 45) return 'Orange';
+        if (h < 70) return 'Yellow';
+        if (h < 170) return 'Green';
+        if (h < 250) return 'Blue';
+        if (h < 290) return 'Purple';
+        if (h < 345) return 'Pink';
 
         return 'multi-color';
     }
@@ -234,13 +254,13 @@ const ItemDetails = ({ onClose }) => {
                     <div className='popup-content'>
                         <div className='popup-header'>
                             <p className='popup-title'>ITEM DETAILS</p>
-                            <div className='close' onClick={onClose}>
+                            <div className='close' onClick={e => setShowItemDetails(false)}>
                                 <CloseIcon/>
                             </div>
                         </div>
                         <hr/>
                         <div className='popup-content bottom'>
-                            <img src={blueTank}/>
+                            <img src={processedUrl}/>
                             <div className='item-field-wrapper'>
                                 <div className='item-field'>
                                     <h1 className='field-name'>NAME</h1>

@@ -9,9 +9,11 @@ const app = express();
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 app.use(express.json());
 
-// Routes (example)
 const userRoutes = require("./routes/users");
 app.use("/api/users", userRoutes);
+
+const imageRoutes = require('./routes/images');
+app.use('/api/images', imageRoutes);
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {

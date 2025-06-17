@@ -18,6 +18,8 @@ const Closet = () => {
     const [showFilter, setShowFilter] = useState(false);
     const [tags, setTags] = useState([]);
     const [colors, setColors] = useState([]);
+    const [showItemDetails, setShowItemDetails] = useState(false);
+    const [processedUrl, setProcessedUrl] = useState('');
 
     const colorOptions = {
         Red: '#F35050',
@@ -77,6 +79,13 @@ const Closet = () => {
         setTags
     }
 
+    const popupProps = {
+        setShowAddPopup,
+        setShowItemDetails,
+        processedUrl,
+        setProcessedUrl
+    }
+
     return (
         <div className="closet">
             <TopBar/>
@@ -109,9 +118,9 @@ const Closet = () => {
                             <FilterIcon/>
                         </div>
                     </div>
-                    {showAddPopup && <AddItem onClose={toggleAddPopup}/>}
-                    {/* <ItemDetails/> */}
+                    {showAddPopup && <AddItem onClose={toggleAddPopup} props={popupProps}/>}
                     {showFilter && <Filter {...filterProps}/>}
+                    {showItemDetails && <ItemDetails props={popupProps}/>}
                 </div>
             </div>
             
