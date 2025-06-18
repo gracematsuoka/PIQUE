@@ -1,17 +1,17 @@
-.popup-container.add-tag.td {
+.popup-container.add-tag.tag-details {
     width: 90px;
     align-items: unset;
 }
 
-.popup-container.add-tag.td input {
+.popup-container.add-tag.tag-details input {
     width: 90%
 }
 
-.popup-container.add-tag.td .sub-btn {
+.popup-container.add-tag.tag-details .sub-btn {
     padding: 1px 4px 1px 4px
 }
 
-.popup-container.add-tag.td .sub-btn:hover {
+.popup-container.add-tag.tag-details .sub-btn:hover {
     background-color: rgba(0, 0, 0, 0.034);
 }
 
@@ -45,9 +45,6 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    // width: 90%;
-    // padding-left: 10px;
-    // padding-right: 10px;
 }
 
 .circle {

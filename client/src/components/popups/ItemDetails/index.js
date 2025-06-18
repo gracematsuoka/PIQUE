@@ -4,12 +4,11 @@ import {ReactComponent as Edit} from '../../../assets/images/icons/edit.svg'
 import {ReactComponent as Add} from '../../../assets/images/icons/add.svg'
 import {ReactComponent as Remove} from '../../../assets/images/icons/remove.svg'
 import AddTag from '../AddTag'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, use } from 'react'
 import { getAuth } from 'firebase/auth'
 
 const ItemDetails = ({ props }) => {
-    const {setShowAddPopup, setShowItemDetails, processedUrl, setProcessedUrl} = props;
-
+    const {setShowAddPopup, setShowItemDetails, processedUrl, setProcessedUrl, tab} = props;
     const [name, setName] = useState('');
     const [category, setCategory] = useState('');
     const [brand, setBrand] = useState('');
@@ -20,7 +19,6 @@ const ItemDetails = ({ props }) => {
     const [tagDivs, setTagDivs] = useState([]);
     const [addedTags, setAddedTags] = useState([]);
     const addTagRef = useRef(null);
-    const [tagsLoaded, setTagsLoaded] = useState(false);
 
     const addTagProps = {
         tagDivs,
@@ -52,7 +50,6 @@ const ItemDetails = ({ props }) => {
                     mongoId: tag._id,
                     updated: false
             }));
-            console.log('populated tags:', tags)
             setTagDivs(tags);
         } catch (err) {
             console.log('Failed to populate tags:', err);
@@ -60,8 +57,19 @@ const ItemDetails = ({ props }) => {
     }
 
     const handleSaveData = async () => {
+        await handleSaveTags();
+
+        // only runs if use is uploading image (aka doesn't already exist in database)
+        const imageURL = await handleSaveImage();
+        const itemId = await handleSaveItem(imageURL);
+
+        await handleSaveUserItem(itemId);
+        setShowItemDetails(false);
+    }
+
+    // save tags to mongo (for user)
+    const handleSaveTags = async () => {
         try {
-            // save tags to mongo
             const auth = getAuth();
             const token = await auth.currentUser.getIdToken();
             const tagsCreate = [];
@@ -95,9 +103,15 @@ const ItemDetails = ({ props }) => {
                     body: JSON.stringify({tags: tagsUpdate})
                 });
             }
+        } catch (err) {
+            console.log('Failed to update/create tags:', err);
+        }
+    }
 
-            // save image to cf
-            const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/get-upload-url`);
+    // save image to cf
+    const handleSaveImage = async () => {
+        try {
+            const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/images/get-upload-url`);
             const {uploadURL} = await res.json();
             const blob = await fetch(processedUrl).then(res => res.blob());
 
@@ -107,14 +121,88 @@ const ItemDetails = ({ props }) => {
             const uploadRes = await fetch(uploadURL, {
                 method: 'POST',
                 body: formData
-            })
+            });
 
             const data = await uploadRes.json();
-            
-
-            setShowItemDetails(false);
+            const imageId = data.result?.id;
+            const publicURL = `https://imagedelivery.net/${process.env.REACT_APP_CF_HASH}/${imageId}/public`;
+            return publicURL;
         } catch (err) {
-            console.log('Failed to update/create tags:', err);
+            console.log('Failed to save image to cf:', err);
+        }
+    }
+
+    // save item to general database
+    const handleSaveItem = async (imageURL) => {
+        try { 
+            const auth = getAuth();
+            const token = await auth.currentUser.getIdToken();
+            const colors = colorDivs.map(color => ({
+                color: color.colorGroup,
+                hex: color.color
+            }));
+
+            const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/items/create-item`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    imageURL,
+                    name, 
+                    colors,
+                    category,
+                    brand,
+                    price,
+                    link
+                })
+            });
+
+            const data = await res.json();
+            const itemId = data.item._id;
+            return itemId;
+        } catch (err) {
+            console.log('Failed to save item details to general database:', err);
+        }
+    }
+
+    // save item to user's "closet"
+    const handleSaveUserItem = async (itemId) => {
+        try { 
+            const auth = getAuth();
+            const token = await auth.currentUser.getIdToken();
+            const colors = colorDivs.map(color => ({
+                color: color.colorGroup,
+                hex: color.color
+            }));
+            const tags = addedTags.map(tag => ({
+                name: tag.content,
+                hex: tag.color,
+                key: tag.id
+            }))
+            console.log('itemId:', itemId)
+
+            const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user-items/create-item`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    name, 
+                    colors,
+                    category,
+                    brand,
+                    price,
+                    link,
+                    tags,
+                    itemId,
+                    tab
+                })
+            });
+        } catch (err) {
+            console.log('Failed to save item details to general database:', err);
         }
     }
 
@@ -247,6 +335,15 @@ const ItemDetails = ({ props }) => {
         return { h, s: s * 100, l: l * 100 };
     } 
 
+    const handleRemoveTag = (id) => {
+        setAddedTags(prev => prev
+            .map(div => 
+                    div.id === id ? {...div, showDetails: false} : div
+                )
+            .filter(div => div.id !== id)
+        )
+    }
+
     return (
         <div className='item-details'>
             <div className="popup-overlay"></div>
@@ -271,7 +368,7 @@ const ItemDetails = ({ props }) => {
                                     <h1 className='field-name'>COLOR</h1>
                                     <div className='edit-color-wrapper'>
                                         {colorDivs.map(colorDiv => (
-                                        <div className='edit-color-field'>
+                                        <div className='edit-color-field' key={colorDiv.id}>
                                             <div className='edit-color'>
                                                 <input type='color' id='colorPicker' className='color-input' value={colorDiv.color} onChange={e => handleCGChange(colorDiv.id, e.target.value)}/>
                                             </div>
@@ -310,6 +407,7 @@ const ItemDetails = ({ props }) => {
                                         {addedTags.map(div => 
                                                 <div className='tag' key={div.id} style={{backgroundColor: div.color}}>
                                                     <p>{div.content}</p>
+                                                    <CloseIcon onClick={e => handleRemoveTag(div.id)}/>
                                                 </div>
                                         )}
                                     </div>

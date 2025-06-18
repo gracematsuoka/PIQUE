@@ -154,9 +154,15 @@ hr {
 }
 
 .tag {
-    // background-color: antiquewhite;
-    padding: 2px 12px 2px 12px;
+    padding: 2px 8px 2px 8px;
     border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.tags-wrapper .tag svg {
+    width: 12px;
 }
 
 .add-tag {

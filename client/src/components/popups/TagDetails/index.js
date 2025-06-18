@@ -1,6 +1,6 @@
 import './index.scss';
 import {ReactComponent as Delete} from '../../../assets/images/icons/delete.svg'
-import { forwardRef, useState } from 'react';
+import React, { forwardRef, useEffect, useState, useRef } from 'react';
 import { getAuth } from 'firebase/auth';
 
 
@@ -66,7 +66,7 @@ const TagDetails = forwardRef(({name, setTagDivs, setAddedTags, id, mongoId}, re
     }
 
     return (
-        <div className='popup-container add-tag td' ref={ref}>
+        <div className='popup-container add-tag tag-details' ref={ref}>
             <input type='text' value={tagName} 
                 onChange={e => setTagName(e.target.value)}
                 onKeyDown={e => handleEditTagDiv(e)}
@@ -79,7 +79,7 @@ const TagDetails = forwardRef(({name, setTagDivs, setAddedTags, id, mongoId}, re
             <div className='td-color'>
                 <p className='colorsP'>Colors</p>
                 {Object.entries(colors).map(([color, hex]) => (
-                    <div className='sub-btn td-color-option' onClick={e => handleChangeColor(hex)}>
+                    <div className='sub-btn td-color-option' key={hex} onClick={e => handleChangeColor(hex)}>
                         <div className='circle' style={{backgroundColor: hex}}/>
                         <p>{color}</p>
                     </div>

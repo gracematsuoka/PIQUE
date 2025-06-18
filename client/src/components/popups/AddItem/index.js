@@ -6,11 +6,11 @@ import SearchBar from '../../reusable/SearchBar'
 import { useState, useEffect } from 'react'
 
 const AddItem = ({ onClose, props }) => {
-    const {setShowAddPopup, setShowItemDetails, processedUrl, setProcessedUrl} = props;
+    const {setShowAddPopup, setShowItemDetails, processedUrl, setProcessedUrl, tab} = props;
     const [isFromDevice, setIsFromDevice] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     const [filled, setFilled] = useState(0);
-    const [tab, setTab] = useState('upload');
+    const [addTab, setAddTab] = useState('upload');
 
     useEffect(() => {
         if(isLoading && filled < 100) {
@@ -55,13 +55,13 @@ const AddItem = ({ onClose, props }) => {
                         <p className='popup-title'>ADD ITEM TO CLOSET</p>
                     </div>
                     <div className='basic-nav popup'>
-                        <p className={tab === 'database' ? 'active' : ''} onClick={() => setTab('database')}>DATABASE</p>
-                        <p className={tab === 'upload' ? 'active' : ''} onClick={() => setTab('upload')}>FROM DEVICE</p>
+                        <p className={addTab === 'database' ? 'active' : ''} onClick={() => setAddTab('database')}>DATABASE</p>
+                        <p className={addTab === 'upload' ? 'active' : ''} onClick={() => setAddTab('upload')}>FROM DEVICE</p>
                     </div>
                     <hr/>
-                    {tab === 'database' && <SearchBar/>}
+                    {addTab === 'database' && <SearchBar/>}
 
-                    {tab === 'upload' && (
+                    {addTab === 'upload' && (
                         <div className='popup-content bottom'>
                             <ShirtIcon className='clothes-upload'/>
                             <p>Drag & drop photo here</p>

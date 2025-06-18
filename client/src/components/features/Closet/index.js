@@ -37,7 +37,6 @@ const Closet = () => {
     }
 
     const populateTags = async () => {
-        console.log('ran')
         const auth = getAuth();
         const token = await auth.currentUser.getIdToken();
 
@@ -65,7 +64,7 @@ const Closet = () => {
             hex: hex,
             checked: false
         })))
-    }, [])
+    }, [])  
 
     const toggleAddPopup = () => {
         setShowAddPopup(!showAddPopup);
@@ -83,7 +82,8 @@ const Closet = () => {
         setShowAddPopup,
         setShowItemDetails,
         processedUrl,
-        setProcessedUrl
+        setProcessedUrl,
+        tab
     }
 
     return (
@@ -119,7 +119,7 @@ const Closet = () => {
                         </div>
                     </div>
                     {showAddPopup && <AddItem onClose={toggleAddPopup} props={popupProps}/>}
-                    {showFilter && <Filter {...filterProps}/>}
+                    <Filter className={`popup-container filter ${showFilter ? 'open' : ''}`} {...filterProps}/>
                     {showItemDetails && <ItemDetails props={popupProps}/>}
                 </div>
             </div>

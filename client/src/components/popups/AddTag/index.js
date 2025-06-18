@@ -13,12 +13,16 @@ const AddTag = forwardRef((addTagProps, ref) => {
     useEffect(() => {
         const handleClickOutside = (e) => {
             setTagDivs(prev => prev.map(div => {
-                if (div.showDetails && detailsRefs.current[div.id] && !detailsRefs.current[div.id].contains(e.target) && moreRefs.current[div.id] && !moreRefs.current[div.id].contains(e.target)) {
+                if (div.showDetails && 
+                    detailsRefs.current[div.id] && 
+                    !detailsRefs.current[div.id].contains(e.target) && 
+                    moreRefs.current[div.id] && 
+                    !moreRefs.current[div.id].contains(e.target)) {
                     return {...div, showDetails: false};
                 }
                 return div;
             }))   
-        }
+        };
 
         document.addEventListener('mousedown', handleClickOutside);
 
@@ -39,9 +43,12 @@ const AddTag = forwardRef((addTagProps, ref) => {
     }
 
     const toggleDetails = (id) => {
-        setTagDivs(prev => prev.map(div => 
-            div.id === id ? {...div, showDetails: !div.showDetails} : div
-        ))
+        setTagDivs(prev => prev.map(div => {
+            if (div.id === id) {
+                return { ...div, showDetails: !div.showDetails };
+            }
+            return { ...div, showDetails: false };
+        }))
     }
 
     const handleKeyDown = (e) => {
@@ -70,14 +77,23 @@ const AddTag = forwardRef((addTagProps, ref) => {
             <div className='tag-detail-wrapper'>
                     {tagDivs.map(div => 
                         <div className='tag-detail' key={div.id}>
-                            <div className='sub-btn'>
-                                <div className='tag' onClick={e => {!tagAdded(div.id) && addTag(div)}} style={{backgroundColor: div.color}}>
+                            <div className='sub-btn' onClick={e => {!tagAdded(div.id) && addTag(div)}}>
+                                <div className='tag' style={{backgroundColor: div.color}}>
                                     <p>{div.content}</p>
                                 </div>
                             </div>
                             <div className='more-details'>
-                                <More onClick={e => toggleDetails(div.id)} ref={el => (moreRefs.current[div.id] = el)}/>
-                                {div.showDetails && <TagDetails className='tag-details' ref={el =>( detailsRefs.current[div.id] = el)} name={div.content} setTagDivs={setTagDivs} setAddedTags={setAddedTags} id={div.id} mongoId={div.mongoId}/>}
+                                <div onClick={e => toggleDetails(div.id)} ref={el => (moreRefs.current[div.id] = el)}>
+                                    <More/>
+                                </div>
+                                {div.showDetails && <TagDetails 
+                                                        className='tag-details' 
+                                                        ref={el => (detailsRefs.current[div.id] = el)} 
+                                                        name={div.content} setTagDivs={setTagDivs} 
+                                                        setAddedTags={setAddedTags} 
+                                                        id={div.id} 
+                                                        mongoId={div.mongoId}
+                                                        />}
                             </div>
                         </div>
                     )}

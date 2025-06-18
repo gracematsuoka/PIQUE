@@ -2,8 +2,7 @@ import './index.scss';
 import {ReactComponent as Close} from '../../../assets/images/icons/close.svg';
 import {ReactComponent as Check} from '../../../assets/images/icons/check.svg';
 
-const Filter = (props) => {
-    const {setShowFilter, colors, setColors, tags, setTags} = props
+const Filter = ({className, setShowFilter, colors, setColors, tags, setTags}) => {
 
     const toggleTagChecked = (key) => {
         setTags(prev => prev.map(tag => 
@@ -18,7 +17,7 @@ const Filter = (props) => {
     }
 
     return (
-        <div className="popup-container filter">
+        <div className={className}>
             <div className='close'>
                 <Close onClick={e => setShowFilter(false)}/>
             </div>
