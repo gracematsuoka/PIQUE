@@ -20,7 +20,7 @@ const TopBar = () => {
                 <img 
                     className='profile-pic' 
                     src={mongoUser?.profileURL || defaultProfilePic}
-                    onClick={togglePopup}
+                    onClick={() => togglePopup()}
                 />
                 {isPopupVisible && (
                     <ProfilePopup/>

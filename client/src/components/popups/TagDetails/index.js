@@ -4,7 +4,15 @@ import React, { forwardRef, useEffect, useState, useRef } from 'react';
 import { getAuth } from 'firebase/auth';
 
 
-const TagDetails = forwardRef(({name, setTagDivs, setAddedTags, id, mongoId}, ref) => {
+const TagDetails = forwardRef(({name, 
+                                setTagDivs, 
+                                setAddedTags, 
+                                id, 
+                                mongoId, 
+                                handlArrayChange,
+                                tagDivs,
+                                originalTags
+                            }, ref) => {
     const [tagName, setTagName] = useState(name);
 
     const colors = {
@@ -68,7 +76,9 @@ const TagDetails = forwardRef(({name, setTagDivs, setAddedTags, id, mongoId}, re
     return (
         <div className='popup-container add-tag tag-details' ref={ref}>
             <input type='text' value={tagName} 
-                onChange={e => setTagName(e.target.value)}
+                onChange={e => {
+                        setTagName(e.target.value);
+                    }}
                 onKeyDown={e => handleEditTagDiv(e)}
             />
             <div className='sub-btn td-delete' onClick={handleDeleteTag}>
@@ -79,7 +89,11 @@ const TagDetails = forwardRef(({name, setTagDivs, setAddedTags, id, mongoId}, re
             <div className='td-color'>
                 <p className='colorsP'>Colors</p>
                 {Object.entries(colors).map(([color, hex]) => (
-                    <div className='sub-btn td-color-option' key={hex} onClick={e => handleChangeColor(hex)}>
+                    <div className='sub-btn td-color-option' 
+                        key={hex} 
+                        onClick={e => {
+                                handleChangeColor(hex);
+                                }}>
                         <div className='circle' style={{backgroundColor: hex}}/>
                         <p>{color}</p>
                     </div>

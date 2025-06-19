@@ -2,8 +2,7 @@ const mongoose = require('mongoose');
 
 const TagSchema = new mongoose.Schema({
     name: String,
-    hex: String,
-    key: Number
+    hex: String
 })
 
 const UserSchema = new mongoose.Schema({

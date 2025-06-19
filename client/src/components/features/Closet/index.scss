@@ -23,11 +23,16 @@
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    position: absolute;
+    position: fixed;
     z-index: 3;
     right: 20px;
     bottom: 30px;
     cursor: pointer;
+}
+
+.add:hover {
+    outline: 4px solid rgba(128, 128, 128, 0.276);
+    transition: outline 0.2s ease-in-out;
 }
 
 .basic-nav.sub {

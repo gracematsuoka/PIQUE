@@ -4,8 +4,16 @@ import {ReactComponent as Add} from '../../../assets/images/icons/add.svg'
 import TagDetails from '../TagDetails';
 import { forwardRef, useState, useEffect, useRef } from 'react';
 
-const AddTag = forwardRef((addTagProps, ref) => {
-    const {tagDivs, setTagDivs, addedTags, setAddedTags, showAddTag, setShowAddTag} = addTagProps;
+const AddTag = forwardRef(({tagDivs, 
+                            setTagDivs, 
+                            addedTags, 
+                            setAddedTags, 
+                            showAddTag, 
+                            setShowAddTag, 
+                            handleArrayChange,
+                            setChangedField,
+                            originalTags
+                        },ref) => {
     const [tagName, setTagName] = useState('');
     const detailsRefs = useRef({});
     const moreRefs = useRef({});
@@ -77,7 +85,12 @@ const AddTag = forwardRef((addTagProps, ref) => {
             <div className='tag-detail-wrapper'>
                     {tagDivs.map(div => 
                         <div className='tag-detail' key={div.id}>
-                            <div className='sub-btn' onClick={e => {!tagAdded(div.id) && addTag(div)}}>
+                            <div className='sub-btn' 
+                                onClick={e => {
+                                    if(!tagAdded(div.id)) {
+                                    addTag(div) 
+                                    }}
+                                    }>
                                 <div className='tag' style={{backgroundColor: div.color}}>
                                     <p>{div.content}</p>
                                 </div>
@@ -89,17 +102,28 @@ const AddTag = forwardRef((addTagProps, ref) => {
                                 {div.showDetails && <TagDetails 
                                                         className='tag-details' 
                                                         ref={el => (detailsRefs.current[div.id] = el)} 
-                                                        name={div.content} setTagDivs={setTagDivs} 
+                                                        name={div.content} 
+                                                        setTagDivs={setTagDivs} 
                                                         setAddedTags={setAddedTags} 
                                                         id={div.id} 
                                                         mongoId={div.mongoId}
+                                                        handleArrayChange={handleArrayChange}
+                                                        tagDivs={tagDivs}
+                                                        originalTags={originalTags}
                                                         />}
                             </div>
                         </div>
                     )}
             </div>
             <div className='create-tag'>
-                <input type='text' placeholder='Create new tag' value={tagName} onKeyDown={e => handleKeyDown(e)} onChange={e => setTagName(e.target.value)}/>
+                <input 
+                    type='text' 
+                    placeholder='Create new tag' 
+                    value={tagName} 
+                    onKeyDown={e => handleKeyDown(e)} 
+                    onChange={e => {
+                            setTagName(e.target.value);
+                            }}/>
                 <Add onClick={e => {
                     const tagDiv = createTagDiv(tagName);
                     addDiv(tagDiv);

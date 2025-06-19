@@ -7,6 +7,7 @@ import SearchBar from "../../reusable/SearchBar"
 import AddItem from "../../popups/AddItem"
 import ItemDetails from "../../popups/ItemDetails"
 import Filter from "../../popups/Filter"
+import Items from "../../reusable/Items"
 import { useState, useEffect } from "react"
 import { getAuth } from 'firebase/auth'
 import {ReactComponent as FilterIcon} from '../../../assets/images/icons/filter.svg'
@@ -20,6 +21,8 @@ const Closet = () => {
     const [colors, setColors] = useState([]);
     const [showItemDetails, setShowItemDetails] = useState(false);
     const [processedUrl, setProcessedUrl] = useState('');
+    const [reloadItems, setReloadItems] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
 
     const colorOptions = {
         Red: '#F35050',
@@ -70,6 +73,11 @@ const Closet = () => {
         setShowAddPopup(!showAddPopup);
     }
 
+    const handleCloseDetails = () => {
+        setSelectedItem(null);
+
+    }
+
     const filterProps = {
         setShowFilter,
         colors,
@@ -83,7 +91,8 @@ const Closet = () => {
         setShowItemDetails,
         processedUrl,
         setProcessedUrl,
-        tab
+        tab,
+        setReloadItems
     }
 
     return (
@@ -118,9 +127,30 @@ const Closet = () => {
                             <FilterIcon/>
                         </div>
                     </div>
+                    <Items reload={reloadItems}
+                            onSelectItem={(item) => {
+                                setSelectedItem(item);
+                                setShowItemDetails(true);
+                            }}/>
                     {showAddPopup && <AddItem onClose={toggleAddPopup} props={popupProps}/>}
                     <Filter className={`popup-container filter ${showFilter ? 'open' : ''}`} {...filterProps}/>
-                    {showItemDetails && <ItemDetails props={popupProps}/>}
+                    {showItemDetails && <ItemDetails 
+                                            mode='create' 
+                                            setShowItemDetails={setShowItemDetails}
+                                            processedUrl={processedUrl}
+                                            tab={tab}
+                                            setReloadItems={setReloadItems}
+                                            />}
+                    {showItemDetails && selectedItem && 
+                                        <ItemDetails 
+                                            mode='edit' 
+                                            setShowItemDetails={setShowItemDetails}
+                                            tab={tab}
+                                            processedUrl={selectedItem.itemRef?.imageURL}
+                                            setReloadItems={setReloadItems}
+                                            selectedItem={selectedItem}
+                                            onClose={handleCloseDetails}
+                                            />}
                 </div>
             </div>
             

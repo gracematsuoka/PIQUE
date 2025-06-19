@@ -25,7 +25,7 @@ hr {
 .basic-btn {
     border-radius: 100px;
     border: none;
-    padding: 5px 20px 5px 20px;
+    padding: 5px 10px 5px 10px;
     cursor: pointer;
 }
 
@@ -48,7 +48,8 @@ hr {
     display: flex;
     align-items: center;
     gap: 10px;
-    width: 100%
+    width: 320px;
+    position: relative;
 }
 
 .item-field input {
@@ -56,6 +57,18 @@ hr {
     border: none;
     border-radius: 5px;
     padding: 4px;
+    width: 65%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.item-field a {
+    font-size: 13px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 65%
 }
 
 .item-field select {
@@ -190,4 +203,9 @@ hr {
 .field-name {
     width: 60px;
     text-align: left;
+}
+
+.buttons {
+    display: flex;
+    gap: 5px
 }

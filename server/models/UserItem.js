@@ -8,12 +8,11 @@ const ColorSchema = new mongoose.Schema({
 const TagSchema = new mongoose.Schema({
     name: String,
     hex: String,
-    key: Number
 })
 
 const UserItem = new mongoose.Schema({
-    ownerId: mongoose.Types.ObjectId,
-    itemId: mongoose.Types.ObjectId,
+    ownerId: mongoose.Types.ObjectId, // user's copy (not original owner)
+    itemRef: {type: mongoose.Types.ObjectId, ref: 'Item'}, 
     name: String, 
     colors: [ColorSchema],
     category: String,

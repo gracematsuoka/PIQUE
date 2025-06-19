@@ -7,26 +7,116 @@ import AddTag from '../AddTag'
 import { useState, useEffect, useRef, use } from 'react'
 import { getAuth } from 'firebase/auth'
 
-const ItemDetails = ({ props }) => {
-    const {setShowAddPopup, setShowItemDetails, processedUrl, setProcessedUrl, tab} = props;
+const ItemDetails = ({ mode, 
+                    setShowItemDetails,
+                    processedUrl,
+                    tab,
+                    setReloadItems,
+                    selectedItem }) => {
     const [name, setName] = useState('');
     const [category, setCategory] = useState('');
     const [brand, setBrand] = useState('');
-    const [price, setPrice] = useState();
+    const [price, setPrice] = useState('');
     const [link, setLink] = useState('');
     const [colorDivs, setColorDivs] = useState([createColorDiv('none')]);
     const [showAddTag, setShowAddTag] = useState(false);
     const [tagDivs, setTagDivs] = useState([]);
     const [addedTags, setAddedTags] = useState([]);
     const addTagRef = useRef(null);
+    const editLinkRef = useRef(null);
+    const linkInputRef = useRef(null);
+    const [originalField, setOriginalField] = useState(null);
+    const [changedField, setChangedField] = useState({});
+    const [editLink, setEditLink] = useState(false);
 
-    const addTagProps = {
-        tagDivs,
-        setTagDivs,
-        addedTags,
-        setAddedTags,
-        showAddTag,
-        setShowAddTag
+    useEffect(() => {
+        if (mode === 'edit' && selectedItem) {
+            setName(selectedItem.name);
+            setCategory(selectedItem.category);
+            setBrand(selectedItem.brand);
+            setPrice(selectedItem.price);
+            setLink(selectedItem.link);
+            setColorDivs(selectedItem.colors.map((color, index) => ({
+                id: color._id,
+                colorGroup: color.color,
+                color: color.hex,
+                displayRem: index === 0 ? 'none' : ''
+            })));
+            setOriginalField(selectedItem);
+            setAddedTags(selectedItem.tags.map(tag => ({
+                id: tag.id,
+                content: tag.name,
+                color: tag.hex,
+                showDetails: false,
+                mongoId: tag.id,
+                updated: false
+            })));
+        }
+
+    }, [mode, selectedItem])
+
+    useEffect(() => {
+        if (originalField?.colors) {
+        handleArrayChange(
+            originalField.colors.map(color => ({
+                color: color.colorGroup,
+                hex: color.color
+            })), 
+            colorDivs.map(colorDiv => ({
+                color: colorDiv.colorGroup,
+                hex: colorDiv.color
+            })), 
+            'colors');
+        }
+    }, [colorDivs]);
+
+    useEffect(() => {
+        if (originalField?.tags) {
+            handleArrayChange(
+                originalField.tags.map(tag => ({
+                    name: tag.content,
+                    hex: tag.color
+                })), 
+                addedTags.map(tag => ({
+                    name: tag.content,
+                    hex: tag.color
+                })), 
+                'tags');
+        }
+    }, [addedTags]);
+
+    const handleChange = (field, value) => {
+        console.log('original:', originalField)
+        if (originalField[field] !== value) {
+            setChangedField(prev => ({...prev, [field]: value}))
+        } else {
+            setChangedField(prev => {
+            const fieldCopy = {...prev};
+            delete fieldCopy[field];
+            return fieldCopy;
+            })
+        }
+        console.log('field changed:', changedField)
+    }
+
+    const handleArrayChange = (originalArray, changedArray, field) => {
+        if (!arraysEqual(originalArray, changedArray)) {
+            setChangedField(prev => ({...prev, [field]: changedArray}))
+        } else {
+            setChangedField(prev => {
+                const fieldCopy = {...prev};
+                delete fieldCopy[field];
+                return fieldCopy;
+            })
+        }
+        console.log('array changed:', changedField)
+    }
+
+    const arraysEqual = (a, b) => {
+        if (a.length !== b.length) return false;
+        return a.every((item, i) => 
+            JSON.stringify(item) === JSON.stringify(b[i])
+        )
     }
 
     const handlePopulateTags = async () => {
@@ -43,11 +133,10 @@ const ItemDetails = ({ props }) => {
 
             const data = await res.json();
             const tags = data.tags.map(tag => ({
-                    id: tag.key,
+                    id: tag._id,
                     content: tag.name,
                     color: tag.hex,
                     showDetails: false,
-                    mongoId: tag._id,
                     updated: false
             }));
             setTagDivs(tags);
@@ -56,15 +145,41 @@ const ItemDetails = ({ props }) => {
         }
     }
 
-    const handleSaveData = async () => {
+    const handleCreateItem = async (selectedTab) => {
         await handleSaveTags();
 
-        // only runs if use is uploading image (aka doesn't already exist in database)
         const imageURL = await handleSaveImage();
-        const itemId = await handleSaveItem(imageURL);
+        const itemRef = await handleSaveItem(imageURL);
 
-        await handleSaveUserItem(itemId);
+        await handleSaveUserItem(itemRef, selectedTab);
+
         setShowItemDetails(false);
+        setReloadItems(prev => !prev);
+    }
+
+    const handleSaveChanges = async () => {
+        await handleSaveTags();
+
+        if (Object.keys(changedField).length > 0) {
+            try {
+                const auth = getAuth();
+                const token = await auth.currentUser.getIdToken();
+
+                await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user-items/update-item/${selectedItem._id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(changedField)
+                })
+
+                setShowItemDetails(false);
+                setReloadItems(prev => !prev);
+            } catch (err) {
+                console.log('Failed to save updates:', err);
+            }
+        }
     }
 
     // save tags to mongo (for user)
@@ -75,10 +190,10 @@ const ItemDetails = ({ props }) => {
             const tagsCreate = [];
             const tagsUpdate = [];
             tagDivs.map(div => {
-                if (div.mongoId && div.updated) {
-                    tagsUpdate.push({name: div.content, hex: div.color, mongoId: div.mongoId});
-                } else if (!div.mongoId) {
-                    tagsCreate.push({name: div.content, hex: div.color, key: div.id});
+                if (div.id && div.updated) {
+                    tagsUpdate.push({name: div.content, hex: div.color});
+                } else if (!div.id) {
+                    tagsCreate.push({name: div.content, hex: div.color});
                 }
             })
 
@@ -142,6 +257,8 @@ const ItemDetails = ({ props }) => {
                 hex: color.color
             }));
 
+            const numPrice = price === '' ? null : parseFloat(price);
+
             const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/items/create-item`, {
                 method: 'POST',
                 headers: {
@@ -154,21 +271,21 @@ const ItemDetails = ({ props }) => {
                     colors,
                     category,
                     brand,
-                    price,
+                    price: numPrice,
                     link
                 })
             });
 
             const data = await res.json();
-            const itemId = data.item._id;
-            return itemId;
+            const itemRef = data.item._id;
+            return itemRef;
         } catch (err) {
             console.log('Failed to save item details to general database:', err);
         }
     }
 
     // save item to user's "closet"
-    const handleSaveUserItem = async (itemId) => {
+    const handleSaveUserItem = async (itemRef, selectedTab) => {
         try { 
             const auth = getAuth();
             const token = await auth.currentUser.getIdToken();
@@ -178,10 +295,10 @@ const ItemDetails = ({ props }) => {
             }));
             const tags = addedTags.map(tag => ({
                 name: tag.content,
-                hex: tag.color,
-                key: tag.id
+                hex: tag.color
             }))
-            console.log('itemId:', itemId)
+
+            const numPrice = price === '' ? null : parseFloat(price);
 
             const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user-items/create-item`, {
                 method: 'POST',
@@ -194,11 +311,11 @@ const ItemDetails = ({ props }) => {
                     colors,
                     category,
                     brand,
-                    price,
+                    price: numPrice,
                     link,
                     tags,
-                    itemId,
-                    tab
+                    itemRef,
+                    tab: selectedTab
                 })
             });
         } catch (err) {
@@ -210,6 +327,13 @@ const ItemDetails = ({ props }) => {
         const handleClickOutside = (e) => {
             if (addTagRef.current && !addTagRef.current.contains(e.target)){
                 setShowAddTag(false);
+            }
+            if (editLinkRef.current && 
+                !editLinkRef.current.contains(e.target) &&
+                linkInputRef.current &&
+                !linkInputRef.current.contains(e.target)
+            ) {
+                setEditLink(false);
             }
         }
 
@@ -357,12 +481,19 @@ const ItemDetails = ({ props }) => {
                         </div>
                         <hr/>
                         <div className='popup-content bottom'>
-                            <img src={processedUrl}/>
+                            <img src={processedUrl || null}/>
                             <div className='item-field-wrapper'>
                                 <div className='item-field'>
                                     <h1 className='field-name'>NAME</h1>
-                                    <input type='text' value={name} id='name' onChange={e => setName(e.target.value)} placeholder='Empty'/>
-                                    <label htmlFor='name'><Edit/></label>
+                                    <input type='text' 
+                                            value={name}
+                                            id='name' 
+                                            onChange={e => {
+                                                    setName(e.target.value);
+                                                    mode === 'edit' && handleChange('name', e.target.value);
+                                                    }}
+                                            placeholder='Empty'/>
+                                    <label className='right-icon' htmlFor='name'><Edit/></label>
                                 </div>
                                 <div className='item-field color'>
                                     <h1 className='field-name'>COLOR</h1>
@@ -370,22 +501,45 @@ const ItemDetails = ({ props }) => {
                                         {colorDivs.map(colorDiv => (
                                         <div className='edit-color-field' key={colorDiv.id}>
                                             <div className='edit-color'>
-                                                <input type='color' id='colorPicker' className='color-input' value={colorDiv.color} onChange={e => handleCGChange(colorDiv.id, e.target.value)}/>
+                                                <input type='color' 
+                                                        id='colorPicker' 
+                                                        className='color-input' 
+                                                        value={colorDiv.color} 
+                                                        onChange={e => {
+                                                            handleCGChange(colorDiv.id, e.target.value);
+                                                            }}/>
                                             </div>
-                                            <select name='colors' id='colorGroup' value={colorDiv.colorGroup} onChange={e => handleCPChange(colorDiv.id, e.target.value)}>
+                                            <select name='colors' 
+                                                    id='colorGroup' 
+                                                    value={colorDiv.colorGroup} 
+                                                    onChange={e => {
+                                                            handleCPChange(colorDiv.id, e.target.value);
+                                                            }}>
                                                 {Object.keys(colorOptions).map(color => 
                                                     <option value={color}>{color}</option>
                                                 )}
                                             </select>
-                                            <Remove style={{display: colorDiv.displayRem}} onClick={e => handleDeleteColorDiv(colorDiv.id)}/>
+                                            <Remove style={{display: colorDiv.displayRem}} 
+                                                    onClick={e => {
+                                                        handleDeleteColorDiv(colorDiv.id);
+                                                        }}/>
                                         </div>
                                         ))}
                                     </div>
-                                    <Add className='right-icon' onClick={addColorDiv}/>
+                                    <Add className='right-icon' 
+                                        onClick={e => {
+                                            addColorDiv();
+                                        }}
+                                    />
                                 </div>
                                 <div className='item-field category'>
                                     <h1 className='field-name'>CATEG.</h1>
-                                    <select name='category' value={category} onChange={e => setCategory(e.target.value)}>
+                                    <select name='category' 
+                                            value={category} 
+                                            onChange={e => {
+                                                    setCategory(e.target.value);
+                                                    mode === 'edit' && handleChange('category', e.target.value);
+                                                    }}>
                                         <option value='tops'>Tops</option>
                                         <option value='bottoms'>Bottoms</option>
                                         <option value='outerwear'>Outerwear</option>
@@ -398,8 +552,15 @@ const ItemDetails = ({ props }) => {
                                 </div>
                                 <div className='item-field'>
                                     <h1 className='field-name'>BRAND</h1>
-                                    <input type='text' value={brand} id='brand' onChange={e => setBrand(e.target.value)} placeholder='Empty'/>
-                                    <label htmlFor='brand'><Edit/></label>
+                                    <input type='text' 
+                                            value={brand} 
+                                            id='brand' 
+                                            placeholder='Empty'
+                                            onChange={e => {
+                                                    setBrand(e.target.value);
+                                                    mode === 'edit' && handleChange('brand', e.target.value);
+                                                    }}/>
+                                    <label className='right-icon' htmlFor='brand'><Edit/></label>
                                 </div>
                                 <div className='item-field tags'>
                                     <h1 className='field-name'>TAGS</h1>
@@ -413,7 +574,15 @@ const ItemDetails = ({ props }) => {
                                     </div>
                                     {showAddTag && <AddTag 
                                                         className='add-tag' 
-                                                        {...addTagProps}
+                                                        tagDivs={tagDivs}
+                                                        setTagDivs={setTagDivs}
+                                                        addedTags={addedTags}
+                                                        setAddedTags={setAddedTags}
+                                                        showAddTag={showAddTag}
+                                                        setShowAddTag={setShowAddTag}
+                                                        handleArrayChange={handleArrayChange}
+                                                        setChangedField={setChangedField}
+                                                        originalTags={originalField.tags}
                                                         ref={addTagRef}
                                                     />}
                                     {!showAddTag && <Add className='right-icon' onClick={e => {
@@ -425,18 +594,50 @@ const ItemDetails = ({ props }) => {
                                     <h1 className='field-name'>PRICE</h1>
                                     <div className='price-wrapper'>
                                         <p className='dollar'>$</p>
-                                        <input type='number' value={price} id='price' onChange={e => setPrice(e.target.value)} placeholder='0.00'/>
-                                        <label htmlFor='price'><Edit/></label>
+                                        <input type='number' 
+                                                value={price} 
+                                                ref={linkInputRef}
+                                                id='price' 
+                                                placeholder='0.00'
+                                                onChange={e => {
+                                                        setPrice(e.target.value);
+                                                        mode === 'edit' && handleChange('price', e.target.value);
+                                                        }}/>
+                                        <label className='right-icon' htmlFor='price'><Edit/></label>
                                     </div>
                                 </div>
                                 <div className='item-field'>
                                     <h1 className='field-name'>LINK</h1>
-                                    <input type='url' value={link} id='link' onChange={e => setLink(e.target.value)} placeholder='Empty'/>
-                                    <label htmlFor='link'><Edit/></label>
+                                    {editLink && <input type='url' 
+                                            value={link} 
+                                            id='link' 
+                                            placeholder='Empty'
+                                            onChange={e => {
+                                                setLink(e.target.value);
+                                                mode === 'edit' && handleChange('link', e.target.value);
+                                            }}/>}
+                                    {!editLink && <a href={link}
+                                                     target="_blank"
+                                                     rel="noopener noreferrer"
+                                                     onClick={(e) => {
+                                                       if (!link) e.preventDefault(); 
+                                                     }}>{link}</a>
+                                    }
+                                    <label htmlFor='link' ref={editLinkRef} className='right-icon' onClick={() => setEditLink(true)}><Edit/></label>
                                 </div>
                             </div>
                         </div>
-                        <button className='basic-btn' onClick={handleSaveData}>Save</button>
+                        {mode === 'create' && 
+                            <div className='buttons'>
+                                <button className='basic-btn' onClick={() => handleCreateItem('closet')} style={{backgroundColor: '#6B799F', color: '#ffffff'}}>Save to Closet</button>
+                                <button className='basic-btn' onClick={() => handleCreateItem('wishlist')}>Save to Wishlist</button>
+                            </div>
+                        }
+                        {mode === 'edit' &&
+                            <>
+                                <button className='basic-btn' onClick={() => handleSaveChanges()}>Save Changes</button>
+                            </>
+                        }
                 </div>
             </div>
         </div>
