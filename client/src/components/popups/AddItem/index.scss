@@ -30,9 +30,9 @@
 }
 
 .clothes-upload {
-    fill: $light-blue;
+    fill: #3D4D66;
     fill-opacity: 0.7;
-    background-color: #3d4d6620;
+    background-color: #C0C5CD;
     padding: 15px;
     width: 80px;
     border-radius: 50%;
@@ -82,4 +82,23 @@
     border-radius: 10px;
     background-color: #6B799F;
     transition: width 0.5s ease;
+}
+
+.active-drag {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #6b799fb5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    border-radius: 20px;
+    
+    h1 {
+      color: white;
+      font-size: 2rem;
+    }
 }

@@ -1,16 +1,24 @@
 import './index.scss'
-import {ReactComponent as BackIcon} from '../../../assets/images/icons/back.svg'
-import {ReactComponent as ShirtIcon} from '../../../assets/images/icons/shirt.svg'
-import {ReactComponent as UploadIcon} from '../../../assets/images/icons/upload.svg'
-import SearchBar from '../../reusable/SearchBar'
-import { useState, useEffect } from 'react'
+import {ReactComponent as BackIcon} from '../../../assets/images/icons/back.svg';
+import {ReactComponent as ShirtIcon} from '../../../assets/images/icons/shirt.svg';
+import {ReactComponent as UploadIcon} from '../../../assets/images/icons/upload.svg';
+import SearchBar from '../../reusable/SearchBar';
+import { useState, useEffect, useCallback } from 'react';
+import { useDropzone } from 'react-dropzone';
 
-const AddItem = ({ onClose, props }) => {
-    const {setShowAddPopup, setShowItemDetails, processedUrl, setProcessedUrl, tab} = props;
+const AddItem = ({onClose, 
+                    setShowAddPopup, 
+                    setShowItemDetails, 
+                    processedUrl, 
+                    setProcessedUrl, 
+                    tab
+                    }) => {
     const [isFromDevice, setIsFromDevice] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     const [filled, setFilled] = useState(0);
     const [addTab, setAddTab] = useState('upload');
+    const [error, setError] = useState('');
+    const maxSize = 10 * 1024 * 1024;
 
     useEffect(() => {
         if(isLoading && filled < 100) {
@@ -18,8 +26,7 @@ const AddItem = ({ onClose, props }) => {
         }
     }, [filled, isLoading])
 
-    const handleUpload = async (e) => {
-        const image = e.target.files[0];
+    const processFile = async (image) => {
         const formData = new FormData();
         formData.append('image', image);
 
@@ -42,46 +49,104 @@ const AddItem = ({ onClose, props }) => {
         }
     }
 
+    const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
+        setError('');
+
+        if (rejectedFiles.length > 0) {
+            setError('Image must be under 10 MB and with the allowed file type (.png, .jpg, .jpeg)');
+            console.log('error')
+            return;
+        }
+        if (acceptedFiles.length > 0) {
+            processFile(acceptedFiles[0]);
+        }
+    }, [processFile])
+    
+    const {getRootProps, getInputProps, isDragActive, fileRejections} = useDropzone({
+        accept: {
+            'image/*': ['.png', '.jpg', '.jpeg']
+        },
+        maxSize: maxSize,
+        onDrop,
+        noClick: true,
+        multiple: false
+    })
+
+    const handleUpload = async (e) => {
+        const image = e.target.files[0];
+
+        if (!image) return;
+
+        setError('');
+
+        if (image.size > maxSize) {
+            setError('Image must be under 10 MB');
+            return;
+        }
+
+        const fileType = image.type;
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+
+        if (!allowedTypes.includes(fileType)) {
+            setError('Please upload an image with the allowed file type');
+            return;
+        }
+
+        processFile(image);
+    }
+
     return (
             <>
-            <div className="popup-overlay"></div>
-            <div className="popup-container overlay">
-            {!isLoading &&  
-                <div className='popup-content'>
-                    <div className='popup-header'>
-                        <div className='back' onClick={onClose}>
-                            <BackIcon/>
+            <div {...getRootProps()} style={{ width: '100%', height: '100%' }}>
+                <div className="popup-overlay"></div>
+                <div className="popup-container overlay">
+                {!isLoading &&  
+                    <div className='popup-content'>
+                        <div className='popup-header'>
+                            <div className='back' onClick={onClose}>
+                                <BackIcon/>
+                            </div>
+                            <p className='popup-title'>ADD ITEM TO CLOSET</p>
                         </div>
-                        <p className='popup-title'>ADD ITEM TO CLOSET</p>
-                    </div>
-                    <div className='basic-nav popup'>
-                        <p className={addTab === 'database' ? 'active' : ''} onClick={() => setAddTab('database')}>DATABASE</p>
-                        <p className={addTab === 'upload' ? 'active' : ''} onClick={() => setAddTab('upload')}>FROM DEVICE</p>
-                    </div>
-                    <hr/>
-                    {addTab === 'database' && <SearchBar/>}
-
-                    {addTab === 'upload' && (
-                        <div className='popup-content bottom'>
-                            <ShirtIcon className='clothes-upload'/>
-                            <p>Drag & drop photo here</p>
-                            <p className='or'>OR</p>
-                            <button className='sub-btn'>
-                                <UploadIcon/>
-                                <label htmlFor='image-upload'>Upload from device</label>
-                                <input type='file' multiple id='image-upload' accept='image/*' onChange={handleUpload}/>
-                            </button>
+                        <div className='basic-nav popup'>
+                            <p className={addTab === 'database' ? 'active' : ''} onClick={() => setAddTab('database')}>DATABASE</p>
+                            <p className={addTab === 'upload' ? 'active' : ''} onClick={() => setAddTab('upload')}>FROM DEVICE</p>
                         </div>
-                    )}
-                </div>}
+                        <hr/>
+                        {addTab === 'database' && <SearchBar/>}
 
-            {isLoading && 
-                <div className='loading'>
-                    <div className='progress-bar' style={{width: `${filled}%`}}/>
-                    <p>Removing image background...</p>
+                        {addTab === 'upload' && (
+                            <div className='popup-content bottom'>
+                                <ShirtIcon className='clothes-upload'/>
+                                {error && <p className='error'>{error}</p> }
+                                <p>Drag & drop photo here</p>
+                                <p className='or'>OR</p>
+                                <button className='sub-btn'>
+                                    <UploadIcon/>
+                                    <label htmlFor='image-upload'>Upload from device</label>
+                                    <input type='file' multiple id='image-upload' accept='image/*' onChange={handleUpload}/>
+                                </button>
+                                <p className='or'>accepts any: .png, .jpg, .jpeg</p>
+                            </div>
+                        )}  
+                        <input {...getInputProps()} />
+                    </div>
+                }
+
+                {isLoading && 
+                    <div className='loading'>
+                        <div className='progress-bar' style={{width: `${filled}%`}}/>
+                        <p>Removing background from image...</p>
+                    </div>
+                }
+                {!isLoading && isDragActive && 
+                    <div className='active-drag'>
+                        <h1>Drop image</h1>
+                    </div>
+                }
                 </div>
-            }
             </div>
+            
             </>
     )
 }

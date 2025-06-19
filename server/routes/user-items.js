@@ -27,8 +27,7 @@ router.post('/create-item', authenticateUser, async (req, res) => {
 router.get('/get-closet', authenticateUser, async (req, res) => {
     const { mongoId } = req.user;
 
-    // const items = await UserItem.find({ownerId: mongoId, tab: 'closet'});
-    const items = await UserItem.find({ownerId: mongoId, tab: 'closet'}).populate('itemRef');
+    const items = await UserItem.find({ownerId: mongoId, tab: 'closet'}).populate('itemRef', 'imageURL');
 
     res.status(200).json({message: 'Closet items retrieved', items})
 })

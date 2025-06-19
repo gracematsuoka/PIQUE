@@ -16,9 +16,11 @@
     flex-direction: column;
     width: 100vw;
     gap: 20px;
-    margin-top: 20px;
-    margin-left: 120px;
-    margin-right: 50px;
+    padding-top: 80px;
+    padding-left: 120px;
+    padding-right: 50px;
+    // z-index: 0;
+    box-sizing: border-box;
     // background-color: antiquewhite;
 }
 

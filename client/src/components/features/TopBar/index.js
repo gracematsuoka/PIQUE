@@ -22,9 +22,9 @@ const TopBar = () => {
                     src={mongoUser?.profileURL || defaultProfilePic}
                     onClick={() => togglePopup()}
                 />
-                {isPopupVisible && (
+                {isPopupVisible && 
                     <ProfilePopup/>
-                )}
+                    }
             </div>
         </div>
     )

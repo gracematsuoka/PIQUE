@@ -34,7 +34,7 @@ const Auth = ({ mode }) => {
             setError('');
             setLoading(true);
             if (isLogin) {
-                login(email, password);
+                await login(email, password);
             } else {
                 await signup(email, password);
                 

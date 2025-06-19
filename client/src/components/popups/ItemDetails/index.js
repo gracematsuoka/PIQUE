@@ -7,12 +7,15 @@ import AddTag from '../AddTag'
 import { useState, useEffect, useRef, use } from 'react'
 import { getAuth } from 'firebase/auth'
 
+
 const ItemDetails = ({ mode, 
                     setShowItemDetails,
                     processedUrl,
                     tab,
                     setReloadItems,
-                    selectedItem }) => {
+                    selectedItem,
+                    setLoading
+                 }) => {
     const [name, setName] = useState('');
     const [category, setCategory] = useState('');
     const [brand, setBrand] = useState('');
@@ -146,18 +149,35 @@ const ItemDetails = ({ mode,
     }
 
     const handleCreateItem = async (selectedTab) => {
-        await handleSaveTags();
-
-        const imageURL = await handleSaveImage();
-        const itemRef = await handleSaveItem(imageURL);
-
-        await handleSaveUserItem(itemRef, selectedTab);
-
+        setLoading(true);
         setShowItemDetails(false);
-        setReloadItems(prev => !prev);
+        window.onbeforeunload = () => 'Saving in progress…';
+
+        try {
+            const auth = getAuth();
+            const token = await auth.currentUser.getIdToken();
+            const tagsPromise = handleSaveTags(token);
+            const imageURLPromise = handleSaveImage();
+
+            await tagsPromise;
+            const imageURL = await imageURLPromise;
+            const itemRef = await handleSaveItem(imageURL, token);
+
+            await handleSaveUserItem(itemRef, selectedTab, token);
+        } catch (err) {
+            console.log('Error saving item:', err);
+        } finally {
+            setLoading(false);
+            window.onbeforeunload = null;
+            setReloadItems(prev => !prev);
+        }
     }
 
     const handleSaveChanges = async () => {
+        setLoading(true);
+        setShowItemDetails(false);
+        window.onbeforeunload = () => 'Saving in progress…';
+
         await handleSaveTags();
 
         if (Object.keys(changedField).length > 0) {
@@ -173,20 +193,19 @@ const ItemDetails = ({ mode,
                     },
                     body: JSON.stringify(changedField)
                 })
-
-                setShowItemDetails(false);
-                setReloadItems(prev => !prev);
             } catch (err) {
                 console.log('Failed to save updates:', err);
+            } finally {
+                setLoading(false);
+                window.onbeforeunload = null;
+                setReloadItems(prev => !prev);
             }
         }
     }
 
     // save tags to mongo (for user)
-    const handleSaveTags = async () => {
+    const handleSaveTags = async (token) => {
         try {
-            const auth = getAuth();
-            const token = await auth.currentUser.getIdToken();
             const tagsCreate = [];
             const tagsUpdate = [];
             tagDivs.map(div => {
@@ -248,10 +267,8 @@ const ItemDetails = ({ mode,
     }
 
     // save item to general database
-    const handleSaveItem = async (imageURL) => {
+    const handleSaveItem = async (imageURL, token) => {
         try { 
-            const auth = getAuth();
-            const token = await auth.currentUser.getIdToken();
             const colors = colorDivs.map(color => ({
                 color: color.colorGroup,
                 hex: color.color
@@ -285,10 +302,8 @@ const ItemDetails = ({ mode,
     }
 
     // save item to user's "closet"
-    const handleSaveUserItem = async (itemRef, selectedTab) => {
+    const handleSaveUserItem = async (itemRef, selectedTab, token) => {
         try { 
-            const auth = getAuth();
-            const token = await auth.currentUser.getIdToken();
             const colors = colorDivs.map(color => ({
                 color: color.colorGroup,
                 hex: color.color

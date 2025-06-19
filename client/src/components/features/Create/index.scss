@@ -1,0 +1,117 @@
+@import '../../../variables';
+
+.create .nav-content .nav-content-wrapper {
+    width: 100%;
+    // background-color: red;
+    margin-right: 0;
+    padding-right: 0;
+    overflow: hidden;
+    height: 100dvh;
+    gap: 0
+}
+
+.basic-nav.create {
+    font-size: 15px;
+    padding-bottom: 10px;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+.basic-nav.create p {
+    margin-bottom: 0;
+}
+
+.create hr {
+    width: 62vw;
+}
+
+.input-wrapper {
+    padding-top: 15px;
+    box-sizing: border-box;
+}
+
+.create input {
+    border: none;
+    outline: 0.5px solid rgba(128, 128, 128, 0.433);
+    border-radius: 5px;
+    padding: 8px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 15px;
+    margin-left: 5px;
+}
+
+.empty-board-message {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 70%
+}
+
+.button-wrapper {
+    display: flex;
+    gap: 10px;
+    z-index: 50;
+    position: absolute;
+    bottom: 20px;
+    right: 33vw;
+    // background-color: palevioletred;
+}
+
+.create .nav-content .sub-btn {
+    outline: 1px solid black
+}
+
+.sub-btn.post {
+    background-color: #4f64996e;
+}
+
+.sub-btn.post:hover {
+    background-color: #4f649988;
+}
+
+.create-board {
+    // background-color: pink;
+    width: 65vw;
+    height: 100vh;
+}
+
+.create-wrapper {
+    display: flex;
+    // background-color: burlywood;
+}
+
+.create-sidebar {
+    background-color: white;
+    // background-color: cadetblue;
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    outline: 1px solid black;
+    position: relative;
+    width: 35vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-left: 15px;
+    padding-top: 20px;
+    box-sizing: border-box;
+}
+
+.create-sidebar .basic-nav.sub {
+    padding-left: 5px;
+}
+
+.create-sidebar .search-bar input {
+    padding: 5px 17px 5px 5px;
+    font-size: 12px;
+}
+
+.create-sidebar .search-bar svg {
+    width: 13px;
+    right: 5px;
+}

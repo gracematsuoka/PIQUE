@@ -23,6 +23,14 @@ const Closet = () => {
     const [processedUrl, setProcessedUrl] = useState('');
     const [reloadItems, setReloadItems] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [filled, setFilled] = useState(0);
+
+    useEffect(() => {
+        if(loading && filled < 100) {
+            setTimeout(() => setFilled(prev => prev += 5), 50)
+        }
+    }, [filled, loading])
 
     const colorOptions = {
         Red: '#F35050',
@@ -86,15 +94,6 @@ const Closet = () => {
         setTags
     }
 
-    const popupProps = {
-        setShowAddPopup,
-        setShowItemDetails,
-        processedUrl,
-        setProcessedUrl,
-        tab,
-        setReloadItems
-    }
-
     return (
         <div className="closet">
             <TopBar/>
@@ -132,7 +131,22 @@ const Closet = () => {
                                 setSelectedItem(item);
                                 setShowItemDetails(true);
                             }}/>
-                    {showAddPopup && <AddItem onClose={toggleAddPopup} props={popupProps}/>}
+                    {loading && 
+                        <div className="toast">
+                            <div className="progress-bar" 
+                                style={{width: `${filled}%`}}
+                                />
+                            <p>Saving item ...</p>
+                        </div>
+                    }
+                    {showAddPopup && <AddItem onClose={toggleAddPopup}
+                                            setShowAddPopup={setShowAddPopup}
+                                            setShowItemDetails={setShowItemDetails}
+                                            processedUrl={processedUrl}
+                                            setProcessedUrl={setProcessedUrl}
+                                            tab={tab}
+                                            setReloadItems={setReloadItems}
+                                            />}
                     <Filter className={`popup-container filter ${showFilter ? 'open' : ''}`} {...filterProps}/>
                     {showItemDetails && <ItemDetails 
                                             mode='create' 
@@ -140,6 +154,7 @@ const Closet = () => {
                                             processedUrl={processedUrl}
                                             tab={tab}
                                             setReloadItems={setReloadItems}
+                                            setLoading={setLoading}
                                             />}
                     {showItemDetails && selectedItem && 
                                         <ItemDetails 
@@ -150,6 +165,7 @@ const Closet = () => {
                                             setReloadItems={setReloadItems}
                                             selectedItem={selectedItem}
                                             onClose={handleCloseDetails}
+                                            setLoading={setLoading}
                                             />}
                 </div>
             </div>
