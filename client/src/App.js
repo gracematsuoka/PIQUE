@@ -13,7 +13,7 @@ import Create from './components/features/Create';
 import Style from './components/features/Style';
 import Outfits from './components/features/Outfits';
 import Settings from './components/features/Settings';
-import { useAuth } from './AuthContext';
+import { useAuth } from './contexts/AuthContext';
 
 function App() {
   const { currentUser, loading } = useAuth();

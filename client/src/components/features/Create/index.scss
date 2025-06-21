@@ -6,8 +6,8 @@
     margin-right: 0;
     padding-right: 0;
     overflow: hidden;
-    height: 100dvh;
-    gap: 0
+    height: 100vh;
+    gap: 0;
 }
 
 .basic-nav.create {
@@ -22,11 +22,14 @@
 }
 
 .create hr {
-    width: 62vw;
+    width: 100vw;
 }
 
 .input-wrapper {
     padding-top: 15px;
+    padding-left: 15px;
+    padding-right: 50px;
+    padding-bottom: 15px;
     box-sizing: border-box;
 }
 
@@ -57,7 +60,8 @@
     z-index: 50;
     position: absolute;
     bottom: 20px;
-    right: 33vw;
+    margin-left: 25px;
+    // right: 33vw;
     // background-color: palevioletred;
 }
 
@@ -76,11 +80,16 @@
 .create-board {
     // background-color: pink;
     width: 65vw;
-    height: 100vh;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 .create-wrapper {
     display: flex;
+    height: 100%;
+    background-color: rgba(233, 233, 233, 0.413);
     // background-color: burlywood;
 }
 
@@ -93,7 +102,7 @@
     outline: 1px solid black;
     position: relative;
     width: 35vw;
-    height: 100vh;
+    height: 100%;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -104,14 +113,97 @@
 
 .create-sidebar .basic-nav.sub {
     padding-left: 5px;
+    gap: clamp(10px, 35px, 35px);
+
 }
 
 .create-sidebar .search-bar input {
-    padding: 5px 17px 5px 5px;
+    padding: 5px 22px 5px 9px;
     font-size: 12px;
+    border-radius: 12px;
 }
 
 .create-sidebar .search-bar svg {
-    width: 13px;
-    right: 5px;
+    width: 12px;
+    right: 9px;
+}
+
+.image-database {
+    overflow-y: auto;
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    row-gap: 5px;
+}
+
+.item-img-wrapper {
+    width: 110px;
+    height: 120px;
+    cursor: pointer;
+    border-radius: 10px;
+    // background-color: antiquewhite;
+}
+
+.item-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    box-sizing: content-box;
+}
+
+#canvas {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    border-radius: 5px;
+    
+}
+
+.canvas-wrap {
+    // background-color: pink;
+    margin:0;
+    height: 100vh;
+    width: 65vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1
+}
+
+.create-top {
+    display: flex;
+    align-items: center;
+    // background-color: pink;
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    position: relative;
+    background-color: white;
+    padding: 5px 20px 5px 20px;
+    border-radius: 50px;
+    gap: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.toolbar hr {
+    border-left: 2px solid black;
+    height: 12px;
+    width: 0px
+}
+
+.toolbar-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 5px;
+    padding: 2px 5px;
+}
+
+.toolbar-icon:hover {
+    background-color: rgba(206, 206, 206, 0.295);
+}
+
+.toolbar svg {
+    height: 25px;
 }

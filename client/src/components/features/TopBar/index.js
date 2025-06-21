@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom"
 import "./index.scss"
-import { useAuth } from "../../../AuthContext"
+import { useAuth } from "../../../contexts/AuthContext"
 import defaultProfilePic from '../../../assets/images/icons/default-profile-pic.png'
 import ProfilePopup from "../../popups/ProfilePopup"
 import { useState } from "react"

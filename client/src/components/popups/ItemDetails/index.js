@@ -14,7 +14,9 @@ const ItemDetails = ({ mode,
                     tab,
                     setReloadItems,
                     selectedItem,
-                    setLoading
+                    setLoading,
+                    setUpdatedItem,
+                    setAddedItem
                  }) => {
     const [name, setName] = useState('');
     const [category, setCategory] = useState('');
@@ -163,13 +165,14 @@ const ItemDetails = ({ mode,
             const imageURL = await imageURLPromise;
             const itemRef = await handleSaveItem(imageURL, token);
 
-            await handleSaveUserItem(itemRef, selectedTab, token);
+            const userItem = await handleSaveUserItem(itemRef, selectedTab, token);
+            setAddedItem({...userItem});
+            console.log('just added:', userItem)
         } catch (err) {
             console.log('Error saving item:', err);
         } finally {
             setLoading(false);
             window.onbeforeunload = null;
-            setReloadItems(prev => !prev);
         }
     }
 
@@ -185,7 +188,7 @@ const ItemDetails = ({ mode,
                 const auth = getAuth();
                 const token = await auth.currentUser.getIdToken();
 
-                await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user-items/update-item/${selectedItem._id}`, {
+                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user-items/update-item/${selectedItem._id}`, {
                     method: 'PATCH',
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -193,12 +196,15 @@ const ItemDetails = ({ mode,
                     },
                     body: JSON.stringify(changedField)
                 })
+
+                const data = await res.json();
+                const item = data.item;
+                setUpdatedItem({...item});
             } catch (err) {
                 console.log('Failed to save updates:', err);
             } finally {
                 setLoading(false);
                 window.onbeforeunload = null;
-                setReloadItems(prev => !prev);
             }
         }
     }
@@ -333,6 +339,11 @@ const ItemDetails = ({ mode,
                     tab: selectedTab
                 })
             });
+
+            const data = await res.json();
+            const userItem = data.popItem;
+            console.log('user item:', userItem)
+            return userItem;
         } catch (err) {
             console.log('Failed to save item details to general database:', err);
         }

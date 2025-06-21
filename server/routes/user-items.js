@@ -21,7 +21,8 @@ router.post('/create-item', authenticateUser, async (req, res) => {
     });
 
     await userItem.save();
-    res.status(201).json({message: 'User item created', userItem});
+    const popItem = userItem.populate('itemRef');
+    res.status(201).json({message: 'User item created', popItem});
 })
 
 router.get('/get-closet', authenticateUser, async (req, res) => {
@@ -37,7 +38,10 @@ router.patch('/update-item/:id', authenticateUser, async (req, res) => {
     const changedField = req.body;
 
     try {
-        const item = await UserItem.findById(id);
+        const item = await UserItem
+                    .findById(id)
+                    .populate('itemRef');
+
         if (!item) {
             return res.status(404).json({ error: 'Item not found' });
         }
@@ -51,11 +55,20 @@ router.patch('/update-item/:id', authenticateUser, async (req, res) => {
         if (changedField.link) item.link = changedField.link;
 
         await item.save();
-        res.status(200).json({message: 'Item updated'});
+        res.status(200).json({message: 'Item updated', item});
     } catch (err) {
         console.error('Failed to update item:', err);
         res.status(500).json({error: 'Server error'});
     }
+})
+
+router.delete('/delete-item', authenticateUser, async (req, res) => {
+    const { itemId } = req.query;
+    console.log('itemId:', itemId)
+
+    await UserItem.findByIdAndDelete(itemId);
+
+    res.status(200).json({message: 'Deleted item'})
 })
 
 module.exports = router;

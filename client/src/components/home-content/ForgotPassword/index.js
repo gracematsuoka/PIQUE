@@ -1,7 +1,7 @@
 import './index.scss'
 import { Link } from "react-router-dom"
 import { useState } from "react"
-import { useAuth } from '../../../AuthContext'
+import { useAuth } from '../../../contexts/AuthContext'
 
 const ForgotPassword = () => {
     const [error, setError] = useState('');

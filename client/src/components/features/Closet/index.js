@@ -1,7 +1,7 @@
 import NavBar from "../NavBar"
 import TopBar from "../TopBar"
 import "./index.scss"
-import { useAuth } from "../../../AuthContext"
+import { useAuth } from "../../../contexts/AuthContext"
 import addClothes from "../../../assets/images/icons/addclothes.png"
 import SearchBar from "../../reusable/SearchBar"
 import AddItem from "../../popups/AddItem"
@@ -25,10 +25,12 @@ const Closet = () => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [loading, setLoading] = useState(false);
     const [filled, setFilled] = useState(0);
+    const [updatedItem, setUpdatedItem] = useState(null);
+    const [addedItem, setAddedItem] = useState(null);
 
     useEffect(() => {
         if(loading && filled < 100) {
-            setTimeout(() => setFilled(prev => prev += 5), 50)
+            setTimeout(() => setFilled(prev => prev += 10), 50)
         }
     }, [filled, loading])
 
@@ -126,11 +128,17 @@ const Closet = () => {
                             <FilterIcon/>
                         </div>
                     </div>
-                    <Items reload={reloadItems}
-                            onSelectItem={(item) => {
-                                setSelectedItem(item);
-                                setShowItemDetails(true);
-                            }}/>
+                    <div className="items-wrapper">
+                        <Items reload={reloadItems}
+                                onSelectItem={(item) => {
+                                    setSelectedItem(item);
+                                    setShowItemDetails(true);
+                                }}
+                                updatedItem={updatedItem}
+                                addedItem={addedItem}
+                                setSelectedItem={setSelectedItem}
+                                />
+                    </div>
                     {loading && 
                         <div className="toast">
                             <div className="progress-bar" 
@@ -155,6 +163,7 @@ const Closet = () => {
                                             tab={tab}
                                             setReloadItems={setReloadItems}
                                             setLoading={setLoading}
+                                            setAddedItem={setAddedItem}
                                             />}
                     {showItemDetails && selectedItem && 
                                         <ItemDetails 
@@ -166,6 +175,7 @@ const Closet = () => {
                                             selectedItem={selectedItem}
                                             onClose={handleCloseDetails}
                                             setLoading={setLoading}
+                                            setUpdatedItem={setUpdatedItem}
                                             />}
                 </div>
             </div>

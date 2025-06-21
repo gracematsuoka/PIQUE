@@ -12,6 +12,16 @@
     z-index: 100;
 }
 
+.popup-container.profile {
+    height: fit-content;
+    width: fit-content;
+    margin: 0
+}
+
+.popup-container.profile hr {
+    width: 150px
+}
+
 .popup-name {
     font-size: 25px;
     font-weight: 600;

@@ -1,7 +1,7 @@
 import './index.scss'
 import { Link } from 'react-router-dom'
 import GoogleIcon from '../../../assets/images/icons/googleicon.png'
-import { useAuth } from '../../../AuthContext'
+import { useAuth } from '../../../contexts/AuthContext'
 import { useEffect, useState } from 'react'
 import {getAuth} from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'

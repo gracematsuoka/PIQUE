@@ -4,7 +4,9 @@
 }
 
 .closet .nav-content-wrapper {
-    gap: 30px
+    gap: 30px;
+    overflow: hidden;
+    height: 100vh;
 }
 
 .closet p {
@@ -99,4 +101,9 @@
     border-radius: 10px;
     transition: width 0.5s ease;
     background-color: white;
+}
+
+.items-wrapper {
+    overflow-y: auto;
+    flex: 1;
 }

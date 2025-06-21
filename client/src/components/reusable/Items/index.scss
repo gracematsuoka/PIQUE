@@ -14,12 +14,16 @@
     height: 160px;
     // background-color: pink;
     overflow: hidden;
-    cursor: pointer;
     border-radius: 10px;
+    position: relative;
 }
 
 .item-wrapper:hover {
     background-color: rgba(236, 236, 236, 0.2);
+
+    .more {
+        display:flex;
+    }
 }
 
 .item-wrapper img {
@@ -88,4 +92,60 @@
     justify-content: center;
     align-items: center;
     margin-top: 70px;
+}
+
+.more {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    fill: black;
+    width: 15px;
+    aspect-ratio: 1/1;
+    display:none;
+    padding: 2px 5px 2px 5px;
+    border-radius: 5px;
+    // background-color: white;
+    // outline: 0.1px solid black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.mini-pop {
+    position: absolute;
+    top: 0;
+    right: 30px;
+    background-color: white;
+    border-radius: 5px;
+}
+
+.mini-pop .sub-btn {
+    font-size: 13px;
+}
+
+.mini-pop svg {
+    height: 13px;
+}
+
+.items .popup-overlay {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.items .popup-container.overlay {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.items .popup-name {
+    font-size: 20px;
+}
+
+.items .sub-btn.cancel {
+    color: white;
+    font-weight: 700;
+    background-color: #6b799fe6;
+}
+
+.items .sub-btn.cancel:hover {
+    background-color: #6b799f;
 }

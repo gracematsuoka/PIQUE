@@ -1,5 +1,5 @@
 import { getAuth } from 'firebase/auth'
-import { useAuth } from "../../../AuthContext"
+import { useAuth } from "../../../contexts/AuthContext"
 import {ReactComponent as LogoutIcon} from '../../../assets/images/icons/logout.svg'
 import {ReactComponent as SettingsIcon} from '../../../assets/images/icons/settings.svg'
 import {ReactComponent as FaceIcon} from '../../../assets/images/icons/face.svg'
@@ -31,7 +31,7 @@ const ProfilePopup = () => {
     }
     
     return (
-        <div className="popup-container">
+        <div className="popup-container profile">
             <p className='popup-name'>{mongoUser?.name || 'Name'}</p>
             <p className='popup-username'>@{username}</p>
             <div className='follow'>

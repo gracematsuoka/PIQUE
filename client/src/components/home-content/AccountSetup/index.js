@@ -2,7 +2,7 @@ import './index.scss'
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { getAuth } from "firebase/auth"
-import { useAuth } from '../../../AuthContext';
+import { useAuth } from '../../../contexts/AuthContext';
 import UploadProfilePic from '../../image-upload/UploadProfilePic/UploadProfilePic';
 import WarningPopup from '../../popups/WarningPopup';
 

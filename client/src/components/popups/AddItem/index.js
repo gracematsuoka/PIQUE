@@ -49,25 +49,36 @@ const AddItem = ({onClose,
         }
     }
 
-    const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
+    const onDropRejected = useCallback((rejections) => {
         setError('');
 
-        if (rejectedFiles.length > 0) {
-            setError('Image must be under 10 MB and with the allowed file type (.png, .jpg, .jpeg)');
-            console.log('error')
-            return;
-        }
-        if (acceptedFiles.length > 0) {
-            processFile(acceptedFiles[0]);
-        }
+        if (rejections.length > 0) {
+            // setError('Image must be under 10 MB and with the allowed file type (.png, .jpg, .jpeg)');
+            const { code } = rejections[0].errors[0];  
+            switch (code) {
+                case 'file-too-large':
+                setError('Image must be under 10 MB');
+                break;
+                case 'file-invalid-type':
+                setError('Allowed types: .png, .jpg, .jpeg');
+                break;
+                default:
+                setError('File rejected');
+        }}}, [])
+
+    const onDropAccepted = useCallback((accepted) => {
+        setError('');
+        if (accepted.length) processFile(accepted[0]);
     }, [processFile])
     
     const {getRootProps, getInputProps, isDragActive, fileRejections} = useDropzone({
         accept: {
-            'image/*': ['.png', '.jpg', '.jpeg']
+            'image/png': ['.png'],
+            'image/jpeg': ['.jpeg', '.jpg']
         },
         maxSize: maxSize,
-        onDrop,
+        onDropRejected,
+        onDropAccepted,
         noClick: true,
         multiple: false
     })
@@ -88,7 +99,7 @@ const AddItem = ({onClose,
         const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
 
         if (!allowedTypes.includes(fileType)) {
-            setError('Please upload an image with the allowed file type');
+            setError('Allowed types: .png, .jpg, .jpeg');
             return;
         }
 
@@ -126,7 +137,6 @@ const AddItem = ({onClose,
                                     <label htmlFor='image-upload'>Upload from device</label>
                                     <input type='file' multiple id='image-upload' accept='image/*' onChange={handleUpload}/>
                                 </button>
-                                <p className='or'>accepts any: .png, .jpg, .jpeg</p>
                             </div>
                         )}  
                         <input {...getInputProps()} />

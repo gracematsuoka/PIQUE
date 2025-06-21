@@ -1,7 +1,7 @@
 import imageCompression from 'browser-image-compression';
 import {getStorage, ref, uploadBytes, getDownloadURL} from 'firebase/storage';
 import {getAuth} from 'firebase/auth';
-import { useAuth } from '../../../AuthContext';
+import { useAuth } from '../../../contexts/AuthContext';
 import {useState} from 'react';
 import defaultProfilePic from '../../../assets/images/icons/default-profile-pic.png'
 

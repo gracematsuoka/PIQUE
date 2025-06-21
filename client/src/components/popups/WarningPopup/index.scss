@@ -9,7 +9,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    z-index: 100;
+    z-index: 145;
 }
 
 .popup-container.overlay .popup-content {
@@ -29,7 +29,7 @@
     width: 100vw;
     height: 100vh;
     background-color: rgba(255, 255, 255, 0.25);
-    z-index: 99;
+    z-index: 140;
 }
 
 .x svg {
