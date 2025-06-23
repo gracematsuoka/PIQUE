@@ -11,7 +11,7 @@ import ForgotPassword from './components/home-content/ForgotPassword';
 import Closet from './components/features/Closet';
 import Create from './components/features/Create';
 import Style from './components/features/Style';
-import Outfits from './components/features/Outfits';
+import Saved from './components/features/Saved';
 import Settings from './components/features/Settings';
 import { useAuth } from './contexts/AuthContext';
 
@@ -104,10 +104,10 @@ function App() {
             }
           />
           <Route
-            path="/outfits"
+            path="/saved"
             element={
               <PrivateRoute>
-                <Outfits />
+                <Saved />
               </PrivateRoute>
             }
           />

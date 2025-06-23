@@ -21,6 +21,9 @@ app.use('/api/user-items', userItemRoutes);
 const ItemRoutes = require('./routes/items');
 app.use('/api/items', ItemRoutes);
 
+const PostRoutes = require('./routes/posts');
+app.use('/api/posts', PostRoutes);
+
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB connected");

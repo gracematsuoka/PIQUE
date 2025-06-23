@@ -20,10 +20,10 @@ const NavBar = () => {
                     <p>Explore</p>
                 </Link>
             </div>
-            <div className={`icon-wrapper ${location.pathname === '/outfits' ? 'active' : ''}`}>
-                <Link to='/outfits'>
+            <div className={`icon-wrapper ${location.pathname === '/saved' ? 'active' : ''}`}>
+                <Link to='/saved'>
                     <HeartTagIcon/>
-                    <p>Outfits</p>
+                    <p>Saved</p>
                 </Link>
             </div>
             <div className={`icon-wrapper ${location.pathname === '/create' ? 'active' : ''}`}>

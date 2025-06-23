@@ -1,13 +1,13 @@
 import NavBar from "../NavBar"
 import TopBar from "../TopBar"
 
-const Outfits = () => {
+const Saved = () => {
     return (
-        <div className="outfits">
+        <div className="outfisavedts">
             <TopBar/>
             <NavBar/>
         </div>
     )
 }
 
-export default Outfits
+export default Saved

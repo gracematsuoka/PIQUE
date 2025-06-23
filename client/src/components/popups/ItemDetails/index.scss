@@ -90,7 +90,7 @@ hr {
     font-size: 15px;
 }
 
-.item-field .color-input {
+.color-input {
     appearance: none;
     -webkit-appearance: none;
     width: 25px; 
@@ -104,15 +104,15 @@ hr {
     overflow: hidden;
 }
 
-.item-field .color-input::-webkit-color-swatch-wrapper {
+.color-input::-webkit-color-swatch-wrapper {
     padding: 0;
   }
-  .item-field .color-input::-webkit-color-swatch {
+  .color-input::-webkit-color-swatch {
     border: none;
     border-radius: 50%;
   }
   
-  .item-field .color-input::-moz-color-swatch {
+  .color-input::-moz-color-swatch {
     border: none;
     border-radius: 50%;
   }

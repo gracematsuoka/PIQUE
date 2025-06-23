@@ -1,0 +1,88 @@
+.postprev .popup-container.overlay .popup-content {
+    display: flex;
+    flex-direction: column; 
+    gap: 20px;
+    padding: 20px 25px;
+}
+.prev-title h1{
+    font-family: 'Publica Play Bold';
+    font-size: 23px;
+    font-weight: 500;
+}
+
+.prev-title p {
+    font-size: 13px;
+    padding-bottom: 5px;
+}
+
+.prev-content {
+    display: flex;
+    justify-content: center;
+    gap: 30px
+}
+
+.prev-content img {
+    height: 300px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.prev-desc {
+    display: flex;
+    flex-direction: column;
+    gap: 10px
+}
+
+.prev-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px
+}
+
+.postprev .description, .prev-desc input {
+    padding: 5px;
+    border: 0.5px solid lightgray;
+    outline: none;
+    border-radius: 5px;
+    margin: 0;
+    font-size: 14px;
+}
+
+.prev-btns {
+    display: flex;
+    gap: 10px
+}
+
+.sub-btn button {
+    font-family: 'Publica Play Bold';
+    display: flex;
+}
+
+.postprev .loading {
+    background-color: black;
+    width: 120px;
+    display: flex;
+    border-radius: 30px;
+    padding: 15px;
+    gap: 7px;
+    z-index: 100;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 145;
+    color: white;
+    font-size: 12px;
+}
+
+.postprev .progress-bar {
+    height: 8px
+}
+

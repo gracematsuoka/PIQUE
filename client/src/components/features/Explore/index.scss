@@ -1,0 +1,72 @@
+.posts {
+    display: flex;
+    gap: 20px
+}
+
+.post {
+    height: 400px;
+    width: fit-content;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    cursor: pointer;
+    transform: scale(1);
+    transition: transform 0.2s ease-in-out;
+
+    &:hover .post-save-bar {
+        display: flex;
+    }
+}
+
+.post:hover {
+    transform: scale(0.98);
+    transition: transform 0.3s ease-in-out;
+}
+
+.post img {
+    height: 100%;
+    border-radius: 10px;
+}
+
+.post-save-bar {
+    position: absolute;
+    display: none;
+    justify-content: space-between;
+    padding: 5px;
+    box-sizing: border-box;
+    width: 100%;
+    bottom: 0;
+    font-size: 12px;
+}
+
+.like-btn {
+    display: flex;
+    align-items: center;
+    background-color: #ebebeb98;
+    border-radius: 15px;
+    border: 1px solid black;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.like-btn svg, .post .save-btn svg {
+    height: 15px;
+}
+
+.post .save-btn p{
+    font-size: 12px;
+}
+
+.post .save-btn {
+    background-color: #ebebeb98;
+    padding: 3px 5px;
+    justify-content: center;
+    align-items: center;
+}
+
+.post .save-btn:hover, .like-btn:hover {
+    background-color: #d1d0d0b8;
+}
+
+
+
