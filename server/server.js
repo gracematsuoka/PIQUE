@@ -24,6 +24,9 @@ app.use('/api/items', ItemRoutes);
 const PostRoutes = require('./routes/posts');
 app.use('/api/posts', PostRoutes);
 
+const BoardRoutes = require('./routes/boards');
+app.use('/api/boards', BoardRoutes);
+
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB connected");

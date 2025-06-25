@@ -57,10 +57,14 @@ const AccountSetup = ({ mode }) => {
 
     const validateUsername = async (username) => {
         try {
+            const auth = getAuth();
+            const token = await auth.currentUser.getIdToken();
+
             const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/check-username`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify({username}),
             })
@@ -69,11 +73,13 @@ const AccountSetup = ({ mode }) => {
 
             if (!data.exists || username == mongoUser.username) {
                 setUsernameValid('✓ Username is available');
+                setError('');
             } else {
                 setUsernameValid('☓ Username already exists');
+                setError('');
             }
         } catch (err) {
-            console.error('Error checking username:', error);
+            console.error('Error checking username:', err);
             setError('An error occurred trying to validate username');
         }
     }
@@ -138,7 +144,7 @@ const AccountSetup = ({ mode }) => {
                                     setSuccessMessage('');
                                 }}
                             />
-                            {usernameValid && <p className={`live-validate ${
+                            {usernameValid && username && <p className={`live-validate ${
                                 usernameValid.includes('☓') ? 'invalid' : 'valid'
                                 }`}>
                                 {usernameValid}

@@ -27,7 +27,7 @@ const Congrats = ({setShowCongrats, setReload}) => {
                         </div>
                         <p>Your post is now up</p>
                         <div className='btn-wrap'>
-                            <button className='sub-btn post'>VIEW POST</button>
+                            <button className='sub-btn bold'>VIEW POST</button>
                             <button className='sub-btn' 
                                 onClick={() => {
                                     setShowCongrats(false);

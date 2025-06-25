@@ -13,6 +13,8 @@ import Create from './components/features/Create';
 import Style from './components/features/Style';
 import Saved from './components/features/Saved';
 import Settings from './components/features/Settings';
+import Boards from './components/features/Boards';
+import Favorites from './components/features/Favorites';
 import { useAuth } from './contexts/AuthContext';
 
 function App() {
@@ -109,8 +111,13 @@ function App() {
               <PrivateRoute>
                 <Saved />
               </PrivateRoute>
-            }
-          />
+            }>
+            <Route index element={<Boards/>}/>
+            <Route path='favorites' element={<Favorites/>}/>
+            <Route 
+              path='/saved/:userId/boards/:boardId'
+            />
+          </Route>
         </Routes>
       </Router>
     </div>

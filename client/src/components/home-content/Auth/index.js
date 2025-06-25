@@ -125,7 +125,7 @@ const Auth = ({ mode }) => {
                         </div>
                         <button className='submit' disabled={loading} type='submit'>{isLogin ? 'Log in' : 'Sign up'}</button>
                     </form>
-                    <p><b>OR</b></p>
+                    <p className='or-p'><b>OR</b></p>
                     <button className='auth-container' onClick={handleGoogleSignIn}>
                         <img src={GoogleIcon}></img>
                         {isLogin ? 'Sign in with Google' : 'Continue with Google'}

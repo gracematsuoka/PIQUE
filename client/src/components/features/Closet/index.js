@@ -11,6 +11,7 @@ import Items from "../../reusable/Items"
 import { useState, useEffect } from "react"
 import { getAuth } from 'firebase/auth'
 import {ReactComponent as FilterIcon} from '../../../assets/images/icons/filter.svg'
+import Tooltip from "@mui/material/Tooltip"
 
 const Closet = () => {
     const {mongoUser} = useAuth();
@@ -109,9 +110,11 @@ const Closet = () => {
                         <p className={tab === 'collections' ? 'active' : ''}>COLLECTIONS</p>
                     </div>
                     <SearchBar/>
+                    <Tooltip title='New item'>
                     <div className="add" onClick={toggleAddPopup}>
                         <img src={addClothes}/>
                     </div>
+                    </Tooltip>
                     <div className="nav-filter-wrapper">
                         <div className="basic-nav sub">
                             <p>ALL</p>

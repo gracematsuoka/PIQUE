@@ -67,17 +67,18 @@
 }
 
 .create .nav-content .sub-btn {
-    outline: 1px solid black
+    outline: 1px solid black;
+    // font-weight: 700;
 }
 
-.sub-btn.post {
+.sub-btn.bold {
     background-color: #6B799F;
     color: white;
     height: fit-content;
     border-radius: 5px;
 }
 
-.sub-btn.post:hover {
+.sub-btn.bold:hover {
     background-color: #57668e;
 }
 
@@ -319,4 +320,10 @@
 .context-menu li:hover {
     background-color: #6B799F;
     cursor: pointer
+}
+
+.empty-closet {
+    text-align: center;
+    color: rgba(128, 128, 128, 0.773);
+    padding: 50px 10px; 
 }

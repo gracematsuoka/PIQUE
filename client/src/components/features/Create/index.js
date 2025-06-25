@@ -7,7 +7,7 @@ import Filter from "../../popups/Filter";
 import { useRef, useState, useEffect } from "react";
 import Select, {components} from 'react-select';
 import CreatableSelect from 'react-select/creatable';
-import {Canvas, FabricImage, Textbox, FabricObject, Point} from "fabric";
+import {Canvas, FabricImage, Textbox, FabricObject, Point, FabricText} from "fabric";
 import { useCloset } from "../../../contexts/ClosetContext";
 import CanvasHistory from "../../../utils/CanvasHistory";
 import Tooltip from "@mui/material/Tooltip";
@@ -191,6 +191,10 @@ const Create = () => {
             }
         }
     }, [reload])
+
+    useEffect(() => {
+        closetItems.length > 0 ? setIsEmpty(false) : setIsEmpty(true)
+    }, closetItems)
 
     useEffect(() => {
         if (!canvas) return;
@@ -748,45 +752,35 @@ const Create = () => {
                                         }
                                     </div>
                                 </div>
-                                {isEmpty && 
-                                    <div className='empty-board-message'>
-                                        <ShirtIcon className='clothes-upload'/>
-                                        <p>Start dragging items here</p>
-                                    </div>
-                                }
-                                {!isEmpty &&
                                     <div className="canvas-wrap"
                                         ref={fabricRef}
                                         onDragOver={e => e.preventDefault()}
-                                        onDrop={e => handleDrop(e)}
-                                    >
+                                        onDrop={e => handleDrop(e)}>
                                         <canvas id="canvas" ref={canvasRef}/>
-
-                                    {menu.visible &&
-                                        <ul className="context-menu" style={{top: menu.y, left: menu.x, position: 'absolute'}}>
-                                            <li onClick={() => {canvas.bringObjectToFront(menu.target)}}>
-                                                <KeyboardDoubleArrowUpIcon/>
-                                                <p>Bring to front</p>
-                                            </li>
-                                            <li onClick={() => {canvas.bringObjectForward(menu.target)}}>
-                                                <KeyboardArrowUpIcon/>
-                                                <p>Bring forward</p>
-                                            </li>
-                                            <li onClick={() => {canvas.sendObjectBackwards(menu.target)}}>
-                                                <KeyboardArrowUpIcon/>
-                                                <p>Send backward</p>
-                                            </li>
-                                            <li onClick={() => {canvas.sendObjectToBack(menu.target)}}>
-                                                <KeyboardDoubleArrowDownIcon/>
-                                                <p>Send to back</p>
-                                            </li>
-                                        </ul> 
-                                    }
-                                    </div>
+                                {menu.visible &&
+                                    <ul className="context-menu" style={{top: menu.y, left: menu.x, position: 'absolute'}}>
+                                        <li onClick={() => {canvas.bringObjectToFront(menu.target)}}>
+                                            <KeyboardDoubleArrowUpIcon/>
+                                            <p>Bring to front</p>
+                                        </li>
+                                        <li onClick={() => {canvas.bringObjectForward(menu.target)}}>
+                                            <KeyboardArrowUpIcon/>
+                                            <p>Bring forward</p>
+                                        </li>
+                                        <li onClick={() => {canvas.sendObjectBackwards(menu.target)}}>
+                                            <KeyboardArrowUpIcon/>
+                                            <p>Send backward</p>
+                                        </li>
+                                        <li onClick={() => {canvas.sendObjectToBack(menu.target)}}>
+                                            <KeyboardDoubleArrowDownIcon/>
+                                            <p>Send to back</p>
+                                        </li>
+                                    </ul> 
                                 }
+                                </div>
                                 <div className="button-wrapper">
-                                    <button className="sub-btn post" onClick={() => handlePost()} >NEXT</button>
-                                    <button className="sub-btn" onClick={handleSave}>SAVE</button>
+                                    <button className="sub-btn bold" onClick={() => handlePost()} >Next</button>
+                                    <button className="sub-btn" onClick={handleSave}>Save</button>
                                 </div>
                             </div>
                             <div className="create-sidebar">
@@ -799,7 +793,8 @@ const Create = () => {
                                     <SearchBar/>
                                     {/* <Filter /> */}
                                 </div>
-                                <div className="image-database">
+                                {!isEmpty && 
+                                    <div className="image-database">
                                         {closetItems.map(item => 
                                             <div className="item-img-wrapper" 
                                                 key={item._id}
@@ -812,7 +807,13 @@ const Create = () => {
                                                 />
                                             </div>
                                         )}
-                                </div>
+                                    </div>
+                                }
+                                {isEmpty && 
+                                    <div className="empty-closet">
+                                        <p>You have no items in your closet, navigate to 'closet' to start adding items</p>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>

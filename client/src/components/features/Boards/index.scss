@@ -1,0 +1,80 @@
+.boards {
+    padding-left: 120px;
+    padding-top: 20px;
+}
+
+.board {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    background-color: #fcfcfc;
+    width: fit-content;
+    padding: 10px 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+    cursor: pointer;
+    transform: scale(1);
+    transition: transform 0.3s ease-in-out;
+}
+
+.board:hover {
+    transform: scale(0.98);
+    transition: transform 0.3s ease-in-out;
+}
+
+.board img {
+    width: 230px;
+    height: 150px;
+    object-fit: cover;
+    object-position: 0 25%;
+    border-radius: 10px;
+    box-shadow: 0 4px 9px rgba(0, 0, 0, 0.15);
+}
+
+.board .h1-wrap {
+    width: 230px;
+    height: 30px;
+    padding: 9px 0 4px 0;
+    white-space: nowrap;
+    overflow-x: scroll;
+}
+
+.board h1 {
+    font-family: 'Publica Play Bold';
+    font-weight: 500;
+    font-size: 25px;
+}
+
+.board-title {
+    font-size: 12px;
+}
+
+.edit {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: black;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+}
+
+.edit svg {
+    width: 15px;
+    fill:white
+}
+
+.edit:hover {
+    background-color: rgba(0, 0, 0, 0.842);
+    outline: 1px solid white
+}
+
+.add svg {
+    fill: white;
+    width: 40px
+}

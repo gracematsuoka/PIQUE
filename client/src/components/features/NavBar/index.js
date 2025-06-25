@@ -20,7 +20,7 @@ const NavBar = () => {
                     <p>Explore</p>
                 </Link>
             </div>
-            <div className={`icon-wrapper ${location.pathname === '/saved' ? 'active' : ''}`}>
+            <div className={`icon-wrapper ${location.pathname.includes('/saved') ? 'active' : ''}`}>
                 <Link to='/saved'>
                     <HeartTagIcon/>
                     <p>Saved</p>

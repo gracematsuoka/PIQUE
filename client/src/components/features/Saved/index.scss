@@ -1,0 +1,30 @@
+.saved .basic-nav {
+    align-items: center;
+}
+
+.saved .basic-nav svg {
+    height: 19px
+}
+
+.basic-nav a {
+    text-decoration: none;
+    color: black;
+    opacity: 0.5;
+    font-weight: 600;
+}
+
+.basic-nav hr {
+    opacity: 0;
+    border-top: 1.2px solid black;
+}
+
+.basic-nav .active hr {
+    opacity: 1;
+
+}
+
+.basic-nav .active {
+    opacity: 1;
+    text-decoration: underline;
+    text-underline-offset: 7px;
+}
