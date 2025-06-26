@@ -62,6 +62,7 @@ const Closet = () => {
         })
 
         const data = await res.json();
+        if (!data) return;
         setTags(data.tags.map(tag => ({
             name: tag.name,
             hex: tag.hex,

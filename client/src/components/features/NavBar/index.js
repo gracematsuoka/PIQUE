@@ -38,12 +38,12 @@ const NavBar = () => {
                     <p>Closet</p>
                 </Link>
             </div>
-            <div className={`icon-wrapper sparkle ${location.pathname === '/style' ? 'active' : ''}`}>
+            {/* <div className={`icon-wrapper sparkle ${location.pathname === '/style' ? 'active' : ''}`}>
                 <Link to='/style'>
                     <img src={location.pathname === '/style' ? WhiteSparkle : BlackSparkle}/>
                     <p>Style Me</p>
                 </Link>
-            </div>
+            </div> */}
         </div>
     )
 }

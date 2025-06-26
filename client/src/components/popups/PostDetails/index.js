@@ -22,7 +22,6 @@ const PostDetails = ({
         <div className='post-details'>
         <div className="popup-overlay"></div>
                 <div className="popup-container overlay">
-                
                     <div className='popup-content'>
                         <div className='post-header'>
                             <img src={mongoUser?.profileURL || defaultProfilePic}/>

@@ -1,17 +1,61 @@
-.posts {
+.explore {
+    height: 100vh;
     display: flex;
-    gap: 20px
+    flex-direction: column;
 }
 
+.explore .nav-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.explore .nav-content-wrapper {
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.posts {
+    column-count: 1;
+    column-gap: 1rem;
+    overflow-y: auto;
+    flex: 1;
+    padding: 5px 5px;
+    width: 100%;
+}
+
+@media (min-width: 600px) {
+    .posts {
+      column-count: 3;
+    }
+  }
+  
+  @media (min-width: 900px) {
+    .posts {
+      column-count: 4;
+    }
+  }
+  
+  @media (min-width: 1200px) {
+    .posts {
+      column-count: 5;
+    }
+  }
+
 .post {
-    height: 400px;
-    width: fit-content;
+    break-inside: avoid;
+    margin-bottom: 1rem;
+    // width: 200px;
+    width: 100%;
+    // height: fit-content;
     position: relative;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border-radius: 10px;
     cursor: pointer;
     transform: scale(1);
-    transition: transform 0.2s ease-in-out;
+    transition: transform 0.2s ease-in-out, all 0.3s ease;
 
     &:hover .post-save-bar {
         display: flex;
@@ -24,15 +68,17 @@
 }
 
 .post img {
-    height: 100%;
+    width: 100%;
+    height: auto;
     border-radius: 10px;
+    display: block;
 }
 
 .post-save-bar {
     position: absolute;
     display: none;
     justify-content: space-between;
-    padding: 5px;
+    padding: 10px;
     box-sizing: border-box;
     width: 100%;
     bottom: 0;
@@ -42,10 +88,11 @@
 .like-btn {
     display: flex;
     align-items: center;
+    justify-content: flex-start;
     background-color: #ebebeb98;
     border-radius: 15px;
     border: 1px solid black;
-    padding: 5px;
+    padding: 5px 9px 5px 7px;
     cursor: pointer;
 }
 
@@ -59,7 +106,7 @@
 
 .post .save-btn {
     background-color: #ebebeb98;
-    padding: 3px 5px;
+    padding: 3px 7px 3px 3px;
     justify-content: center;
     align-items: center;
 }
