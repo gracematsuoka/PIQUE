@@ -1,14 +1,92 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAuth } from "../../../contexts/AuthContext"
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import TopBar from "../TopBar";
 import NavBar from "../NavBar";
 import './index.scss';
+import { getAuth } from "firebase/auth";
+import Follows from "../../popups/Follows";
+import { Bouncy } from 'ldrs/react';
 import defaultProfilePic from '../../../assets/images/icons/default-profile-pic.png'
 
 const Profile = () => {
     const {mongoUser} = useAuth();
-    let username = (mongoUser?.username || 'Username').toLowerCase();
+    const {username} = useParams();
+    const [userData, setUserData] = useState(null);
+    const [showFollowers, setShowFollowers] = useState(false);
+    const [showFollowing, setShowFollowing] = useState(false);
+    const [followers, setFollowers] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [isFollowing, setIsFollowing] = useState(false)
+
+    const isSelf = username === mongoUser?.username; 
+
+    useEffect(() => {
+        const handleFetchUser = async () => {
+            setLoading(true);
+            try {
+                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/${username}`);           
+
+                const data = await res.json();
+                setUserData(data);
+                setFollowers(data.followers.length);
+            } catch (err) {
+                console.log('Failed to fetch user data:', err);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        const checkFollowing = async () => {
+            try {
+                const auth = getAuth();
+                const token = await auth.currentUser.getIdToken();
+                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/${username}/is-following`, {
+                    method: 'GET',
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                const data = await res.json();
+                setIsFollowing(data.following);
+            } catch (err) {
+                console.log('Failed to verify following status:', err);
+            }
+        }
+
+        handleFetchUser();
+        checkFollowing();
+    }, [username])
+
+    const handleFollow = async () => {
+        setIsFollowing(prev => !prev);
+        const auth = getAuth();
+        const token = await auth.currentUser.getIdToken();
+        console.log(isFollowing)
+        if (!isFollowing) {
+            console.log('follow')
+            await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/${username}/add-follow`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            setFollowers(prev => prev += 1);
+        } else {
+            await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/${username}/remove-follow`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            setFollowers(prev => prev -= 1);
+        }
+    }
+
+    // if (loading) return;
+
+    if (!userData) return 'Unable to fetch user data'
 
     return (
         <div className="profile">
@@ -18,24 +96,45 @@ const Profile = () => {
                 <div className="nav-content-wrapper">
                     <div className="profile-header">
                         <div className="profile-pic-wrapper">
-                            <img className='profile-pic' src={mongoUser?.profileURL || defaultProfilePic}/>
+                            <img className='profile-pic' src={userData?.profileURL || defaultProfilePic}/>
                         </div>
                         <div className="profile-text">
-                            <p className='popup-name'>{mongoUser?.name || 'Name'}</p>
-                            <p className='popup-username'>@{username}</p>
+                            <p className='popup-name'>{userData.name}</p>
+                            <p className='popup-username'>@{userData.username}</p>
                             <div className='follow'>
-                                <p><b>10</b> followers</p>
-                                <p><b>10</b> following</p>
+                                <div className="sub-btn" onClick={() => setShowFollowers(true)}>
+                                    <p><b>{followers}</b> followers</p>
+                                </div>
+                                <div className="sub-btn" onClick={() => setShowFollowing(true)}>
+                                    <p><b>{userData.following.length}</b> following</p>
+                                </div>
                             </div>
+                            {!isSelf &&
+                                <div className="sub-btn follow" onClick={handleFollow}>
+                                    {isFollowing ? 'Following ✓' : 'Follow'}
+                                </div>
+                            }
                         </div>
                     </div>
                     <hr/>
                     <div className="post-drafts">
                         <div className="basic-nav">
                             <p>POSTS</p>
-                            <p>DRAFTS</p>
                         </div>
                     </div>
+
+                    {showFollowers && 
+                        <Follows mode='followers'
+                                followers={userData.followers}
+                                setShowFollowers={setShowFollowers}
+                                isSelf={isSelf}
+                        />}
+                    {showFollowing && 
+                        <Follows mode='following'
+                                following={userData.following}
+                                setShowFollowing={setShowFollowing}
+                                isSelf={isSelf}
+                        />}
                 </div>
             </div>
         </div>

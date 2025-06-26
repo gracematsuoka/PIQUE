@@ -33,7 +33,9 @@
 .profile-text {
     display: flex;
     flex-direction: column;
-    gap: 5px
+    align-items: flex-start;
+    justify-content: flex-start;
+    // gap: 5px
 }
 
 .profile .popup-name {
@@ -66,4 +68,15 @@
 
 .profile .profile-text .follow {
     font-size: 16px;
+    padding: 0;
+}
+
+.profile-text .sub-btn.follow {
+    width: fit-content;
+    // background-color: lightgray;
+    background-color: #6B799F;
+    color: white;
+    font-weight: 600;
+    padding: 5px 10px;
+    font-size: 15px;
 }

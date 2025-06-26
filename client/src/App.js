@@ -16,6 +16,7 @@ import Settings from './components/features/Settings';
 import Boards from './components/features/Boards';
 import Favorites from './components/features/Favorites';
 import { useAuth } from './contexts/AuthContext';
+import { ClosetProvider } from './contexts/ClosetContext';
 
 function App() {
   const { currentUser, loading } = useAuth();
@@ -74,27 +75,27 @@ function App() {
             }
           />
           <Route
-            path="/profile"
-            element={
-              <PrivateRoute>
-                <Profile />
-              </PrivateRoute>
-            }
+            path="/profile/:username"
+            element={<Profile />}
           />
           <Route
             path="/closet"
             element={
+              <ClosetProvider>
               <PrivateRoute>
                 <Closet />
               </PrivateRoute>
+              </ClosetProvider>
             }
           />
           <Route
             path="/create"
             element={
+              <ClosetProvider>
               <PrivateRoute>
                 <Create />
               </PrivateRoute>
+              </ClosetProvider>
             }
           />
           <Route

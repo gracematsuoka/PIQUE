@@ -12,7 +12,6 @@ const ProfilePopup = () => {
     const [error, setError] = useState();
     const {mongoUser, logout} = useAuth();
     const navigate = useNavigate();
-    let username = (mongoUser?.username || 'Username').toLowerCase();
     const [isPopupVisible, setIsPopupVisible] = useState(false);
 
     const togglePopup = () => {
@@ -33,14 +32,10 @@ const ProfilePopup = () => {
     return (
         <div className="popup-container profile">
             <p className='popup-name'>{mongoUser?.name || 'Name'}</p>
-            <p className='popup-username'>@{username}</p>
-            <div className='follow'>
-                <p><b>10</b> followers</p>
-                <p><b>10</b> following</p>
-            </div>
+            <p className='popup-username'>@{mongoUser?.username || 'username'}</p>
             <hr/>
             <div className='sub-btn'>
-                <Link to='/profile'>
+                <Link to={`/profile/${mongoUser?.username}`}>
                     <FaceIcon/>
                     <p>Profile</p>
                 </Link>

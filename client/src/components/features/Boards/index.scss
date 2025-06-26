@@ -1,6 +1,10 @@
 .boards {
     padding-left: 120px;
     padding-top: 20px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    row-gap: 20px;
 }
 
 .board {
@@ -22,6 +26,10 @@
 .board:hover {
     transform: scale(0.98);
     transition: transform 0.3s ease-in-out;
+
+    .edit {
+        display: flex
+    }
 }
 
 .board img {
@@ -30,7 +38,7 @@
     object-fit: cover;
     object-position: 0 25%;
     border-radius: 10px;
-    box-shadow: 0 4px 9px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 9px rgba(0, 0, 0, 0.1);
 }
 
 .board .h1-wrap {
@@ -58,7 +66,8 @@
     background-color: black;
     width: 24px;
     height: 24px;
-    display: flex;
+    // display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
     border-radius: 50%;
