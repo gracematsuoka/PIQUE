@@ -27,13 +27,13 @@ const Congrats = ({setShowCongrats, setReload}) => {
                         </div>
                         <p>Your post is now up</p>
                         <div className='btn-wrap'>
-                            <button className='sub-btn bold'>VIEW POST</button>
+                            <button className='sub-btn bold'>View post</button>
                             <button className='sub-btn' 
                                 onClick={() => {
                                     setShowCongrats(false);
                                     setReload(true);
                             }}>
-                                KEEP STYLING
+                                Keep styling
                             </button>
                         </div>
                     </div>

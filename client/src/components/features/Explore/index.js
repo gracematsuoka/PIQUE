@@ -13,11 +13,10 @@ import collection from '../../../assets/images/test/500x500.png';
 import { getAuth } from "firebase/auth";
 
 const Explore = () => {
-    const [showDetails, setShowDetails] = useState(false);
     const [posts, setPosts] = useState([]);
     const [cursor, setCursor] = useState(null);
     const [hasMore, setHasMore] = useState(true);
-    const [selectedId, setSelectedId] = useState(null);
+    const [selectedPost, setSelectedPost] = useState(null);
     const sentinelRef = useRef(null);
 
     useEffect(() => {
@@ -92,12 +91,11 @@ const Explore = () => {
             <TopBar/>
                 <div className="nav-content">
                     <NavBar/>
-                    {selectedId && 
+                    {selectedPost && 
                         <PostDetails
-                            posts={posts}
-                            setPosts={setPosts}
-                            selectedId={selectedId}
-                            setSelectedId={setSelectedId}
+                            selectedPost={selectedPost}
+                            setSelectedPost={setSelectedPost}
+                            handleLike={handleLike}
                     />}
                     <div className="nav-content-wrapper">
                         <div className="search-bar-wrapper">
@@ -107,7 +105,7 @@ const Explore = () => {
                             {posts.map(post =>
                                 <div className="post" key={post._id}>
                                     <img src={post.postURL} onClick={() => {
-                                        setSelectedId(post._id);
+                                        setSelectedPost(post);
                                     }}/>
                                     <div className="post-save-bar">
                                         <div className="like-btn" 

@@ -3,6 +3,7 @@ const router = express.Router();
 const Post = require("../models/Post");
 const Like = require('../models/Like');
 const authenticateUser = require("../middleware/authenticateUser");
+const { auth } = require("firebase-admin");
 
 router.post('/create-post', authenticateUser, async (req, res) => {
     const {mongoId} = req.user;
@@ -73,6 +74,15 @@ router.delete('/:postId/unlike', authenticateUser, async (req, res) => {
 
     await Post.findByIdAndUpdate(postId, {$inc: {likes: -1}});
     res.sendStatus(204);
+})
+
+router.get('/:postId', authenticateUser, async (req, res) => {
+    const {postId} = req.params;
+
+    const post = await Post.findById(postId);
+    if (!post) return res.status(404).json({error: 'Post not found'});
+    
+    res.status(200).json(post);
 })
 
 module.exports = router;

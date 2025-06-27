@@ -1,3 +1,7 @@
+.post-details .popup-content {
+    width: fit-content
+}
+
 .post-header {
     display: flex;
     align-items: center;
@@ -33,11 +37,14 @@
 }
 
 .post-content .outfit {
-    height: 500px;
-    width: auto;
-    border-radius: 10px;
-    outline: 0.9px solid black
-    // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: fit-content;
+    height: fit-content;
+}
+
+.post-content .outfit canvas {
+    display: block;
+    border-radius: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .save-bar {

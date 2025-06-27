@@ -177,7 +177,6 @@ const Create = () => {
                 isDragging: false,
                 lastPosX: 0,
                 lastPosY: 0,
-                // viewportTransform: [1, 0, 0, 1, 0, 0]
             })
             fabricCanvas.backgroundColor='#ffffff';
             fabricCanvas.renderAll();
@@ -313,50 +312,8 @@ const Create = () => {
             } else {
                 hideContextMenu();
             }
-
-
-            // var evt = opt.e;
-            // if (evt.altKey === true) {
-            //     console.log('drag')
-            //     canvas.isDragging = true;
-            //     canvas.selection = false;
-            //     canvas.lastPosX = evt.clientX;
-            //     canvas.lastPosY = evt.clientY;
-            // }
         }
 
-        const handleMouseWheel = (opt) => {
-            var delta = opt.e.deltaY;
-            var zoom = canvas.getZoom();
-            zoom *= 0.999 ** delta;
-            if (zoom > 20) zoom = 20;
-            if (zoom < 0.01) zoom = 0.01;
-            canvas.setZoom(zoom);
-            opt.e.preventDefault();
-            opt.e.stopPropagation();
-        }
-
-        const handleMouseMove = (opt) => {
-          if (canvas.isDragging) {
-            var e = opt.e;
-            var vpt = canvas.viewportTransform;
-            vpt[4] += e.clientX - canvas.lastPosX;
-            vpt[5] += e.clientY - canvas.lastPosY;
-            canvas.requestRenderAll();
-            canvas.lastPosX = e.clientX;
-            canvas.lastPosY = e.clientY;
-          }
-        }
-
-        const handleMouseUp = (opt) => {
-          canvas.setViewportTransform(canvas.viewportTransform);
-          canvas.isDragging = false;
-          canvas.selection = true;
-        }
-
-        // canvas.on('mouse:wheel', handleMouseWheel);
-        // canvas.on('mouse:move', handleMouseMove);
-        // canvas.on('mouse:up', handleMouseUp);
         canvas.on('mouse:down', handleContextMenu);
         canvas.on('selection:created', syncCanvas);
         canvas.on('selection:cleared', syncCanvas);
@@ -369,9 +326,6 @@ const Create = () => {
             canvas.off('selection:cleared', syncCanvas);
             canvas.off('selection:updated', syncCanvas);
             canvas.off('mouse:down', handleContextMenu);
-            // canvas.off('mouse:wheel', handleMouseWheel);
-            // canvas.off('mouse:move', handleMouseMove);
-            // canvas.off('mouse:up', handleMouseUp);
         }
     }, [canvas]);
 
@@ -511,7 +465,8 @@ const Create = () => {
         img.toObject = function(propertiesToInclude) {
             return {
                 ...Object.getPrototypeOf(this).toObject.call(this, propertiesToInclude),
-                itemId: this.itemId
+                itemId: this.itemId,
+                itemName: this.itemName
             };
         };
 
@@ -524,7 +479,36 @@ const Create = () => {
             hasControls: true,
             scaleX:0.5,
             scaleY:0.5,
-            itemId: data.itemRef._id
+            itemId: data.itemRef._id,
+            itemName: data.name
+        })
+
+        canvas.add(img)
+    }
+
+    const addImage = async (item) => {
+        const img = await FabricImage.fromURL(item.itemRef?.imageURL.replace('/public', '/300'),
+            {crossOrigin: 'anonymous'});
+
+        img.toObject = function(propertiesToInclude) {
+            return {
+                ...Object.getPrototypeOf(this).toObject.call(this, propertiesToInclude),
+                itemId: this.itemId,
+                itemName: this.itemName
+            };
+        };
+
+        img.set({
+            left: 50,
+            top: 50,
+            originX: 'center',
+            originY: 'center',
+            selectable: true,
+            hasControls: true,
+            scaleX:0.5,
+            scaleY:0.5,
+            itemId: item.itemRef._id,
+            itemName: item.name
         })
 
         canvas.add(img)
@@ -549,12 +533,12 @@ const Create = () => {
     }
 
     const handleSave = () => {
-        const json = canvas.toJSON(['itemId'], true);
+        const json = canvas.toJSON(['itemId', 'itemName'], true);
         const dataURL = canvas.toDataURL({format: 'png', multiplier: 2})     
     }
     
     const handlePost = () => {
-        const json = canvas.toJSON(['itemId'], true);
+        const json = canvas.toJSON(['itemId', 'itemName'], true);
         const dataURL = canvas.toDataURL({format: 'png', multiplier: 3})
         setCanvasJSON(json);
         setPostURL(dataURL);
@@ -800,6 +784,7 @@ const Create = () => {
                                                 key={item._id}
                                                 draggable
                                                 onDragStart={e => handleDragStart(e, item)}
+                                                onClick={() => addImage(item)}
                                                 >
                                                 <img 
                                                     src={item.itemRef?.imageURL.replace('/public', '/300')}
