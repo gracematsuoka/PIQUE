@@ -118,7 +118,7 @@ router.get('/:username', async (req, res) => {
 
     try {
         const user = await User.findOne({username})
-                                .select('name username profileURL followers following')
+                                .select('name username profileURL followers following _id')
                                 .lean();
 
         if (!user) {

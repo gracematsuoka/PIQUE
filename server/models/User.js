@@ -12,8 +12,8 @@ const UserSchema = new mongoose.Schema({
     email: {type: String, required: true, unique: true},
     profileURL: String,
     tags: [TagSchema],
-    followers: Array,
-    following: Array
+    followers: Number,
+    following: Number
 }, { timestamps: true })
 
 module.exports = mongoose.model("User", UserSchema);

@@ -15,7 +15,8 @@ const Profile = () => {
     const [userData, setUserData] = useState(null);
     const [showFollowers, setShowFollowers] = useState(false);
     const [showFollowing, setShowFollowing] = useState(false);
-    const [followers, setFollowers] = useState(null);
+    const [followers, setFollowers] = useState(0);
+    const [following, setFollowing] = useState(0);
     const [loading, setLoading] = useState(false);
     const [isFollowing, setIsFollowing] = useState(false)
 
@@ -29,7 +30,8 @@ const Profile = () => {
 
                 const data = await res.json();
                 setUserData(data);
-                setFollowers(data.followers.length);
+                setFollowers(data.followers);
+                setFollowing(data.following);
             } catch (err) {
                 console.log('Failed to fetch user data:', err);
             } finally {
@@ -37,11 +39,16 @@ const Profile = () => {
             }
         }
 
+        handleFetchUser();
+    }, [username])
+
+    useEffect(() => {
+        if (!userData) return; 
         const checkFollowing = async () => {
             try {
                 const auth = getAuth();
                 const token = await auth.currentUser.getIdToken();
-                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/${username}/is-following`, {
+                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/follows/${userData._id}/is-following`, {
                     method: 'GET',
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -49,24 +56,21 @@ const Profile = () => {
                 });
 
                 const data = await res.json();
-                setIsFollowing(data.following);
+                setIsFollowing(data.follow);
             } catch (err) {
                 console.log('Failed to verify following status:', err);
             }
         }
 
-        handleFetchUser();
         checkFollowing();
-    }, [username])
+    }, [userData])
 
     const handleFollow = async () => {
         setIsFollowing(prev => !prev);
         const auth = getAuth();
         const token = await auth.currentUser.getIdToken();
-        console.log(isFollowing)
         if (!isFollowing) {
-            console.log('follow')
-            await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/${username}/add-follow`, {
+            await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/follows/${userData._id}/create-follow`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -74,8 +78,8 @@ const Profile = () => {
             });
             setFollowers(prev => prev += 1);
         } else {
-            await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/${username}/remove-follow`, {
-                method: 'POST',
+            await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/follows/${userData._id}/remove-follow`, {
+                method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -83,8 +87,6 @@ const Profile = () => {
             setFollowers(prev => prev -= 1);
         }
     }
-
-    // if (loading) return;
 
     if (!userData) return 'Unable to fetch user data'
 
@@ -106,7 +108,7 @@ const Profile = () => {
                                     <p><b>{followers}</b> followers</p>
                                 </div>
                                 <div className="sub-btn" onClick={() => setShowFollowing(true)}>
-                                    <p><b>{userData.following.length}</b> following</p>
+                                    <p><b>{following}</b> following</p>
                                 </div>
                             </div>
                             {!isSelf &&
@@ -125,15 +127,17 @@ const Profile = () => {
 
                     {showFollowers && 
                         <Follows mode='followers'
-                                followers={userData.followers}
                                 setShowFollowers={setShowFollowers}
+                                setFollowers={setFollowers}
                                 isSelf={isSelf}
+                                userId={userData._id}
                         />}
                     {showFollowing && 
                         <Follows mode='following'
-                                following={userData.following}
                                 setShowFollowing={setShowFollowing}
+                                setFollowing={setFollowing}
                                 isSelf={isSelf}
+                                userId={userData._id}
                         />}
                 </div>
             </div>
