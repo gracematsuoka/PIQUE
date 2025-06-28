@@ -389,6 +389,10 @@ const ItemDetails = ({ mode,
         setColorDivs(prev => prev.filter(colorDiv => colorDiv.id !== id))
     }
 
+    const itemOptions = ['Tops', 'Bottoms', 'Outerwear', 'Shoes', 
+        'Jewelry', 'Bags', 'Accessories', 'Other'
+    ]
+
     const colorOptions = {
         Red: '#F35050',
         Orange: '#EEA34E',
@@ -566,14 +570,9 @@ const ItemDetails = ({ mode,
                                                     setCategory(e.target.value);
                                                     mode === 'edit' && handleChange('category', e.target.value);
                                                     }}>
-                                        <option value='tops'>Tops</option>
-                                        <option value='bottoms'>Bottoms</option>
-                                        <option value='outerwear'>Outerwear</option>
-                                        <option value='shoes'>Shoes</option>
-                                        <option value='jewelry'>Jewelry</option>
-                                        <option value='bags'>Bags</option>
-                                        <option value='accessories'>Accessories</option>
-                                        <option value='other'>Other</option>
+                                        {itemOptions.map(item =>
+                                            <option value={item}>{item}</option>
+                                        )}
                                     </select>
                                 </div>
                                 <div className='item-field'>

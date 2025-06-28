@@ -31,7 +31,7 @@ router.get('/get-posts', authenticateUser, async (req, res) => {
     const docs = await Post.find(cursor ? {_id: {$lt: cursor}} : {})
                             .sort({_id: -1})
                             .limit(limit + 1)
-                            .select('likes _id postURL')
+                            .select('likes _id postURL userId colors')
                             .lean();
     
     const hasMore = docs.length > limit;
@@ -79,7 +79,7 @@ router.delete('/:postId/unlike', authenticateUser, async (req, res) => {
 router.get('/:postId', authenticateUser, async (req, res) => {
     const {postId} = req.params;
 
-    const post = await Post.findById(postId);
+    const post = await Post.findById(postId).populate('userRef', 'username profileURL');
     if (!post) return res.status(404).json({error: 'Post not found'});
     
     res.status(200).json(post);

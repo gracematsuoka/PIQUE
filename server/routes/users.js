@@ -219,8 +219,10 @@ router.post('/create-tag', authenticateUser, async (req, res) => {
 
 router.get('/get-tags', authenticateUser, async (req, res) => {
     const { mongoId } = req.user;
+    console.log('got')
 
-    const user = await User.findById(mongoId);
+    const user = await User.findById(mongoId).lean().select('tags');
+    if (!user) return res.status(404).json({error: 'User not found'});
     res.json({tags: user.tags});
 })
 

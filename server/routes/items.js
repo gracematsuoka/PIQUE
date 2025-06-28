@@ -23,4 +23,13 @@ router.post('/create-item', authenticateUser, async (req, res) => {
     res.status(201).json({message: 'Item created', item});
 })
 
+router.post('/get-items', authenticateUser, async (req, res) => {
+    const {itemIds} = req.body;
+
+    const items = await Item.find({_id: {$in: itemIds}})
+                            .select('_id name category brand link colors');
+
+    res.json({items});
+})
+
 module.exports = router;

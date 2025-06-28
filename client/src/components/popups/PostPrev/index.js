@@ -111,8 +111,8 @@ const PostPrev = ({canvasJSON,
                                         <textarea className='description' rows='8' placeholder='Description' value={description} onChange={e => setDescription(e.target.value)}/>
                                     </div>
                                     <div className='prev-btns'>
-                                        <button className='sub-btn bold' onClick={handlePost}>POST</button>
-                                        <button className='sub-btn' onClick={() => setShowPost(false)}>CANCEL</button>
+                                        <button className='sub-btn bold' onClick={handlePost}>Post</button>
+                                        <button className='sub-btn' onClick={() => setShowPost(false)}>Cancel</button>
                                     </div>
                                 </div>
                             </div>

@@ -465,8 +465,7 @@ const Create = () => {
         img.toObject = function(propertiesToInclude) {
             return {
                 ...Object.getPrototypeOf(this).toObject.call(this, propertiesToInclude),
-                itemId: this.itemId,
-                itemName: this.itemName
+                itemId: this.itemId
             };
         };
 
@@ -479,8 +478,7 @@ const Create = () => {
             hasControls: true,
             scaleX:0.5,
             scaleY:0.5,
-            itemId: data.itemRef._id,
-            itemName: data.name
+            itemId: data.itemRef._id
         })
 
         canvas.add(img)
@@ -493,8 +491,7 @@ const Create = () => {
         img.toObject = function(propertiesToInclude) {
             return {
                 ...Object.getPrototypeOf(this).toObject.call(this, propertiesToInclude),
-                itemId: this.itemId,
-                itemName: this.itemName
+                itemId: this.itemId
             };
         };
 
@@ -507,8 +504,7 @@ const Create = () => {
             hasControls: true,
             scaleX:0.5,
             scaleY:0.5,
-            itemId: item.itemRef._id,
-            itemName: item.name
+            itemId: item.itemRef._id
         })
 
         canvas.add(img)
@@ -533,12 +529,12 @@ const Create = () => {
     }
 
     const handleSave = () => {
-        const json = canvas.toJSON(['itemId', 'itemName'], true);
+        const json = canvas.toJSON(['itemId'], true);
         const dataURL = canvas.toDataURL({format: 'png', multiplier: 2})     
     }
     
     const handlePost = () => {
-        const json = canvas.toJSON(['itemId', 'itemName'], true);
+        const json = canvas.toJSON(['itemId'], true);
         const dataURL = canvas.toDataURL({format: 'png', multiplier: 3})
         setCanvasJSON(json);
         setPostURL(dataURL);

@@ -54,21 +54,25 @@ const Closet = () => {
         const auth = getAuth();
         const token = await auth.currentUser.getIdToken();
 
-        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/get-tags`, {
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
+        try {
+            const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/get-tags`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
 
-        const data = await res.json();
-        if (!data) return;
-        setTags(data.tags.map(tag => ({
-            name: tag.name,
-            hex: tag.hex,
-            key: tag.key,
-            checked: false
-        })));
+            const data = await res.json();
+            if (!data) return;
+            setTags(data.tags.map(tag => ({
+                name: tag.name,
+                hex: tag.hex,
+                key: tag.key,
+                checked: false
+            })));
+        } catch (err) {
+            console.log('Failed to load tags:', err);
+        }
     }
 
     useEffect(() => {

@@ -4,7 +4,7 @@ const PostSchema = new mongoose.Schema({
     title: String,
     description: String,
     canvasJSON: mongoose.Schema.Types.Mixed,
-    userId: mongoose.Types.ObjectId,
+    userRef: {type: mongoose.Types.ObjectId, ref: 'User'},
     postURL: String,
     likes: Number,
     visibility: String
