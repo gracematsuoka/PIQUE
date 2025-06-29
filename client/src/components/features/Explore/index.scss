@@ -24,6 +24,7 @@
     flex: 1;
     padding: 5px 5px;
     width: 100%;
+    position: relative;
 }
 
 @media (min-width: 600px) {
@@ -81,6 +82,14 @@
     width: 100%;
     bottom: 0;
     font-size: 12px;
+
+    &.active {
+        display: flex;
+
+        .save-btn {
+            background-color: #d1d0d0b8;
+        }
+    }
 }
 
 .like-btn {
@@ -100,6 +109,7 @@
 
 .post .save-btn p{
     font-size: 12px;
+    font-weight: 500;
 }
 
 .post .save-btn {
@@ -113,5 +123,15 @@
     background-color: #d1d0d0b8;
 }
 
+.explore .loading {
+    position: absolute;
+    bottom: 0;
+}
+
+.board-save {
+    position: absolute;
+    bottom: 43px;
+    right: 10px;
+}
 
 

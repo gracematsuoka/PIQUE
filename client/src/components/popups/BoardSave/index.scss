@@ -1,0 +1,60 @@
+.board-save {
+    background-color: white;
+    border-radius: 5px;
+    font-size: 14px;
+    padding: 10px 7px;
+    max-height: 80%;
+    width: 80%;
+    overflow: auto;
+    outline: 1px solid #EBEBEBEB;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    .board-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        gap: 20px;
+
+        p {
+            width: 70%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-family: 'Publica Play Bold';
+            font-size: 12px;
+        }
+    }
+
+    .icon-circle {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background-color: black;
+        display: flex;
+        justify-content: center;
+        align-self: center;
+
+        &:hover {
+            outline: 2px solid #EBEBEBEB
+        }
+    }
+
+    svg {
+        height: 15px;
+        width: 15px;
+        border-radius: 50%;
+        fill: white;
+    }
+
+    .sub-btn.new-board {
+        font-size: 12px;
+        outline: 1px solid #EBEBEBEB;
+
+        &:hover {
+            background-color: #EBEBEBEB;
+        }
+    }
+}

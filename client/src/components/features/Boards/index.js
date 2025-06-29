@@ -69,15 +69,15 @@ const Boards = () => {
                 speed="1.75"
                 color="#6B799F"
                 />
-        ) : boards.length > 0 ? (
+        ) : boards?.length > 0 ? (
             boards.map(board => 
                 <div className="board" key={board._id}>
-                    <img src={board?.coverURL || defaultCover}/>
+                    <img src={board?.coverRef.postURL || defaultCover}/>
                     <div className="board-title">
                         <div className="h1-wrap">
                             <h1>{board.title.toUpperCase()}</h1>
                         </div>
-                        <p>{board.postIds.length} Saved</p>
+                        <p>{board.numSaved} Saved</p>
                     </div>
                     <Tooltip title='Edit board'>
                     <div className="edit" 

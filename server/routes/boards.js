@@ -11,6 +11,7 @@ router.post('/create-board', authenticateUser, async (req, res) => {
         title,
         description,
         userId: mongoId,
+        numSaved: 0
     })
 
     await board.save();
@@ -20,7 +21,7 @@ router.post('/create-board', authenticateUser, async (req, res) => {
 router.get('/get-boards', authenticateUser, async (req, res) => {
     const {mongoId} = req.user;
 
-    const boards = await Board.find({userId: mongoId});
+    const boards = await Board.find({userId: mongoId}).populate('coverRef');
     res.status(200).json({boards});
 })
 

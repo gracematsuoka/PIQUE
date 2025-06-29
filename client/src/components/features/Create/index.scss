@@ -23,6 +23,7 @@
 
 .create hr {
     width: 100vw;
+    
 }
 
 .input-wrapper {
@@ -67,11 +68,12 @@
 }
 
 .create .nav-content .sub-btn {
-    outline: 1px solid black;
+    outline: 1px solid rgba(0, 0, 0, 0.21);
     // font-weight: 700;
 }
 
 .sub-btn.bold {
+    outline: 0;
     background-color: #6B799F;
     color: white;
     height: fit-content;
@@ -103,7 +105,7 @@
     // background-color: cadetblue;
     border-top-left-radius: 30px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    outline: 1px solid black;
+    // outline: 1px solid black;
     position: relative;
     width: 35vw;
     height: 100%;

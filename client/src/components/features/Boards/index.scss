@@ -16,7 +16,7 @@
     width: fit-content;
     padding: 10px 10px;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     position: relative;
     cursor: pointer;
     transform: scale(1);
@@ -38,7 +38,7 @@
     object-fit: cover;
     object-position: 0 25%;
     border-radius: 10px;
-    box-shadow: 0 4px 9px rgba(0, 0, 0, 0.1);
+    outline: 1px solid #efefef
 }
 
 .board .h1-wrap {

@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
 const BoardScema = mongoose.Schema({
-    userId: mongoose.Types.ObjectId,
+    userId: {type: mongoose.Types.ObjectId, ref: 'User'},
     title: String,
     description: String,
-    coverURL: String,
-    postIds: Array
-});
+    coverRef: {type: mongoose.Types.ObjectId, ref: 'Post'},
+    numSaved: Number
+}, {timestamps: true});
 
 module.exports = mongoose.model('Board', BoardScema)

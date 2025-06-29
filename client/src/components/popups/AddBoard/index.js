@@ -7,7 +7,8 @@ const AddBoard = ({setShowAddBoard,
                     setShowEditBoard,
                     mode,
                     board,
-                    setBoards
+                    setBoards,
+                    setBoardData
                 }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
@@ -32,25 +33,6 @@ const AddBoard = ({setShowAddBoard,
         const auth = getAuth();
         const token = await auth.currentUser.getIdToken();
 
-        if (mode === 'add') {
-            try {
-                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/boards/create-board`, {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-type': 'application/json'
-                    },
-                    body: JSON.stringify({title, description})
-                })
-
-                const data = await res.json();
-                const board = data.board;
-
-                setBoards(prev => [...prev, board]);
-            } catch (err) {
-                console.log('Failed to create board:', err);
-            }
-        } 
         if (mode === 'edit') {
             try {
                 const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/boards/edit-board/${board._id}`, {
@@ -71,7 +53,30 @@ const AddBoard = ({setShowAddBoard,
             } catch (err) {
                 console.log('Failed to update board:', err);
             }
-        }
+        } else {
+            try {
+                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/boards/create-board`, {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-type': 'application/json'
+                    },
+                    body: JSON.stringify({title, description})
+                })
+
+                const data = await res.json();
+                const board = data.board;
+
+                if (mode === 'add') setBoards(prev => [...prev, board]);
+
+                if (mode === 'add-explore') setBoardData(prev => [...prev, {
+                    ...board,
+                    exists: false
+                }])
+            } catch (err) {
+                console.log('Failed to create board:', err);
+            }
+        } 
     }
 
     return (
@@ -108,7 +113,7 @@ const AddBoard = ({setShowAddBoard,
                                     onClick={() => {
                                         handleSubmit();
                                     }}>
-                                {mode === 'add' ? 'Create board' : 'Update board'}
+                                {mode === 'edit' ? 'Update board' : 'Add board'}
                             </button>
                             <button className='sub-btn' 
                                     onClick={() => {

@@ -23,4 +23,4 @@ const UserItem = new mongoose.Schema({
     tab: String // closet, wishlist, ...
 }, { timestamps: true })
 
-module.exports = mongoose.model('User Item', UserItem);
+module.exports = mongoose.model('UserItem', UserItem);
