@@ -6,8 +6,9 @@ import AddIcon from '@mui/icons-material/Add';
 import { useEffect, useState } from 'react';
 import { Bouncy } from 'ldrs/react';
 import AddBoard from '../../popups/AddBoard';
-import { getAuth } from 'firebase/auth';
+import { auth } from '../../../firebase';
 import defaultCover from '../../../assets/images/home/pique_hold.png';
+import { useNavigate } from 'react-router-dom';
 
 const Boards = () => {
     const [empty, setEmpty] = useState(true);
@@ -16,11 +17,11 @@ const Boards = () => {
     const [showEditBoard, setShowEditBoard] = useState(false);
     const [selectedBoard, setSelectedBoard] = useState(null);
     const [boards, setBoards] = useState([])
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchBoards = async () => {
             setLoading(true);
-            const auth = getAuth();
             const token = await auth.currentUser.getIdToken();
 
             try {
@@ -71,7 +72,9 @@ const Boards = () => {
                 />
         ) : boards?.length > 0 ? (
             boards.map(board => 
-                <div className="board" key={board._id}>
+                <div className="board" 
+                    key={board._id} 
+                    onClick={() => navigate(`/saved/boards/${board._id}`)}>
                     <img src={board?.coverRef.postURL || defaultCover}/>
                     <div className="board-title">
                         <div className="h1-wrap">

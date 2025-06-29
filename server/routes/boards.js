@@ -41,4 +41,13 @@ router.patch('/edit-board/:boardId', authenticateUser, async (req, res) => {
     res.status(200).json({board});
 })
 
+router.get('/:boardId/board', authenticateUser, async (req, res) => {
+    const {boardId} = req.params;
+
+    const board = await Board.findById(boardId);
+    if (!board) return res.status(404).json({error: 'Board not found'});
+
+    res.json(board);
+})
+
 module.exports = router;

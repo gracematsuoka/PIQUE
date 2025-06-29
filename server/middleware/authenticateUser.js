@@ -16,6 +16,9 @@ const authenticateUser = async (req, res, next) => {
     const email = decodedToken.email;
 
     const mongoUser = await User.findOne({ firebaseUid });
+
+    if (!mongoUser) return res.status(401).json({message: 'AUTH USER NOT FOUND'})
+
     if (mongoUser) {
         req.user = {
             firebaseUid,

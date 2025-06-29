@@ -25,7 +25,6 @@ const Saved = () => {
                             <NavLink to='/saved/all'>ALL SAVED</NavLink>
                         </div>
                         <SearchBar/>
-                        
                     </div>
                 </div>
                 <Outlet/>

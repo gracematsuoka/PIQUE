@@ -3,7 +3,7 @@ import defaultProfilePic from '../../../assets/images/icons/default-profile-pic.
 import CloseIcon from '@mui/icons-material/Close';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAuth } from 'firebase/auth';
+import { auth } from '../../../firebase';
 
 const Follows = ({mode, 
                 setShowFollowers,
@@ -18,7 +18,7 @@ const Follows = ({mode,
 
     useEffect(() => {
         const fetchUserData = async () => {
-            const token = await getAuth().currentUser.getIdToken();
+            const token = auth.currentUser.getIdToken();
 
             const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/follows/${userId}/${mode}`, {
                 method: 'GET',
@@ -45,7 +45,6 @@ const Follows = ({mode,
                 data.user._id === userId ? {...data, follow: !data.follow} : data
             ))
 
-            const auth = getAuth();
             const token = await auth.currentUser.getIdToken();
             await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/follows/${userId}/remove-follower/${otherUserId}`, {
                 method: 'DELETE',
@@ -60,7 +59,6 @@ const Follows = ({mode,
             setUserData(userData.map(data => 
                 data.user._id === otherUserId ? {...data, follow: !data.follow} : data
             ));
-            const auth = getAuth();
             const token = await auth.currentUser.getIdToken();
 
             if (!follow) {

@@ -1,11 +1,10 @@
 import './index.scss'
 import {ReactComponent as CloseIcon} from '../../../assets/images/icons/close.svg'
-import {getAuth} from 'firebase/auth'
+import { auth } from '../../../firebase';
 import {useNavigate} from 'react-router-dom'
 
 const WarningPopup = ({ onClose }) => {
     const navigate = useNavigate();
-    const auth = getAuth();
 
     const handleDeleteUser = async () => {
         try {

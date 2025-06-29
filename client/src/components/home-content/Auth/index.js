@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import GoogleIcon from '../../../assets/images/icons/googleicon.png'
 import { useAuth } from '../../../contexts/AuthContext'
 import { useEffect, useState } from 'react'
+import { auth } from '../../../firebase';
 import {getAuth} from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
 
@@ -38,7 +39,6 @@ const Auth = ({ mode }) => {
             } else {
                 await signup(email, password);
                 
-                const auth = getAuth();
                 const token = await auth.currentUser.getIdToken();
 
                 await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/create-user`, {

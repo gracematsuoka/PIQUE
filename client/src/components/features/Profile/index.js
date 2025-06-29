@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import TopBar from "../TopBar";
 import NavBar from "../NavBar";
 import './index.scss';
-import { getAuth } from "firebase/auth";
+import { auth } from '../../../firebase';
 import Follows from "../../popups/Follows";
 import { Bouncy } from 'ldrs/react';
 import defaultProfilePic from '../../../assets/images/icons/default-profile-pic.png'
@@ -26,7 +26,7 @@ const Profile = () => {
         const handleFetchUser = async () => {
             setLoading(true);
             try {
-                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/${username}`);           
+                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/${username}/get-user`);           
 
                 const data = await res.json();
                 setUserData(data);
@@ -46,7 +46,6 @@ const Profile = () => {
         if (!userData) return; 
         const checkFollowing = async () => {
             try {
-                const auth = getAuth();
                 const token = await auth.currentUser.getIdToken();
                 const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/follows/${userData._id}/is-following`, {
                     method: 'GET',
@@ -67,7 +66,6 @@ const Profile = () => {
 
     const handleFollow = async () => {
         setIsFollowing(prev => !prev);
-        const auth = getAuth();
         const token = await auth.currentUser.getIdToken();
         if (!isFollowing) {
             await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/follows/${userData._id}/create-follow`, {

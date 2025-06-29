@@ -1,4 +1,4 @@
-import { getAuth } from 'firebase/auth'
+import { auth } from '../../../firebase';
 import { useAuth } from "../../../contexts/AuthContext"
 import {ReactComponent as LogoutIcon} from '../../../assets/images/icons/logout.svg'
 import {ReactComponent as SettingsIcon} from '../../../assets/images/icons/settings.svg'
@@ -8,7 +8,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 
 const ProfilePopup = () => {
-    const auth = getAuth();
     const [error, setError] = useState();
     const {mongoUser, logout} = useAuth();
     const navigate = useNavigate();

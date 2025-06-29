@@ -8,7 +8,7 @@ import { Bouncy } from 'ldrs/react';
 import 'ldrs/react/Bouncy.css';
 import { useCloset } from '../../../contexts/ClosetContext';
 import {ReactComponent as CloseIcon} from '../../../assets/images/icons/close.svg';
-import {getAuth} from 'firebase/auth';
+import { auth } from '../../../firebase';
 
 const Items = ({onSelectItem, reload, updatedItem, addedItem, setSelectedItem}) => {
     const { closetItems, setClosetItems, loading, setLoading } = useCloset();
@@ -32,11 +32,10 @@ const Items = ({onSelectItem, reload, updatedItem, addedItem, setSelectedItem}) 
     }, [addedItem])
 
     const handleDelete = async () => {
-        const auth = getAuth();
         const token = await auth.currentUser.getIdToken();
 
         console.log('front:', deleteId)
-        await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user-items/delete-item?itemId=${deleteId}`, {
+        await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/useritems/delete-item?itemId=${deleteId}`, {
             method: 'DELETE',
             headers: {
                 Authorization: `Bearer ${token}`

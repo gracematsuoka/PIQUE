@@ -15,8 +15,8 @@ app.use("/api/users", userRoutes);
 const imageRoutes = require('./routes/images');
 app.use('/api/images', imageRoutes);
 
-const userItemRoutes = require('./routes/user-items');
-app.use('/api/user-items', userItemRoutes);
+const userItemRoutes = require('./routes/useritems');
+app.use('/api/useritems', userItemRoutes);
 
 const ItemRoutes = require('./routes/items');
 app.use('/api/items', ItemRoutes);

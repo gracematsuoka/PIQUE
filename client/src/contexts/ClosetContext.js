@@ -1,5 +1,5 @@
 import React, {useContext, useState, useEffect} from 'react';
-import {getAuth} from 'firebase/auth';
+import { auth } from '../firebase';
 
 const ClosetContext = React.createContext();
 
@@ -15,10 +15,10 @@ export function ClosetProvider({ children }) {
         setLoading(true);
         const fetchCloset = async () => {
             try {
-                const auth = getAuth();
                 const token = await auth.currentUser.getIdToken();
 
-                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user-items/get-closet`, {
+
+                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/useritems/get-closet`, {
                     method: 'GET',
                     headers: {
                         Authorization: `Bearer ${token}`

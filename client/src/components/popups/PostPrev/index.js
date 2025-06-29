@@ -1,6 +1,6 @@
 import './index.scss';
 import { useState, useEffect } from 'react';
-import { getAuth } from 'firebase/auth';
+import { auth } from '../../../firebase';
 
 const PostPrev = ({canvasJSON,
                     postURL,
@@ -35,7 +35,6 @@ const PostPrev = ({canvasJSON,
         const cfURL = await handleSaveImage();
 
         try {
-            const auth = getAuth();
             const token = await auth.currentUser.getIdToken();
 
             await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/posts/create-post`, {

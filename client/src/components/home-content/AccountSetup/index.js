@@ -1,14 +1,13 @@
 import './index.scss'
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { getAuth } from "firebase/auth"
+import { auth } from '../../../firebase';
 import { useAuth } from '../../../contexts/AuthContext';
 import UploadProfilePic from '../../image-upload/UploadProfilePic/UploadProfilePic';
 import WarningPopup from '../../popups/WarningPopup';
 
 const AccountSetup = ({ mode }) => {
     const isSetup = mode === 'setup';
-    const auth = getAuth();
     const user = auth.currentUser;
     const {mongoUser, resetPassword} = useAuth();
     const email = mongoUser?.email || '';
@@ -57,7 +56,6 @@ const AccountSetup = ({ mode }) => {
 
     const validateUsername = async (username) => {
         try {
-            const auth = getAuth();
             const token = await auth.currentUser.getIdToken();
 
             const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/check-username`, {

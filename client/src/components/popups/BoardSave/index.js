@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import './index.scss';
-import { getAuth } from 'firebase/auth';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import Tooltip from '@mui/material/Tooltip';

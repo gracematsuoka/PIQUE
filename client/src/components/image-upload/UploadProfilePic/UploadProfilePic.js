@@ -1,12 +1,11 @@
 import imageCompression from 'browser-image-compression';
 import {getStorage, ref, uploadBytes, getDownloadURL} from 'firebase/storage';
-import {getAuth} from 'firebase/auth';
+import { auth } from '../../../firebase';
 import { useAuth } from '../../../contexts/AuthContext';
 import {useState} from 'react';
 import defaultProfilePic from '../../../assets/images/icons/default-profile-pic.png'
 
 const UploadProfilePic = () => {
-    const auth = getAuth();
     const {mongoUser} = useAuth();
     const [file, setFile] = useState(mongoUser?.profileURL || defaultProfilePic);
 

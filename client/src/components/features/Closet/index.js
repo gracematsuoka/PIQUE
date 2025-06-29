@@ -9,7 +9,7 @@ import ItemDetails from "../../popups/ItemDetails"
 import Filter from "../../popups/Filter"
 import Items from "../../reusable/Items"
 import { useState, useEffect } from "react"
-import { getAuth } from 'firebase/auth'
+import { auth } from '../../../firebase';
 import {ReactComponent as FilterIcon} from '../../../assets/images/icons/filter.svg'
 import Tooltip from "@mui/material/Tooltip"
 
@@ -51,7 +51,6 @@ const Closet = () => {
     }
 
     const populateTags = async () => {
-        const auth = getAuth();
         const token = await auth.currentUser.getIdToken();
 
         try {

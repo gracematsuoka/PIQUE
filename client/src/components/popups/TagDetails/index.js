@@ -1,7 +1,7 @@
 import './index.scss';
 import {ReactComponent as Delete} from '../../../assets/images/icons/delete.svg'
 import React, { forwardRef, useEffect, useState, useRef } from 'react';
-import { getAuth } from 'firebase/auth';
+import { auth } from '../../../firebase';
 
 
 const TagDetails = forwardRef(({name, 
@@ -62,7 +62,6 @@ const TagDetails = forwardRef(({name,
                     )
 
         if (mongoId) {
-            const auth = getAuth();
             const token = await auth.currentUser.getIdToken();
             await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/delete-tag?tagId=${mongoId}`, {
                 method: 'DELETE',

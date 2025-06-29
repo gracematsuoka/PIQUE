@@ -15,6 +15,7 @@ import Saved from './components/features/Saved';
 import Settings from './components/features/Settings';
 import Boards from './components/features/Boards';
 import Favorites from './components/features/Favorites';
+import Board from './components/features/Board';
 import { useAuth } from './contexts/AuthContext';
 import { ClosetProvider } from './contexts/ClosetContext';
 
@@ -76,7 +77,11 @@ function App() {
           />
           <Route
             path="/profile/:username"
-            element={<Profile />}
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
           />
           <Route
             path="/closet"
@@ -115,10 +120,15 @@ function App() {
             }>
             <Route index element={<Boards/>}/>
             <Route path='favorites' element={<Favorites/>}/>
-            <Route 
-              path='/saved/:userId/boards/:boardId'
-            />
           </Route>
+          <Route 
+              path='/saved/boards/:boardId'
+              element={
+                <PrivateRoute>
+                  <Board/>
+                </PrivateRoute>
+              }
+            />
         </Routes>
       </Router>
     </div>

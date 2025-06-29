@@ -1,7 +1,7 @@
 import './index.scss';
 import CloseIcon from '@mui/icons-material/Close';
 import { useState, useEffect } from 'react';
-import { getAuth } from 'firebase/auth';
+import { auth } from '../../../firebase';
 
 const AddBoard = ({setShowAddBoard,
                     setShowEditBoard,
@@ -30,7 +30,6 @@ const AddBoard = ({setShowAddBoard,
         }
 
         mode === 'edit' ? setShowEditBoard(false) : setShowAddBoard(false);
-        const auth = getAuth();
         const token = await auth.currentUser.getIdToken();
 
         if (mode === 'edit') {

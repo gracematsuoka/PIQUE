@@ -1,0 +1,43 @@
+.board-page {
+
+    .board-header {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+
+        h1 {
+            font-family: 'Publica Play Bold';
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .numsaved {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+
+            svg {
+                transform: rotate(-30deg);
+                height: 17px;
+                fill: grey;
+            }
+
+            p {
+                color: grey
+            }
+        }
+
+        hr {
+            width: 20%;
+        }
+
+        .board-desc {
+            margin-top: 15px;
+            max-height: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: rgba(0, 0, 0, 0.59);
+            width: 50%;
+        }
+    }
+}

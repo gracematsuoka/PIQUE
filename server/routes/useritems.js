@@ -29,7 +29,7 @@ router.get('/get-closet', authenticateUser, async (req, res) => {
     const { mongoId } = req.user;
 
     const items = await UserItem.find({ownerId: mongoId, tab: 'closet'}).populate('itemRef', 'imageURL');
-
+    console.log('items:',items)
     res.status(200).json({message: 'Closet items retrieved', items})
 })
 

@@ -12,7 +12,7 @@ import BlackShirt from '../../../assets/images/icons/hangshirt-black.png'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import Tooltip from '@mui/material/Tooltip';
-import { getAuth } from 'firebase/auth';
+import { auth } from '../../../firebase';
 import { Canvas, FabricImage, FabricText } from 'fabric';
 import { useNavigate } from 'react-router-dom';
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
@@ -36,7 +36,6 @@ const PostDetails = ({
 
     useEffect(() => {
         const fetchPostDetails = async () => {
-            const auth = getAuth();
             const token = await auth.currentUser.getIdToken();
             setToken(token);
     

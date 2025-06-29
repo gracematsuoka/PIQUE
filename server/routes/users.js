@@ -72,7 +72,7 @@ router.post('/update-user', authenticateUser, async (req, res) => {
         const user = await User.findById(req.user.mongoId)
 
         if (!user) {
-            return res.status(404).json({message: 'User not found'});
+            return res.status(404).json({message: 'update: User not found'});
         }
 
         const { name, username, profileURL } = req.body;
@@ -113,7 +113,7 @@ router.get('/me', authenticateUser, async (req, res) => {
     });
 })
 
-router.get('/:username', async (req, res) => {
+router.get('/:username/get-user', async (req, res) => {
     const {username} = req.params;
 
     try {
@@ -122,7 +122,7 @@ router.get('/:username', async (req, res) => {
                                 .lean();
 
         if (!user) {
-            return res.status(404).json({message: 'User not found'});
+            return res.status(404).json({message: 'username: User not found'});
         }
 
         res.json(user);
@@ -218,12 +218,15 @@ router.post('/create-tag', authenticateUser, async (req, res) => {
 })
 
 router.get('/get-tags', authenticateUser, async (req, res) => {
+    try {
     const { mongoId } = req.user;
-    console.log('got')
 
     const user = await User.findById(mongoId).lean().select('tags');
     if (!user) return res.status(404).json({error: 'User not found'});
     res.json({tags: user.tags});
+    } catch (err) {
+        res.status(500).json({error: 'Server failed to get tags:', err})
+    }
 })
 
 router.delete('/delete-tag', authenticateUser, async (req, res) => {

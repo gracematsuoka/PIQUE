@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Post = require("../models/Post");
 const Like = require('../models/Like');
+const BoardPost = require('../models/BoardPost');
 const authenticateUser = require("../middleware/authenticateUser");
 const { auth } = require("firebase-admin");
 
@@ -29,6 +30,45 @@ router.get('/get-posts', authenticateUser, async (req, res) => {
     const cursor = req.query.cursor;
 
     const docs = await Post.find(cursor ? {_id: {$lt: cursor}} : {})
+                            .sort({_id: -1})
+                            .limit(limit + 1)
+                            .select('likes _id postURL userId colors')
+                            .lean();
+    
+    const hasMore = docs.length > limit;
+    const posts = hasMore ? docs.slice(0, limit) : docs;
+
+    const likedPostIds = await Like.distinct('postId', 
+        {userId: mongoId, postId: {$in: posts.map(post => post._id)}});
+    const likedIdsSet = new Set(likedPostIds.map(id => id.toString()));
+
+    const postData = posts.map(post => ({
+        ...post,
+        likedByUser: likedIdsSet.has(post._id.toString())
+    }))
+
+    const nextCursor = hasMore ? posts[limit - 1]._id : null;
+
+    res.json({postData, nextCursor, hasMore});
+})
+
+router.get('/:boardId/posts', authenticateUser, async (req, res) => {
+    const {mongoId} = req.user;
+    const {boardId} = req.params;
+
+    const boardPosts = await BoardPost.find({boardRef: boardId}).select('postRef -_id');
+    const postIds = boardPosts.map(bp => bp.postRef);
+    if (postIds.length === 0) {
+        return res.json({postData: [], nextCursor: null, hasMore: false});
+    }
+
+    const limit = Math.min(parseInt(req.query.limit) || 20, 40);
+    const cursor = req.query.cursor;
+
+    const filter = {_id: {$in: postIds}};
+    if (cursor) filter._id.$lt = cursor;
+
+    const docs = await Post.find(filter)
                             .sort({_id: -1})
                             .limit(limit + 1)
                             .select('likes _id postURL userId colors')

@@ -5,7 +5,7 @@ import {ReactComponent as Add} from '../../../assets/images/icons/add.svg'
 import {ReactComponent as Remove} from '../../../assets/images/icons/remove.svg'
 import AddTag from '../AddTag'
 import { useState, useEffect, useRef, use } from 'react'
-import { getAuth } from 'firebase/auth'
+import { auth } from '../../../firebase';
 
 
 const ItemDetails = ({ mode, 
@@ -126,7 +126,6 @@ const ItemDetails = ({ mode,
 
     const handlePopulateTags = async () => {
         try {
-            const auth = getAuth();
             const token = await auth.currentUser.getIdToken();
 
             const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/get-tags`, {
@@ -156,7 +155,6 @@ const ItemDetails = ({ mode,
         window.onbeforeunload = () => 'Saving in progress…';
 
         try {
-            const auth = getAuth();
             const token = await auth.currentUser.getIdToken();
             const tagsPromise = handleSaveTags(token);
             const imageURLPromise = handleSaveImage();
@@ -185,10 +183,9 @@ const ItemDetails = ({ mode,
 
         if (Object.keys(changedField).length > 0) {
             try {
-                const auth = getAuth();
                 const token = await auth.currentUser.getIdToken();
 
-                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user-items/update-item/${selectedItem._id}`, {
+                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/useritems/update-item/${selectedItem._id}`, {
                     method: 'PATCH',
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -321,7 +318,7 @@ const ItemDetails = ({ mode,
 
             const numPrice = price === '' ? null : parseFloat(price);
 
-            const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user-items/create-item`, {
+            const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/useritems/create-item`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
