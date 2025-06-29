@@ -103,90 +103,85 @@ const Closet = () => {
 
     return (
         <div className="closet">
-            <TopBar/>
-            <div className="nav-content">
-                <NavBar/>
-                <div className="nav-content-wrapper">
-                    <p className="welcome-header">Welcome to your closet, {mongoUser?.name || 'Name'}</p>
-                    <div className="basic-nav">
-                        <p className={tab === 'closet' ? 'active' : ''}>MY CLOSET</p>
-                        <p className={tab === 'wishlist' ? 'active' : ''}>MY WISHLIST</p>
-                        <p className={tab === 'collections' ? 'active' : ''}>COLLECTIONS</p>
-                    </div>
-                    <SearchBar/>
-                    <Tooltip title='New item'>
-                    <div className="add" onClick={toggleAddPopup}>
-                        <img src={addClothes}/>
-                    </div>
-                    </Tooltip>
-                    <div className="nav-filter-wrapper">
-                        <div className="basic-nav sub">
-                            <p>ALL</p>
-                            <p>TOPS</p>
-                            <p>BOTTOMS</p>
-                            <p>OUTERWEAR</p>
-                            <p>SHOES</p>
-                            <p>JEWELRY</p>
-                            <p>BAGS</p>
-                            <p>ACCESSORIES</p>
-                        </div>
-                        <div className="filter" onClick={e => setShowFilter(!showFilter)}>
-                            <p>Filter</p>
-                            <FilterIcon/>
-                        </div>
-                    </div>
-                    <div className="items-wrapper">
-                        <Items reload={reloadItems}
-                                onSelectItem={(item) => {
-                                    setSelectedItem(item);
-                                    setShowItemDetails(true);
-                                }}
-                                updatedItem={updatedItem}
-                                addedItem={addedItem}
-                                setSelectedItem={setSelectedItem}
-                                />
-                    </div>
-                    {loading && 
-                        <div className="toast">
-                            <div className="progress-bar" 
-                                style={{width: `${filled}%`}}
-                                />
-                            <p>Saving item ...</p>
-                        </div>
-                    }
-                    {showAddPopup && <AddItem onClose={toggleAddPopup}
-                                            setShowAddPopup={setShowAddPopup}
-                                            setShowItemDetails={setShowItemDetails}
-                                            processedUrl={processedUrl}
-                                            setProcessedUrl={setProcessedUrl}
-                                            tab={tab}
-                                            setReloadItems={setReloadItems}
-                                            />}
-                    <Filter className={`popup-container filter ${showFilter ? 'open' : ''}`} {...filterProps}/>
-                    {showItemDetails && <ItemDetails 
-                                            mode='create' 
-                                            setShowItemDetails={setShowItemDetails}
-                                            processedUrl={processedUrl}
-                                            tab={tab}
-                                            setReloadItems={setReloadItems}
-                                            setLoading={setLoading}
-                                            setAddedItem={setAddedItem}
-                                            />}
-                    {showItemDetails && selectedItem && 
-                                        <ItemDetails 
-                                            mode='edit' 
-                                            setShowItemDetails={setShowItemDetails}
-                                            tab={tab}
-                                            processedUrl={selectedItem.itemRef?.imageURL}
-                                            setReloadItems={setReloadItems}
-                                            selectedItem={selectedItem}
-                                            onClose={handleCloseDetails}
-                                            setLoading={setLoading}
-                                            setUpdatedItem={setUpdatedItem}
-                                            />}
+            <div className="nav-content-wrapper">
+                <p className="welcome-header">Welcome to your closet, {mongoUser?.name || 'Name'}</p>
+                <div className="basic-nav">
+                    <p className={tab === 'closet' ? 'active' : ''}>MY CLOSET</p>
+                    <p className={tab === 'wishlist' ? 'active' : ''}>MY WISHLIST</p>
+                    <p className={tab === 'collections' ? 'active' : ''}>COLLECTIONS</p>
                 </div>
+                <SearchBar/>
+                <Tooltip title='New item'>
+                <div className="add" onClick={toggleAddPopup}>
+                    <img src={addClothes}/>
+                </div>
+                </Tooltip>
+                <div className="nav-filter-wrapper">
+                    <div className="basic-nav sub">
+                        <p>ALL</p>
+                        <p>TOPS</p>
+                        <p>BOTTOMS</p>
+                        <p>OUTERWEAR</p>
+                        <p>SHOES</p>
+                        <p>JEWELRY</p>
+                        <p>BAGS</p>
+                        <p>ACCESSORIES</p>
+                    </div>
+                    <div className="filter" onClick={e => setShowFilter(!showFilter)}>
+                        <p>Filter</p>
+                        <FilterIcon/>
+                    </div>
+                </div>
+                <div className="items-wrapper">
+                    <Items reload={reloadItems}
+                            onSelectItem={(item) => {
+                                setSelectedItem(item);
+                                setShowItemDetails(true);
+                            }}
+                            updatedItem={updatedItem}
+                            addedItem={addedItem}
+                            setSelectedItem={setSelectedItem}
+                            />
+                </div>
+                {loading && 
+                    <div className="toast">
+                        <div className="progress-bar" 
+                            style={{width: `${filled}%`}}
+                            />
+                        <p>Saving item ...</p>
+                    </div>
+                }
+                {showAddPopup && <AddItem onClose={toggleAddPopup}
+                                        setShowAddPopup={setShowAddPopup}
+                                        setShowItemDetails={setShowItemDetails}
+                                        processedUrl={processedUrl}
+                                        setProcessedUrl={setProcessedUrl}
+                                        tab={tab}
+                                        setReloadItems={setReloadItems}
+                                        />}
+                <Filter className={`popup-container filter ${showFilter ? 'open' : ''}`} {...filterProps}/>
+                {showItemDetails && <ItemDetails 
+                                        mode='create' 
+                                        setShowItemDetails={setShowItemDetails}
+                                        processedUrl={processedUrl}
+                                        tab={tab}
+                                        setReloadItems={setReloadItems}
+                                        setLoading={setLoading}
+                                        setAddedItem={setAddedItem}
+                                        />}
+                {showItemDetails && selectedItem && 
+                                    <ItemDetails 
+                                        mode='edit' 
+                                        setShowItemDetails={setShowItemDetails}
+                                        tab={tab}
+                                        processedUrl={selectedItem.itemRef?.imageURL}
+                                        setReloadItems={setReloadItems}
+                                        selectedItem={selectedItem}
+                                        onClose={handleCloseDetails}
+                                        setLoading={setLoading}
+                                        setUpdatedItem={setUpdatedItem}
+                                        />}
             </div>
-            
         </div>
     )
 }

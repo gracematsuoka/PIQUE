@@ -1,6 +1,6 @@
 @import '../../../variables';
 
-.create .nav-content .nav-content-wrapper {
+.create .nav-content-wrapper {
     width: 100%;
     // background-color: red;
     margin-right: 0;
@@ -11,7 +11,7 @@
 }
 
 .basic-nav.create {
-    font-size: 15px;
+    font-size: 13px;
     padding-bottom: 10px;
     box-sizing: border-box;
     margin: 0;
@@ -96,8 +96,8 @@
 .create-wrapper {
     display: flex;
     height: 100%;
-    background-color: rgba(233, 233, 233, 0.413);
-    // background-color: burlywood;
+    // background-color: rgba(233, 233, 233, 0.413);
+    background-color: white;
 }
 
 .create-sidebar {

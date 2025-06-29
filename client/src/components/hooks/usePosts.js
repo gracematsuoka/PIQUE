@@ -45,6 +45,7 @@ export function usePosts() {
     const fetchBoardPosts = async (boardId) => {
         setLoading(true);
         const token = await auth.currentUser.getIdToken();
+        console.log('fetching')
 
         const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/posts/${boardId}/posts?limit=20&${cursor ? `cursor=${cursor}` : ''}`, {
             method: 'GET',
@@ -53,6 +54,7 @@ export function usePosts() {
             }
         })
         const data = await res.json();
+        console.log('data:', data)
         setPosts(prev => [...prev, ...data.postData]);
         setCursor(data.nextCursor);
         setHasMore(data.hasMore);
@@ -149,6 +151,7 @@ export function usePosts() {
 
     return {
         posts,
+        cursor,
         boardData,
         setBoardData,
         hasMore,

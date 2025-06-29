@@ -29,7 +29,6 @@ router.get('/get-closet', authenticateUser, async (req, res) => {
     const { mongoId } = req.user;
 
     const items = await UserItem.find({ownerId: mongoId, tab: 'closet'}).populate('itemRef', 'imageURL');
-    console.log('items:',items)
     res.status(200).json({message: 'Closet items retrieved', items})
 })
 
@@ -64,7 +63,6 @@ router.patch('/update-item/:id', authenticateUser, async (req, res) => {
 
 router.delete('/delete-item', authenticateUser, async (req, res) => {
     const { itemId } = req.query;
-    console.log('itemId:', itemId)
 
     await UserItem.findByIdAndDelete(itemId);
 

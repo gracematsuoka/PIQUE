@@ -64,74 +64,70 @@ const Explore = () => {
 
     return (
         <div className="explore">
-            <TopBar/>
-                <div className="nav-content">
-                    <NavBar/>
-                    {showAddBoard &&
-                        <AddBoard
-                            mode='add-explore'
-                            setShowAddBoard={setShowAddBoard}
-                            setBoardData={setBoardData}
-                        />
-                    }
-                    {selectedPost && 
-                        <PostDetails
-                            selectedPost={selectedPost}
-                            setSelectedPost={setSelectedPost}
-                            handleLike={handleLike}
-                    />}
-                    <div className="nav-content-wrapper">
-                        <div className="search-bar-wrapper">
-                            <SearchBar/>
-                        </div>
-                        <div className="posts">
-                            {posts.map(post =>
-                                <div className="post" key={post._id}>
-                                    <img src={post.postURL} onClick={() => {
-                                        setSelectedPost(post);
-                                    }}/>
-                                    <div className={`post-save-bar ${activePostId === post._id ? 'active' : ''}`}>
-                                        <div className="like-btn" 
-                                            onClick={() => handleLike(post._id)}>
-                                            {!post.likedByUser && <FavoriteBorderIcon/>}
-                                            {post.likedByUser && <FavoriteIcon style={{fill: '#c23b0e'}}/>}
-                                            <p>{post.likes}</p>
-                                        </div>
-                                        <div className="save-btn" 
-                                            onClick={() =>  {
-                                                handleOpen(post._id);
-                                            }}>
-                                            {activePostId === post._id ?
-                                                <RemoveIcon/> :
-                                                <AddIcon/> 
-                                            }
-                                            <p>SAVE</p>
-                                        </div>
-                                    </div>
-                                    {activePostId === post._id && 
-                                        <BoardSave 
-                                            className='board-save'
-                                            postId={activePostId}
-                                            boardData={boardData}
-                                            setBoardData={setBoardData}
-                                            removePost={removePost}
-                                            addPost={addPost}
-                                            setShowAddBoard={setShowAddBoard}
-                                        />
-                                    }
-                                </div>
-                            )}
-                            {hasMore && 
-                                <div ref={sentinelRef}/>
-                            }
-                            {loading && <Bouncy
-                            size="45"
-                            speed="1.75"
-                            color="#6B799F"
-                            />}
-                        </div>
-                    </div>
+            {showAddBoard &&
+                <AddBoard
+                    mode='add-explore'
+                    setShowAddBoard={setShowAddBoard}
+                    setBoardData={setBoardData}
+                />
+            }
+            {selectedPost && 
+                <PostDetails
+                    selectedPost={selectedPost}
+                    setSelectedPost={setSelectedPost}
+                    handleLike={handleLike}
+            />}
+            <div className="nav-content-wrapper">
+                <div className="search-bar-wrapper">
+                    <SearchBar/>
                 </div>
+                <div className="posts">
+                    {posts.map(post =>
+                        <div className="post" key={post._id}>
+                            <img src={post.postURL} onClick={() => {
+                                setSelectedPost(post);
+                            }}/>
+                            <div className={`post-save-bar ${activePostId === post._id ? 'active' : ''}`}>
+                                <div className="like-btn" 
+                                    onClick={() => handleLike(post._id)}>
+                                    {!post.likedByUser && <FavoriteBorderIcon/>}
+                                    {post.likedByUser && <FavoriteIcon style={{fill: '#c23b0e'}}/>}
+                                    <p>{post.likes}</p>
+                                </div>
+                                <div className="save-btn" 
+                                    onClick={() =>  {
+                                        handleOpen(post._id);
+                                    }}>
+                                    {activePostId === post._id ?
+                                        <RemoveIcon/> :
+                                        <AddIcon/> 
+                                    }
+                                    <p>SAVE</p>
+                                </div>
+                            </div>
+                            {activePostId === post._id && 
+                                <BoardSave 
+                                    className='board-save'
+                                    postId={activePostId}
+                                    boardData={boardData}
+                                    setBoardData={setBoardData}
+                                    removePost={removePost}
+                                    addPost={addPost}
+                                    setShowAddBoard={setShowAddBoard}
+                                />
+                            }
+                        </div>
+                    )}
+                    {hasMore && 
+                        <div ref={sentinelRef}/>
+                    }
+                    {loading && <Bouncy
+                    size="45"
+                    speed="1.75"
+                    color="#6B799F"
+                    />}
+                </div>
+            </div>
         </div>
     )
 } 

@@ -64,7 +64,7 @@ const Create = () => {
             '#919568', '#8FAE95', '#B4D2C0', '#F9D994',
             '#5E99A3', '#84BAC0', '#B7D2D7', '#CBBCCF', 
             '#AD92B1', '#E7A396', '#F2C5C6', '#D5B3A1',
-            '#ffffff', '#000000', '#E8E8E8']
+            '#f8f8f8', '#000000', '#9b9b9b']
 
     const fonts = ['Just Me Again Down Here', 'Merriweather', 'Inter', 'Roboto',
         'Open Sans', 'Oswald', 'Playfair Display', 'Caprasimo', 'PT Serif', 'Outfit',
@@ -178,7 +178,7 @@ const Create = () => {
                 lastPosX: 0,
                 lastPosY: 0,
             })
-            fabricCanvas.backgroundColor='#ffffff';
+            fabricCanvas.backgroundColor='#f8f8f8'
             fabricCanvas.renderAll();
 
             setCanvas(fabricCanvas);
@@ -543,262 +543,258 @@ const Create = () => {
 
     return (
         <div className="create">
-            <TopBar/>
-                <div className="nav-content">
-                    <NavBar/>
-                    <div className="nav-content-wrapper">
-                        {showCongrats && <Congrats
-                                            setShowCongrats={setShowCongrats}
-                                            setReload={setReload}
-                        />}
-                        {showPost && <PostPrev
-                                        canvasJSON={canvasJSON}
-                                        postURL={postURL}
-                                        title={title}
-                                        setTitle={setTitle}
-                                        setShowPost={setShowPost}
-                                        setShowCongrats={setShowCongrats}
-                        />}
-                        <div className="basic-nav create">
-                            <p>CREATE</p>
-                            <p>DRAFTS</p>
-                        </div>
-                        <hr/>
-                        <div className="create-wrapper">
-                            <div className="create-board">
-                                <div className="create-top">
-                                    <div className="input-wrapper">
-                                        <input type='text' placeholder="Title goes here..." value={title} onChange={e => setTitle(e.target.value)}/>
-                                    </div>
-                                    <div className="toolbar">
-                                        <div className='toolbar-icon' onClick={() => canvasHistory.undo()}>
-                                            <UndoRoundedIcon/>
+            <div className="nav-content-wrapper">
+                {showCongrats && <Congrats
+                                    setShowCongrats={setShowCongrats}
+                                    setReload={setReload}
+                />}
+                {showPost && <PostPrev
+                                canvasJSON={canvasJSON}
+                                postURL={postURL}
+                                title={title}
+                                setTitle={setTitle}
+                                setShowPost={setShowPost}
+                                setShowCongrats={setShowCongrats}
+                />}
+                <div className="basic-nav create">
+                    <p>CREATE</p>
+                    <p>DRAFTS</p>
+                </div>
+                <hr/>
+                <div className="create-wrapper">
+                    <div className="create-board">
+                        <div className="create-top">
+                            <div className="input-wrapper">
+                                <input type='text' placeholder="Title goes here..." value={title} onChange={e => setTitle(e.target.value)}/>
+                            </div>
+                            <div className="toolbar">
+                                <div className='toolbar-icon' onClick={() => canvasHistory.undo()}>
+                                    <UndoRoundedIcon/>
+                                </div>
+                                <div className="toolbar-icon" onClick={() => canvasHistory.redo()}>
+                                    <RedoRoundedIcon/>
+                                </div>
+                                <hr/>
+                                <Tooltip title='Add text'>
+                                <div className={`toolbar-icon ${showTextOptions && 'active'}`} 
+                                    onClick={() => {
+                                            addText();
+                                            setShowTextOptions(true);
+                                            setShowBackgroundOptions(false);
+                                            setShowSizeOptions(false);
+                                    }}>
+                                    <p>T</p>
+                                </div>
+                                </Tooltip>
+                                {showTextOptions && 
+                                    <div className="toolbar sub">
+                                        <Select className="font-select"
+                                                options={fonts}
+                                                onChange={(selected) => {
+                                                    handleFont(selected.value);
+                                                }}
+                                                placeholder='Inter'
+                                                styles={customStyles}
+                                                components={{ Option: FontOption }}
+                                                value={font}
+                                        />
+                                        <CreatableSelect className="font-select"
+                                            options={fontSizes}
+                                            styles={numCustomStyles}
+                                            placeholder='32'
+                                            value={textSize}
+                                            onChange={(selected) => {
+                                                handleTextSize(selected.value)
+                                            }}
+                                        />
+                                        <div className={`toolbar-icon ${isBold && 'active'}`}  onClick={toggleBold}>
+                                            <FormatBoldOutlinedIcon/>
                                         </div>
-                                        <div className="toolbar-icon" onClick={() => canvasHistory.redo()}>
-                                            <RedoRoundedIcon/>
+                                        <div className={`toolbar-icon ${isUnderline && 'active'}`}  onClick={toggleUnderline}>
+                                            <FormatUnderlinedOutlinedIcon/>
                                         </div>
-                                        <hr/>
-                                        <Tooltip title='Add text'>
-                                        <div className={`toolbar-icon ${showTextOptions && 'active'}`} 
-                                            onClick={() => {
-                                                    addText();
-                                                    setShowTextOptions(true);
-                                                    setShowBackgroundOptions(false);
-                                                    setShowSizeOptions(false);
-                                            }}>
-                                            <p>T</p>
+                                        <div className={`toolbar-icon ${isItalics && 'active'}`}  onClick={toggleItalics}>
+                                            <FormatItalicOutlinedIcon/>
                                         </div>
-                                        </Tooltip>
-                                        {showTextOptions && 
-                                            <div className="toolbar sub">
-                                                <Select className="font-select"
-                                                        options={fonts}
-                                                        onChange={(selected) => {
-                                                            handleFont(selected.value);
+                                        <div className={`toolbar-icon ${showTextColors && 'active'}`} onClick={() => setShowTextColors(prev => !prev)}>
+                                            <FormatColorTextOutlinedIcon/>
+                                        </div>
+                                        {showTextColors && 
+                                            <div className="toolbar sub color">
+                                                {hexCodes.map(hex => 
+                                                    <div className="circle" 
+                                                        key={hex} 
+                                                        style={{backgroundColor: hex, 
+                                                                outline: hex === '#ffffff' ? '0.5px solid lightgray' : ''
                                                         }}
-                                                        placeholder='Inter'
-                                                        styles={customStyles}
-                                                        components={{ Option: FontOption }}
-                                                        value={font}
-                                                />
-                                                <CreatableSelect className="font-select"
-                                                    options={fontSizes}
-                                                    styles={numCustomStyles}
-                                                    placeholder='32'
-                                                    value={textSize}
-                                                    onChange={(selected) => {
-                                                        handleTextSize(selected.value)
-                                                    }}
-                                                />
-                                                <div className={`toolbar-icon ${isBold && 'active'}`}  onClick={toggleBold}>
-                                                    <FormatBoldOutlinedIcon/>
+                                                        onClick={() => {
+                                                            handleTextFill(hex);
+                                                        }}
+                                                    />
+                                                )}
+                                                <div className="edit-color">
+                                                    <input className="color-input" 
+                                                        id='color-input' 
+                                                        type="color"
+                                                        value={textFill}
+                                                        onChange={e => {
+                                                            setTextFill(e.target.value)
+                                                            handleTextFill(e.target.value);
+                                                        }}
+                                                        onClick={e => {
+                                                            setTextFill(e.target.value)
+                                                            handleTextFill(e.target.value);
+                                                        }}
+                                                    />
+                                                    <label htmlFor="color-input">
+                                                        <ModeEditOutlinedIcon/>
+                                                    </label>
                                                 </div>
-                                                <div className={`toolbar-icon ${isUnderline && 'active'}`}  onClick={toggleUnderline}>
-                                                    <FormatUnderlinedOutlinedIcon/>
-                                                </div>
-                                                <div className={`toolbar-icon ${isItalics && 'active'}`}  onClick={toggleItalics}>
-                                                    <FormatItalicOutlinedIcon/>
-                                                </div>
-                                                <div className={`toolbar-icon ${showTextColors && 'active'}`} onClick={() => setShowTextColors(prev => !prev)}>
-                                                    <FormatColorTextOutlinedIcon/>
-                                                </div>
-                                                {showTextColors && 
-                                                    <div className="toolbar sub color">
-                                                        {hexCodes.map(hex => 
-                                                            <div className="circle" 
-                                                                key={hex} 
-                                                                style={{backgroundColor: hex, 
-                                                                        outline: hex === '#ffffff' ? '0.5px solid lightgray' : ''
-                                                                }}
-                                                                onClick={() => {
-                                                                    handleTextFill(hex);
-                                                                }}
-                                                            />
-                                                        )}
-                                                        <div className="edit-color">
-                                                            <input className="color-input" 
-                                                                id='color-input' 
-                                                                type="color"
-                                                                value={textFill}
-                                                                onChange={e => {
-                                                                    setTextFill(e.target.value)
-                                                                    handleTextFill(e.target.value);
-                                                                }}
-                                                                onClick={e => {
-                                                                    setTextFill(e.target.value)
-                                                                    handleTextFill(e.target.value);
-                                                                }}
-                                                            />
-                                                            <label htmlFor="color-input">
-                                                                <ModeEditOutlinedIcon/>
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                }
                                             </div>
                                         }
-                                        <Tooltip title='Background color'>
-                                        <div className={`toolbar-icon ${showBackgroundOptions && 'active'}`} 
+                                    </div>
+                                }
+                                <Tooltip title='Background color'>
+                                <div className={`toolbar-icon ${showBackgroundOptions && 'active'}`} 
+                                    onClick={() => {
+                                        setShowBackgroundOptions(prev => !prev);
+                                        setShowSizeOptions(false);
+                                        setShowTextOptions(false);
+                                    }}>
+                                    <ColorLensRoundedIcon/>
+                                </div>
+                                </Tooltip>
+                                {showBackgroundOptions && 
+                                            <div className="toolbar sub color">
+                                                {hexCodes.map(hex => 
+                                                    <div className="circle" 
+                                                        key={hex} 
+                                                        style={{backgroundColor: hex, 
+                                                                outline: hex === '#ffffff' ? '0.5px solid lightgray' : ''
+                                                        }}
+                                                        onClick={() => {
+                                                            handleBgColor(hex);
+                                                        }}
+                                                    />
+                                                )}
+                                                <div className="edit-color">
+                                                    <input className="color-input" 
+                                                        id='color-input' 
+                                                        type="color"
+                                                        value={backgroundColor}
+                                                        onChange={e => {
+                                                            setBackgroundColor(e.target.value)
+                                                            handleBgColor(e.target.value);
+                                                        }}
+                                                        onClick={e => {
+                                                            setBackgroundColor(e.target.value)
+                                                            handleBgColor(e.target.value);
+                                                        }}
+                                                    />
+                                                    <label htmlFor="color-input">
+                                                        <ModeEditOutlinedIcon/>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        }
+                                <Tooltip title='Canvas size'>
+                                <div className={`toolbar-icon ${showSizeOptions && 'active'}`} 
+                                    onClick={() => {
+                                        setShowSizeOptions(prev => !prev);
+                                        setShowBackgroundOptions(false);
+                                        setShowTextOptions(false);
+                                    }}>
+                                    <CropPortraitRoundedIcon/>
+                                </div>
+                                </Tooltip>
+                                {showSizeOptions && 
+                                    <div className="toolbar sub">
+                                        <div className={`toolbar-icon sub ${sizeOption === 'collection' && 'active'}`}
                                             onClick={() => {
-                                                setShowBackgroundOptions(prev => !prev);
-                                                setShowSizeOptions(false);
-                                                setShowTextOptions(false);
+                                                setSizeOption('collection');
+                                                handleCanvasSize('collection');
                                             }}>
-                                            <ColorLensRoundedIcon/>
+                                            <CropDinIcon/>
+                                            <p>Collection</p>
                                         </div>
-                                        </Tooltip>
-                                        {showBackgroundOptions && 
-                                                    <div className="toolbar sub color">
-                                                        {hexCodes.map(hex => 
-                                                            <div className="circle" 
-                                                                key={hex} 
-                                                                style={{backgroundColor: hex, 
-                                                                        outline: hex === '#ffffff' ? '0.5px solid lightgray' : ''
-                                                                }}
-                                                                onClick={() => {
-                                                                    handleBgColor(hex);
-                                                                }}
-                                                            />
-                                                        )}
-                                                        <div className="edit-color">
-                                                            <input className="color-input" 
-                                                                id='color-input' 
-                                                                type="color"
-                                                                value={backgroundColor}
-                                                                onChange={e => {
-                                                                    setBackgroundColor(e.target.value)
-                                                                    handleBgColor(e.target.value);
-                                                                }}
-                                                                onClick={e => {
-                                                                    setBackgroundColor(e.target.value)
-                                                                    handleBgColor(e.target.value);
-                                                                }}
-                                                            />
-                                                            <label htmlFor="color-input">
-                                                                <ModeEditOutlinedIcon/>
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                }
-                                        <Tooltip title='Canvas size'>
-                                        <div className={`toolbar-icon ${showSizeOptions && 'active'}`} 
+                                        <div className={`toolbar-icon sub ${sizeOption === 'outfit' && 'active'}`}
                                             onClick={() => {
-                                                setShowSizeOptions(prev => !prev);
-                                                setShowBackgroundOptions(false);
-                                                setShowTextOptions(false);
-                                            }}>
-                                            <CropPortraitRoundedIcon/>
-                                        </div>
-                                        </Tooltip>
-                                        {showSizeOptions && 
-                                            <div className="toolbar sub">
-                                                <div className={`toolbar-icon sub ${sizeOption === 'collection' && 'active'}`}
-                                                    onClick={() => {
-                                                        setSizeOption('collection');
-                                                        handleCanvasSize('collection');
+                                                        setSizeOption('outfit');
+                                                        handleCanvasSize('outfit');
                                                     }}>
-                                                    <CropDinIcon/>
-                                                    <p>Collection</p>
-                                                </div>
-                                                <div className={`toolbar-icon sub ${sizeOption === 'outfit' && 'active'}`}
-                                                    onClick={() => {
-                                                                setSizeOption('outfit');
-                                                                handleCanvasSize('outfit');
-                                                            }}>
-                                                    <CropPortraitRoundedIcon/>
-                                                    <p>Outfit</p>
-                                                </div>
-                                            </div>
-                                        }
-                                    </div>
-                                </div>
-                                    <div className="canvas-wrap"
-                                        ref={fabricRef}
-                                        onDragOver={e => e.preventDefault()}
-                                        onDrop={e => handleDrop(e)}>
-                                        <canvas id="canvas" ref={canvasRef}/>
-                                {menu.visible &&
-                                    <ul className="context-menu" style={{top: menu.y, left: menu.x, position: 'absolute'}}>
-                                        <li onClick={() => {canvas.bringObjectToFront(menu.target)}}>
-                                            <KeyboardDoubleArrowUpIcon/>
-                                            <p>Bring to front</p>
-                                        </li>
-                                        <li onClick={() => {canvas.bringObjectForward(menu.target)}}>
-                                            <KeyboardArrowUpIcon/>
-                                            <p>Bring forward</p>
-                                        </li>
-                                        <li onClick={() => {canvas.sendObjectBackwards(menu.target)}}>
-                                            <KeyboardArrowUpIcon/>
-                                            <p>Send backward</p>
-                                        </li>
-                                        <li onClick={() => {canvas.sendObjectToBack(menu.target)}}>
-                                            <KeyboardDoubleArrowDownIcon/>
-                                            <p>Send to back</p>
-                                        </li>
-                                    </ul> 
-                                }
-                                </div>
-                                <div className="button-wrapper">
-                                    <button className="sub-btn bold" onClick={() => handlePost()} >Next</button>
-                                    <button className="sub-btn" onClick={handleSave}>Save</button>
-                                </div>
-                            </div>
-                            <div className="create-sidebar">
-                                <div className="basic-nav sub">
-                                    <p>CLOSET</p>
-                                    <p>DATABASE</p>
-                                    <p>UPLOAD</p>
-                                </div>
-                                <div className="search-filter">
-                                    <SearchBar/>
-                                    {/* <Filter /> */}
-                                </div>
-                                {!isEmpty && 
-                                    <div className="image-database">
-                                        {closetItems.map(item => 
-                                            <div className="item-img-wrapper" 
-                                                key={item._id}
-                                                draggable
-                                                onDragStart={e => handleDragStart(e, item)}
-                                                onClick={() => addImage(item)}
-                                                >
-                                                <img 
-                                                    src={item.itemRef?.imageURL.replace('/public', '/300')}
-                                                    alt={item.name}
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-                                }
-                                {isEmpty && 
-                                    <div className="empty-closet">
-                                        <p>You have no items in your closet, navigate to 'closet' to start adding items</p>
+                                            <CropPortraitRoundedIcon/>
+                                            <p>Outfit</p>
+                                        </div>
                                     </div>
                                 }
                             </div>
+                        </div>
+                            <div className="canvas-wrap"
+                                ref={fabricRef}
+                                onDragOver={e => e.preventDefault()}
+                                onDrop={e => handleDrop(e)}>
+                                <canvas id="canvas" ref={canvasRef}/>
+                        {menu.visible &&
+                            <ul className="context-menu" style={{top: menu.y, left: menu.x, position: 'absolute'}}>
+                                <li onClick={() => {canvas.bringObjectToFront(menu.target)}}>
+                                    <KeyboardDoubleArrowUpIcon/>
+                                    <p>Bring to front</p>
+                                </li>
+                                <li onClick={() => {canvas.bringObjectForward(menu.target)}}>
+                                    <KeyboardArrowUpIcon/>
+                                    <p>Bring forward</p>
+                                </li>
+                                <li onClick={() => {canvas.sendObjectBackwards(menu.target)}}>
+                                    <KeyboardArrowUpIcon/>
+                                    <p>Send backward</p>
+                                </li>
+                                <li onClick={() => {canvas.sendObjectToBack(menu.target)}}>
+                                    <KeyboardDoubleArrowDownIcon/>
+                                    <p>Send to back</p>
+                                </li>
+                            </ul> 
+                        }
+                        </div>
+                        <div className="button-wrapper">
+                            <button className="sub-btn bold" onClick={() => handlePost()} >Next</button>
+                            <button className="sub-btn" onClick={handleSave}>Save</button>
                         </div>
                     </div>
+                    <div className="create-sidebar">
+                        <div className="basic-nav sub">
+                            <p>CLOSET</p>
+                            <p>DATABASE</p>
+                            <p>UPLOAD</p>
+                        </div>
+                        <div className="search-filter">
+                            <SearchBar/>
+                            {/* <Filter /> */}
+                        </div>
+                        {!isEmpty && 
+                            <div className="image-database">
+                                {closetItems.map(item => 
+                                    <div className="item-img-wrapper" 
+                                        key={item._id}
+                                        draggable
+                                        onDragStart={e => handleDragStart(e, item)}
+                                        onClick={() => addImage(item)}
+                                        >
+                                        <img 
+                                            src={item.itemRef?.imageURL.replace('/public', '/300')}
+                                            alt={item.name}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        }
+                        {isEmpty && 
+                            <div className="empty-closet">
+                                <p>You have no items in your closet, navigate to 'closet' to start adding items</p>
+                            </div>
+                        }
+                    </div>
                 </div>
+            </div>
         </div>
     )
 }

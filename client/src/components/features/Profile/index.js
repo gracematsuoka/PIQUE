@@ -90,54 +90,50 @@ const Profile = () => {
 
     return (
         <div className="profile">
-            <TopBar/>
-            <div className="nav-content">
-                <NavBar/>
-                <div className="nav-content-wrapper">
-                    <div className="profile-header">
-                        <div className="profile-pic-wrapper">
-                            <img className='profile-pic' src={userData?.profileURL || defaultProfilePic}/>
-                        </div>
-                        <div className="profile-text">
-                            <p className='popup-name'>{userData.name}</p>
-                            <p className='popup-username'>@{userData.username}</p>
-                            <div className='follow'>
-                                <div className="sub-btn" onClick={() => setShowFollowers(true)}>
-                                    <p><b>{followers}</b> followers</p>
-                                </div>
-                                <div className="sub-btn" onClick={() => setShowFollowing(true)}>
-                                    <p><b>{following}</b> following</p>
-                                </div>
+            <div className="nav-content-wrapper">
+                <div className="profile-header">
+                    <div className="profile-pic-wrapper">
+                        <img className='profile-pic' src={userData?.profileURL || defaultProfilePic}/>
+                    </div>
+                    <div className="profile-text">
+                        <p className='popup-name'>{userData.name}</p>
+                        <p className='popup-username'>@{userData.username}</p>
+                        <div className='follow'>
+                            <div className="sub-btn" onClick={() => setShowFollowers(true)}>
+                                <p><b>{followers}</b> followers</p>
                             </div>
-                            {!isSelf &&
-                                <div className="sub-btn follow" onClick={handleFollow}>
-                                    {isFollowing ? 'Following ✓' : 'Follow'}
-                                </div>
-                            }
+                            <div className="sub-btn" onClick={() => setShowFollowing(true)}>
+                                <p><b>{following}</b> following</p>
+                            </div>
                         </div>
+                        {!isSelf &&
+                            <div className="sub-btn follow" onClick={handleFollow}>
+                                {isFollowing ? 'Following ✓' : 'Follow'}
+                            </div>
+                        }
                     </div>
-                    <hr/>
-                    <div className="post-drafts">
-                        <div className="basic-nav">
-                            <p>POSTS</p>
-                        </div>
-                    </div>
-
-                    {showFollowers && 
-                        <Follows mode='followers'
-                                setShowFollowers={setShowFollowers}
-                                setFollowers={setFollowers}
-                                isSelf={isSelf}
-                                userId={userData._id}
-                        />}
-                    {showFollowing && 
-                        <Follows mode='following'
-                                setShowFollowing={setShowFollowing}
-                                setFollowing={setFollowing}
-                                isSelf={isSelf}
-                                userId={userData._id}
-                        />}
                 </div>
+                <hr/>
+                <div className="post-drafts">
+                    <div className="basic-nav">
+                        <p>POSTS</p>
+                    </div>
+                </div>
+
+                {showFollowers && 
+                    <Follows mode='followers'
+                            setShowFollowers={setShowFollowers}
+                            setFollowers={setFollowers}
+                            isSelf={isSelf}
+                            userId={userData._id}
+                    />}
+                {showFollowing && 
+                    <Follows mode='following'
+                            setShowFollowing={setShowFollowing}
+                            setFollowing={setFollowing}
+                            isSelf={isSelf}
+                            userId={userData._id}
+                    />}
             </div>
         </div>
     )

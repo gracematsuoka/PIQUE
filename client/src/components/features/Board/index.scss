@@ -1,5 +1,21 @@
 .board-page {
-
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    
+    .nav-content {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+    }
+    
+    .nav-content-wrapper {
+        overflow-y: hidden;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+    
     .board-header {
         display: flex;
         flex-direction: column;

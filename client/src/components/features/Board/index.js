@@ -18,6 +18,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 const Board = () => {
     const {
         posts,
+        cursor,
         boardData,
         setBoardData,
         hasMore,
@@ -38,14 +39,10 @@ const Board = () => {
     const [showAddBoard, setShowAddBoard] = useState(false);
     const [selectedPost, setSelectedPost] = useState(null);
 
-    console.log('auth:', auth.currentUser)
-
     useEffect(() => {
-        console.log('ran')
         if (!boardId || !auth.currentUser) return;
-        console.log('elllo')
+
         const fetchBoard = async () => {
-            console.log('hi')
             try {
                 const token = await auth.currentUser.getIdToken();
                 const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/boards/${boardId}/board`, {
@@ -55,28 +52,25 @@ const Board = () => {
                 });
 
                 const data = await res.json();
-                console.log('board:', data)
                 setBoard(data);
             } catch (err) {
                 console.log('Failed to fetch board data:', err);
             }
         }
-
+        console.log('hasmore:', hasMore)
         fetchBoard();
         fetchBoards();
+        // fetchBoardPosts(boardId);
     }, [boardId]);
-
-    useEffect(() => {
-        fetchBoardPosts(boardId);
-    }, [hasMore]);
 
     useEffect(() => {
         if (!hasMore) return;
 
+        console.log('running')
         const observer = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) {
-                    fetchPosts();
+                    fetchBoardPosts(boardId);
                 }
             },
             {
@@ -85,8 +79,9 @@ const Board = () => {
                 threshold: 1.0
             }
         )
-
-        observer.observe(sentinelRef.current);
+        if (sentinelRef.current){
+            observer.observe(sentinelRef.current)
+        };
 
         return () => observer.disconnect();
     }, [hasMore]);
@@ -95,9 +90,9 @@ const Board = () => {
 
     return (
         <div className="board-page">
-            <TopBar/>
+            {/* <TopBar/>
                 <div className="nav-content">
-                    <NavBar/>
+                    <NavBar/> */}
                     {showAddBoard &&
                         <AddBoard
                             mode='add-explore'
@@ -113,7 +108,7 @@ const Board = () => {
                     />}
                     <div className="nav-content-wrapper">
                         <div className='board-header'>
-                            <h1>{board?.title.toUpperCase()}</h1>
+                            <h1>{board?.title?.toUpperCase()}</h1>
                             <div className='numsaved'>
                                 <AttachFileIcon/>
                                 <p>{board?.numSaved} Saved</p>
@@ -126,8 +121,8 @@ const Board = () => {
                         {posts.length > 0 ? (
                             <div className='posts'>
                                 {posts.map(post => 
-                                    <div className='post' key={post.postRef._id}>
-                                        <img src={post.postRef.postURL} onClick={() => {
+                                    <div className='post' key={post._id}>
+                                        <img src={post.postURL} onClick={() => {
                                             setSelectedPost(post);
                                         }}/>
                                         <div className={`post-save-bar ${activePostId === post._id ? 'active' : ''}`}>
@@ -161,9 +156,6 @@ const Board = () => {
                                         }
                                     </div>
                                 )}
-                                {hasMore && 
-                                    <div ref={sentinelRef}/>
-                                }
                             </div>
                         ) : (
                             <div className='empty'>
@@ -173,9 +165,12 @@ const Board = () => {
                                 </div>
                             </div>
                         )}
+                        {hasMore && 
+                            <div ref={sentinelRef}/>
+                        }
                     </div>
                 </div>
-        </div>
+        // </div>
     )
 }
 

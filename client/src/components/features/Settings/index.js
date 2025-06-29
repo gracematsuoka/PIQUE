@@ -5,13 +5,8 @@ import AccountSetup from "../../home-content/AccountSetup"
 const Settings = () => {
     return (
         <div className="settings">
-            <TopBar/>
-            <div className="nav-content">
-                <NavBar/>
-
-                <div className="nav-content-wrapper">
-                    <AccountSetup mode='update'/>
-                </div>
+            <div className="nav-content-wrapper">
+                <AccountSetup mode='update'/>
             </div>
         </div>
     )

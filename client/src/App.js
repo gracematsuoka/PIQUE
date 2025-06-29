@@ -16,6 +16,7 @@ import Settings from './components/features/Settings';
 import Boards from './components/features/Boards';
 import Favorites from './components/features/Favorites';
 import Board from './components/features/Board';
+import MainOutlet from './components/outlets/MainOutlet';
 import { useAuth } from './contexts/AuthContext';
 import { ClosetProvider } from './contexts/ClosetContext';
 
@@ -58,77 +59,93 @@ function App() {
                 <AccountSetup mode='setup'/>
               </PrivateRoute>
             }
-          />
-          <Route
-            path="/explore"
-            element={
-              <PrivateRoute>
-                <Explore />
-              </PrivateRoute> 
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <PrivateRoute>
-                <Settings />
-              </PrivateRoute> 
-            }
-          />
-          <Route
-            path="/profile/:username"
-            element={
-              <PrivateRoute>
-                <Profile />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/closet"
-            element={
-              <ClosetProvider>
-              <PrivateRoute>
-                <Closet />
-              </PrivateRoute>
-              </ClosetProvider>
-            }
-          />
-          <Route
-            path="/create"
-            element={
-              <ClosetProvider>
-              <PrivateRoute>
-                <Create />
-              </PrivateRoute>
-              </ClosetProvider>
-            }
-          />
-          <Route
+          />        
+          
+          {/* <Route
             path="/style"
             element={
               <PrivateRoute>
                 <Style />
               </PrivateRoute>
             }
-          />
-          <Route
-            path="/saved"
+          /> */}
+        
+          <Route 
             element={
               <PrivateRoute>
-                <Saved />
+                <MainOutlet/>
               </PrivateRoute>
             }>
-            <Route index element={<Boards/>}/>
-            <Route path='favorites' element={<Favorites/>}/>
-          </Route>
-          <Route 
-              path='/saved/boards/:boardId'
-              element={
-                <PrivateRoute>
-                  <Board/>
-                </PrivateRoute>
-              }
-            />
+              <Route 
+                path='/saved/boards/:boardId'
+                element={
+                  <PrivateRoute>
+                    <Board/>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/saved"
+                element={
+                  <PrivateRoute>
+                    <Saved />
+                  </PrivateRoute>
+                }>
+                <Route 
+                index 
+                element={<Boards/>}/>
+                <Route 
+                  path='boards'
+                  element={<Boards/>}/>
+                <Route 
+                  path='favorites' 
+                  element={<Favorites/>}/>
+              </Route>
+              <Route
+                path="/create"
+                element={
+                  <ClosetProvider>
+                  <PrivateRoute>
+                    <Create />
+                  </PrivateRoute>
+                  </ClosetProvider>
+                }
+              />
+              <Route
+                path="/closet"
+                element={
+                  <ClosetProvider>
+                  <PrivateRoute>
+                    <Closet />
+                  </PrivateRoute>
+                  </ClosetProvider>
+                }
+              />
+              <Route
+                path="/explore"
+                element={
+                  <PrivateRoute>
+                    <Explore />
+                  </PrivateRoute> 
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <PrivateRoute>
+                    <Settings />
+                  </PrivateRoute> 
+                }
+              />
+              <Route
+                path="/profile/:username"
+                element={
+                  <PrivateRoute>
+                    <Profile />
+                  </PrivateRoute>
+                }
+              />
+          </Route> 
         </Routes>
       </Router>
     </div>
