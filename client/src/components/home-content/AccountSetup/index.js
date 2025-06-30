@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { auth } from '../../../firebase';
 import { useAuth } from '../../../contexts/AuthContext';
-import UploadProfilePic from '../../image-upload/UploadProfilePic/UploadProfilePic';
+import UploadProfilePic from '../../reusable/UploadProfilePic';
 import WarningPopup from '../../popups/WarningPopup';
 
 const AccountSetup = ({ mode }) => {

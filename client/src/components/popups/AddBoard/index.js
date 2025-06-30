@@ -2,26 +2,62 @@ import './index.scss';
 import CloseIcon from '@mui/icons-material/Close';
 import { useState, useEffect } from 'react';
 import { auth } from '../../../firebase';
+import { useMutation } from '@tanstack/react-query';
 
-const AddBoard = ({setShowAddBoard,
-                    setShowEditBoard,
+const AddBoard = ({
                     mode,
                     board,
-                    setBoards,
-                    setBoardData
+                    close,
+                    onSuccess
                 }) => {
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [coverURL, setCoverURL] = useState('');
+    const [title, setTitle] = useState(board?.title || '');
+    const [description, setDescription] = useState(board?.description || '');
+    const [coverURL, setCoverURL] = useState(board?.coverURL || '');
     const [error, setError] = useState('');
 
-    useEffect(() => {
-        if (mode === 'edit') {
-            setTitle(board.title);
-            setDescription(board?.description);
-            setCoverURL(board?.coverURL);
-        }
-    }, [])
+    const addBoard = useMutation({
+        mutationFn: async (newTitle, newDescription) => {
+            try {
+                const token = await auth.currentUser.getIdToken();
+                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/boards/create-board`, {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-type': 'application/json'
+                    },
+                    body: JSON.stringify({title: newTitle, description: newDescription})
+                })
+
+                const { board } = await res.json();
+                return board;
+            } catch (err) {
+                console.log('Failed to create board:', err);
+            }
+        },
+        onSuccess: (newBoard) => onSuccess(newBoard)
+    })
+
+    const editBoard = useMutation({
+        mutationFn: async (newTitle, newDescription, newCoverURL) => {
+            try {
+                const token = await auth.currentUser.getIdToken();
+                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/boards/edit-board/${board._id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-type': 'application/json'
+                    },
+                    body: JSON.stringify({title: newTitle, description: newDescription, coverURL: newCoverURL})
+                })
+
+                const {board} = await res.json();
+                return board;
+            } catch (err) {
+                console.log('Failed to update board:', err);
+            }
+        },
+        onSuccess: (editedBoard) => onSuccess(editedBoard)
+    })
 
     const handleSubmit = async () => {
         if (!title) {
@@ -29,52 +65,11 @@ const AddBoard = ({setShowAddBoard,
             return;
         }
 
-        mode === 'edit' ? setShowEditBoard(false) : setShowAddBoard(false);
-        const token = await auth.currentUser.getIdToken();
-
+        if (mode === 'add') {
+            addBoard.mutate(title, description);
+        }
         if (mode === 'edit') {
-            try {
-                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/boards/edit-board/${board._id}`, {
-                    method: 'PATCH',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-type': 'application/json'
-                    },
-                    body: JSON.stringify({title, description, coverURL})
-                })
-
-                const data = await res.json();
-                const editedBoard = data.board;
-
-                setBoards(prev => prev.map(board => 
-                    board._id = editedBoard._id ? editedBoard : board
-                ));
-            } catch (err) {
-                console.log('Failed to update board:', err);
-            }
-        } else {
-            try {
-                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/boards/create-board`, {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-type': 'application/json'
-                    },
-                    body: JSON.stringify({title, description})
-                })
-
-                const data = await res.json();
-                const board = data.board;
-
-                if (mode === 'add') setBoards(prev => [...prev, board]);
-
-                if (mode === 'add-explore') setBoardData(prev => [...prev, {
-                    ...board,
-                    exists: false
-                }])
-            } catch (err) {
-                console.log('Failed to create board:', err);
-            }
+            editBoard.mutate(title, description, coverURL);
         } 
     }
 
@@ -84,8 +79,8 @@ const AddBoard = ({setShowAddBoard,
                 <div className="popup-container overlay"> 
                     <div className='popup-content'>
                         <div className='popup-header'>
-                            <h1>{mode === 'edit' ? 'Edit board' : 'New board'}</h1>
-                            <div className='close' onClick={() => mode === 'edit' ? setShowEditBoard(false) : setShowAddBoard(false)} >
+                            <h1>{mode.includes('edit') ? 'Edit board' : 'New board'}</h1>
+                            <div className='close' onClick={close}>
                                 <CloseIcon/>
                             </div>
                         </div>
@@ -109,19 +104,15 @@ const AddBoard = ({setShowAddBoard,
                         </div>
                         <div className='prev-btns'>
                             <button className='sub-btn bold' 
-                                    onClick={() => {
-                                        handleSubmit();
-                                    }}>
-                                {mode === 'edit' ? 'Update board' : 'Add board'}
+                                    onClick={handleSubmit}>
+                                {mode.includes('edit') ? 'Update board' : 'Add board'}
                             </button>
                             <button className='sub-btn' 
-                                    onClick={() => {
-                                            mode === 'edit' ? setShowEditBoard(false) : setShowAddBoard(false)
-                            }}>
+                                    onClick={close}>
                                 Cancel
                             </button>
                         </div>
-                        {mode === 'edit' &&
+                        {mode.includes('edit') &&
                             <p className='delete-board'>Delete board</p>
                         }
                     </div>

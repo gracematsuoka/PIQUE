@@ -9,39 +9,35 @@ import AddBoard from '../../popups/AddBoard';
 import { auth } from '../../../firebase';
 import defaultCover from '../../../assets/images/home/pique_hold.png';
 import { useNavigate } from 'react-router-dom';
+import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
+import ErrorIcon from '@mui/icons-material/Error';
+import { useBoard } from '../../hooks/useBoard';
+
 
 const Boards = () => {
-    const [empty, setEmpty] = useState(true);
-    const [loading, setLoading] = useState(false);
     const [showAddBoard, setShowAddBoard] = useState(false);
     const [showEditBoard, setShowEditBoard] = useState(false);
     const [selectedBoard, setSelectedBoard] = useState(null);
-    const [boards, setBoards] = useState([])
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
-    useEffect(() => {
-        const fetchBoards = async () => {
-            setLoading(true);
-            const token = await auth.currentUser.getIdToken();
+    const {
+        data: boards = [],
+        isLoading,
+        isError,
+        error,
+    } = useBoard();
 
-            try {
-                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/boards/get-boards`, {
-                    method: 'GET',
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                })
-
-                const data = await res.json();
-                setBoards(data.boards);
-                setLoading(false);
-            } catch (err) {
-                console.log('Failed to get boards:', err);
-            }
-        }
-
-        fetchBoards();
-    }, [])
+    if (isError) {
+        return (
+            <div className='query-error'>
+                <div className='error-wrapper'>
+                    <ErrorIcon/>
+                    <h1>Error: {error.message}</h1>
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div className="boards">
@@ -52,19 +48,27 @@ const Boards = () => {
             </Tooltip>
             {showAddBoard && 
                 <AddBoard 
-                    setShowAddBoard={setShowAddBoard}
                     mode='add'
-                    setBoards={setBoards}
+                    close={() => setShowAddBoard(false)}
+                    onSuccess={(newBoard) => {
+                        setShowAddBoard(false);
+                        queryClient.setQueryData(['boards'], prev => [...prev, newBoard]);
+                    }}
                 />}
             {showEditBoard &&
                 <AddBoard
-                    setShowEditBoard={setShowEditBoard}
                     mode='edit'
                     board={selectedBoard}
-                    setBoards={setBoards}
+                    close={() => setShowEditBoard(false)}
+                    onSuccess={(newBoard) => {
+                        setShowEditBoard(false);
+                        queryClient.setQueryData(['boards'], 
+                            prev => (prev.map(board => 
+                                board._id === newBoard._id ? newBoard : board))
+                    )}}
                 />
             }
-        {loading ? (
+        {isLoading ? (
             <Bouncy
                 size="45"
                 speed="1.75"

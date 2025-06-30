@@ -8,45 +8,47 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import ErrorIcon from '@mui/icons-material/Error';
 import { useState, useEffect, useRef } from "react";
 import outfit from '../../../assets/images/test/400x600.png';
 import collection from '../../../assets/images/test/500x500.png';
 import { Bouncy } from 'ldrs/react';
 import BoardSave from "../../popups/BoardSave";
 import AddBoard from "../../popups/AddBoard";
-import {usePosts} from '../../hooks/usePosts';
+import { usePost } from "../../hooks/usePost";
+import { useBoard } from "../../hooks/useBoard";
+import { useToggleLike } from "../../hooks/useToggleLike";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Explore = () => {
-    const {
-        posts,
-        boardData,
-        setBoardData,
-        hasMore,
-        activePostId,
-        loading,
-        fetchBoards,
-        fetchPosts,
-        handleLike,
-        handleOpen,
-        removePost,
-        addPost
-    } = usePosts();
 
+    const { data: boards = [] } = useBoard();
+
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading,
+        isError,
+        error
+    } = usePost();
+
+    const { mutate } = useToggleLike();
+    const posts = data?.pages.flatMap(page => page.postData) || [];
     const [selectedPost, setSelectedPost] = useState(null);
     const sentinelRef = useRef(null);
     const [showAddBoard, setShowAddBoard] = useState(false);
+    const [activePostId, setActivePostId] = useState(null);
+    const queryClient = useQueryClient();
 
     useEffect(() => {
-        fetchBoards();
-    }, [])
-
-    useEffect(() => {
-        if (!hasMore) return;
+        if (!hasNextPage) return;
 
         const observer = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) {
-                    fetchPosts();
+                    fetchNextPage();
                 }
             },
             {
@@ -59,23 +61,47 @@ const Explore = () => {
         observer.observe(sentinelRef.current);
 
         return () => observer.disconnect();
-    }, [hasMore]);
+    }, [hasNextPage]);
+    
+    const handleOpen = (postId) => {
+        if (activePostId === postId) {
+            setActivePostId(null);
+        } else {
+            setActivePostId(postId);
+        }
+    }
 
+    if (isError) {
+        return (
+            <div className='query-error'>
+                <div className='error-wrapper'>
+                    <ErrorIcon/>
+                    <h1>Error: {error.message}</h1>
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div className="explore">
             {showAddBoard &&
                 <AddBoard
-                    mode='add-explore'
-                    setShowAddBoard={setShowAddBoard}
-                    setBoardData={setBoardData}
+                    mode='add'
+                    close={() => setShowAddBoard(false)}
+                    onSuccess={(newBoard) => {
+                        setShowAddBoard(false);
+                        queryClient.setQueryData(['boards'], prev => [...prev, newBoard]);
+                    }}
                 />
             }
             {selectedPost && 
                 <PostDetails
                     selectedPost={selectedPost}
                     setSelectedPost={setSelectedPost}
-                    handleLike={handleLike}
+                    mutate={mutate}
+                    boards={boards}
+                    savedBoards={posts.find(post => post._id === selectedPost._id)?.savedBoards || []}
+
             />}
             <div className="nav-content-wrapper">
                 <div className="search-bar-wrapper">
@@ -89,7 +115,7 @@ const Explore = () => {
                             }}/>
                             <div className={`post-save-bar ${activePostId === post._id ? 'active' : ''}`}>
                                 <div className="like-btn" 
-                                    onClick={() => handleLike(post._id)}>
+                                    onClick={() => mutate({postId: post._id, liked: post.likedByUser})}>
                                     {!post.likedByUser && <FavoriteBorderIcon/>}
                                     {post.likedByUser && <FavoriteIcon style={{fill: '#c23b0e'}}/>}
                                     <p>{post.likes}</p>
@@ -109,19 +135,17 @@ const Explore = () => {
                                 <BoardSave 
                                     className='board-save'
                                     postId={activePostId}
-                                    boardData={boardData}
-                                    setBoardData={setBoardData}
-                                    removePost={removePost}
-                                    addPost={addPost}
+                                    boards={boards}
+                                    savedBoards={posts.find(post => post._id === activePostId)?.savedBoards || []}
                                     setShowAddBoard={setShowAddBoard}
                                 />
                             }
                         </div>
                     )}
-                    {hasMore && 
+                    {hasNextPage && 
                         <div ref={sentinelRef}/>
                     }
-                    {loading && <Bouncy
+                    {isFetchingNextPage && <Bouncy
                     size="45"
                     speed="1.75"
                     color="#6B799F"

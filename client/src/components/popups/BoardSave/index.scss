@@ -2,13 +2,14 @@
     background-color: white;
     border-radius: 5px;
     font-size: 14px;
-    padding: 10px 7px;
+    padding: 10px 10px;
     max-height: 80%;
     width: 80%;
     overflow: auto;
     outline: 1px solid #EBEBEBEB;
     display: flex;
     flex-direction: column;
+    // align-items: flex-start;
     gap: 15px;
 
     .board-item {
@@ -25,6 +26,8 @@
             text-overflow: ellipsis;
             font-family: 'Publica Play Bold';
             font-size: 12px;
+            display: flex;
+            justify-content: flex-start;
         }
     }
 

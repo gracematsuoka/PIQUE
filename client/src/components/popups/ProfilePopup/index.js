@@ -7,15 +7,10 @@ import './index.scss'
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 
-const ProfilePopup = () => {
+const ProfilePopup = ({setIsPopupVisible}) => {
     const [error, setError] = useState();
     const {mongoUser, logout} = useAuth();
     const navigate = useNavigate();
-    const [isPopupVisible, setIsPopupVisible] = useState(false);
-
-    const togglePopup = () => {
-        setIsPopupVisible(!isPopupVisible);
-    }
     
     async function handleLogout() {
         setError('');
@@ -33,13 +28,13 @@ const ProfilePopup = () => {
             <p className='popup-name'>{mongoUser?.name || 'Name'}</p>
             <p className='popup-username'>@{mongoUser?.username || 'username'}</p>
             <hr/>
-            <div className='sub-btn'>
+            <div className='sub-btn' onClick={() => setIsPopupVisible(false)}>
                 <Link to={`/profile/${mongoUser?.username}`}>
                     <FaceIcon/>
                     <p>Profile</p>
                 </Link>
             </div>
-            <div className='sub-btn'>
+            <div className='sub-btn' onClick={() => setIsPopupVisible(false)}>
                 <Link to='/settings'>
                     <SettingsIcon/>
                     Settings

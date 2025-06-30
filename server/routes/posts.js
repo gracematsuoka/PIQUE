@@ -4,7 +4,6 @@ const Post = require("../models/Post");
 const Like = require('../models/Like');
 const BoardPost = require('../models/BoardPost');
 const authenticateUser = require("../middleware/authenticateUser");
-const { auth } = require("firebase-admin");
 
 router.post('/create-post', authenticateUser, async (req, res) => {
     const {mongoId} = req.user;
@@ -24,8 +23,10 @@ router.post('/create-post', authenticateUser, async (req, res) => {
     res.status(200).json({message: 'Post created', post})
 })
 
-router.get('/get-posts', authenticateUser, async (req, res) => {
-    const {mongoId} = req.user;
+router.post('/get-posts', authenticateUser, async (req, res) => {
+    const { mongoId } = req.user;
+    const { boardIds } = req.body;
+    console.log('boardids:', boardIds)
     const limit = Math.min(parseInt(req.query.limit) || 20, 40);
     const cursor = req.query.cursor;
 
@@ -42,9 +43,24 @@ router.get('/get-posts', authenticateUser, async (req, res) => {
         {userId: mongoId, postId: {$in: posts.map(post => post._id)}});
     const likedIdsSet = new Set(likedPostIds.map(id => id.toString()));
 
+    const boardPosts = await BoardPost.find({
+        'postRef': { $in: posts.map(post => post._id)}, 
+        'boardRef': { $in: boardIds }
+    });
+
+    const postToBoard = {};
+    for (const el of boardPosts) {
+        const postId = el.postRef.toString();
+        if (!postToBoard[postId]) {
+            postToBoard[postId] = [];
+        }
+        postToBoard[postId].push(el.boardRef.toString());
+    }
+
     const postData = posts.map(post => ({
         ...post,
-        likedByUser: likedIdsSet.has(post._id.toString())
+        likedByUser: likedIdsSet.has(post._id.toString()),
+        savedBoards: postToBoard[post._id.toString()] || []
     }))
 
     const nextCursor = hasMore ? posts[limit - 1]._id : null;

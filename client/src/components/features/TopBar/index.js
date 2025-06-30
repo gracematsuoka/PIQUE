@@ -23,7 +23,9 @@ const TopBar = () => {
                     onClick={() => togglePopup()}
                 />
                 {isPopupVisible && 
-                    <ProfilePopup/>
+                    <ProfilePopup
+                        setIsPopupVisible={setIsPopupVisible}
+                    />
                     }
             </div>
         </div>

@@ -6,6 +6,7 @@ import outfit from '../../../assets/images/home/testoutfit.jpg';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 import { useState, useEffect, useRef } from 'react';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import BlackShirt from '../../../assets/images/icons/hangshirt-black.png'
@@ -16,12 +17,18 @@ import { auth } from '../../../firebase';
 import { Canvas, FabricImage, FabricText } from 'fabric';
 import { useNavigate } from 'react-router-dom';
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
+import BoardSave from '../BoardSave';
+import AddBoard from '../AddBoard';
+import { useQueryClient } from '@tanstack/react-query';
 
 const PostDetails = ({
     selectedPost,
     setSelectedPost,
-    handleLike
+    mutate,
+    boards,
+    savedBoards
     }) => {
+    const queryClient = useQueryClient();
     const [post, setPost] = useState(null);
     const navigate = useNavigate();
     const canvasRef = useRef();
@@ -33,6 +40,8 @@ const PostDetails = ({
     const [items, setItems] = useState([]);
     const [username, setUsername] = useState('');
     const [profileURL, setProfileURL] = useState('');
+    const [showAddBoard, setShowAddBoard] = useState(false);
+    const [showSave, setShowSave] = useState(false);
 
     useEffect(() => {
         const fetchPostDetails = async () => {
@@ -209,6 +218,16 @@ const PostDetails = ({
 
     return (
         <div className='post-details'>
+        {showAddBoard &&
+            <AddBoard
+                mode='add'
+                close={() => setShowAddBoard(false)}
+                onSuccess={(newBoard) => {
+                    setShowAddBoard(false);
+                    queryClient.setQueryData(['boards'], prev => [...prev, newBoard]);
+                }}
+            />
+        }
         <div className="popup-overlay"></div>
                 <div className="popup-container overlay">
                     <div className='popup-content'>
@@ -228,15 +247,29 @@ const PostDetails = ({
                             </div>
                             <div className='post-details'>
                                 <div className='save-bar'>
-                                    <div className='toolbar-icon like' onClick={() => handleLike(selectedPost._id)}>
+                                    <div className='toolbar-icon like' 
+                                        onClick={() => mutate({postId: post._id, liked: post.likedByUser})}>
                                             {!selectedPost.likedByUser && <FavoriteBorderIcon/>}
                                             {selectedPost.likedByUser && <FavoriteIcon style={{fill: '#c23b0e'}}/>}
                                             <p>{selectedPost.likes}</p>
                                     </div>
                                     <Tooltip title='Save to board'>
-                                    <div className='save-btn'>
-                                        <p>+ SAVE</p>
+                                    <div className='save-btn' onClick={() => setShowSave(prev => !prev)}>
+                                        {showSave ? 
+                                            <RemoveIcon/> :
+                                            <AddIcon/>
+                                        }
+                                        <p>SAVE</p>
                                     </div>
+                                    {showSave &&
+                                        <BoardSave 
+                                            className='board-save'
+                                            postId={post._id}
+                                            boards={boards}
+                                            savedBoards={savedBoards}
+                                            setShowAddBoard={setShowAddBoard}
+                                        />
+                                    }
                                     </Tooltip>
                                 </div>
                                 <p className='description'>{post?.description}</p>

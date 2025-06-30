@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { auth } from '../../firebase';
 
-export function usePosts() {
+export function useBoardPosts() {
     const [posts, setPosts] = useState([]);
     const [boardIds, setBoardIds] = useState([]);
     const [boardData, setBoardData] = useState([]);
@@ -20,32 +20,30 @@ export function usePosts() {
             }
         });
 
-        const data = await res.json();
-        setBoards(data.boards);
-        setBoardIds(data.boards?.map(board => board._id));
+        const { boards } = await res.json();
+        return boards;
     }
 
-    const fetchPosts = async () => {
-        setLoading(true);
-        const token = await auth.currentUser.getIdToken();
+    // const fetchPosts = async () => {
+    //     setLoading(true);
+    //     const token = await auth.currentUser.getIdToken();
 
-        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/posts/get-posts?limit=20&${cursor ? `cursor=${cursor}` : ''}`, {
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
-        const data = await res.json();
-        setPosts(prev => [...prev, ...data.postData]);
-        setCursor(data.nextCursor);
-        setHasMore(data.hasMore);
-        setLoading(false);
-    }
+    //     const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/posts/get-posts?limit=20&${cursor ? `cursor=${cursor}` : ''}`, {
+    //         method: 'POST',
+    //         headers: {
+    //             Authorization: `Bearer ${token}`
+    //         }
+    //     })
+    //     const data = await res.json();
+    //     setPosts(prev => [...prev, ...data.postData]);
+    //     setCursor(data.nextCursor);
+    //     setHasMore(data.hasMore);
+    //     setLoading(false);
+    // }
 
     const fetchBoardPosts = async (boardId) => {
         setLoading(true);
         const token = await auth.currentUser.getIdToken();
-        console.log('fetching')
 
         const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/posts/${boardId}/posts?limit=20&${cursor ? `cursor=${cursor}` : ''}`, {
             method: 'GET',
@@ -54,7 +52,6 @@ export function usePosts() {
             }
         })
         const data = await res.json();
-        console.log('data:', data)
         setPosts(prev => [...prev, ...data.postData]);
         setCursor(data.nextCursor);
         setHasMore(data.hasMore);
@@ -159,7 +156,7 @@ export function usePosts() {
         loading,
         fetchBoards,
         fetchBoardPosts,
-        fetchPosts,
+        // fetchPosts,
         handleLike,
         handleOpen,
         removePost,

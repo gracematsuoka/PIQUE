@@ -1,3 +1,7 @@
+.add-board {
+    z-index: 1000;
+}
+
 .add-board input, .add-board textarea {
     padding: 10px;
     border: 0.5px solid lightgray;
@@ -10,8 +14,6 @@
 }
 
 .add-board h1 {
-    // font-family: 'Publica Play Bold';
-    // font-weight: 500;
     letter-spacing: 0.5px;
     font-size: 28px;
 }

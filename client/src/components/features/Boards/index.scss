@@ -1,3 +1,34 @@
+.query-error {
+    width: 100%;
+    height: 100%;
+    margin-top: 70px;
+    display: flex;
+    justify-content: center;
+
+    .error-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        background-color: rgb(241, 199, 199);
+        width: fit-content;
+        height: fit-content;
+        padding: 5px 15px;
+        border-radius: 15px;
+    }
+
+    h1 {
+        color: rgb(178, 37, 37);
+        font-size: 15px;
+    }
+
+    svg {
+        fill: rgb(178, 37, 37);
+        width: 18px;
+        height: 18px;
+    }
+}
+
 .boards {
     padding-left: 120px;
     padding-top: 20px;

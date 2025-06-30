@@ -15,11 +15,29 @@
         flex-direction: column;
         flex: 1;
     }
-    
+
     .board-header {
         display: flex;
         flex-direction: column;
         gap: 5px;
+
+        .board-title-edit {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+
+            svg {
+                height: 20px;
+                display: none;
+            }
+
+            &:hover {
+                svg {
+                    display: flex;
+                    cursor: pointer;
+                }
+            }
+        }
 
         h1 {
             font-family: 'Publica Play Bold';
