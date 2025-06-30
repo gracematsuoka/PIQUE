@@ -26,7 +26,6 @@ router.post('/create-post', authenticateUser, async (req, res) => {
 router.post('/get-posts', authenticateUser, async (req, res) => {
     const { mongoId } = req.user;
     const { boardIds } = req.body;
-    console.log('boardids:', boardIds)
     const limit = Math.min(parseInt(req.query.limit) || 20, 40);
     const cursor = req.query.cursor;
 
@@ -68,12 +67,13 @@ router.post('/get-posts', authenticateUser, async (req, res) => {
     res.json({postData, nextCursor, hasMore});
 })
 
-router.get('/:boardId/posts', authenticateUser, async (req, res) => {
+router.post('/:boardId/posts', authenticateUser, async (req, res) => {
     const {mongoId} = req.user;
     const {boardId} = req.params;
+    const {boardIds} = req.body;
 
-    const boardPosts = await BoardPost.find({boardRef: boardId}).select('postRef -_id');
-    const postIds = boardPosts.map(bp => bp.postRef);
+    const boardPostsRes = await BoardPost.find({boardRef: boardId}).select('postRef -_id');
+    const postIds = boardPostsRes.map(bp => bp.postRef);
     if (postIds.length === 0) {
         return res.json({postData: [], nextCursor: null, hasMore: false});
     }
@@ -97,12 +97,31 @@ router.get('/:boardId/posts', authenticateUser, async (req, res) => {
         {userId: mongoId, postId: {$in: posts.map(post => post._id)}});
     const likedIdsSet = new Set(likedPostIds.map(id => id.toString()));
 
+    const boardPosts = await BoardPost.find({
+        'postRef': { $in: posts.map(post => post._id)}, 
+        'boardRef': { $in: boardIds }
+    });
+    console.log('bp:', boardPosts)
+
+    const postToBoard = {};
+    for (const el of boardPosts) {
+        const postId = el.postRef.toString();
+        if (!postToBoard[postId]) {
+            postToBoard[postId] = [];
+        }
+        postToBoard[postId].push(el.boardRef.toString());
+    }
+    console.log('postboard:', postToBoard)
+
     const postData = posts.map(post => ({
         ...post,
-        likedByUser: likedIdsSet.has(post._id.toString())
+        likedByUser: likedIdsSet.has(post._id.toString()),
+        savedBoards: postToBoard[post._id.toString()] || []
     }))
 
     const nextCursor = hasMore ? posts[limit - 1]._id : null;
+
+    console.log('postData:', postData)
 
     res.json({postData, nextCursor, hasMore});
 })

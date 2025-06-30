@@ -6,10 +6,9 @@ import AddIcon from '@mui/icons-material/Add';
 import { useEffect, useState } from 'react';
 import { Bouncy } from 'ldrs/react';
 import AddBoard from '../../popups/AddBoard';
-import { auth } from '../../../firebase';
 import defaultCover from '../../../assets/images/home/pique_hold.png';
 import { useNavigate } from 'react-router-dom';
-import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import ErrorIcon from '@mui/icons-material/Error';
 import { useBoard } from '../../hooks/useBoard';
 
@@ -79,7 +78,7 @@ const Boards = () => {
                 <div className="board" 
                     key={board._id} 
                     onClick={() => navigate(`/saved/boards/${board._id}`)}>
-                    <img src={board?.coverRef.postURL || defaultCover}/>
+                    <img src={board?.coverRef?.postURL || defaultCover}/>
                     <div className="board-title">
                         <div className="h1-wrap">
                             <h1>{board.title.toUpperCase()}</h1>

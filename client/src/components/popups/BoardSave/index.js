@@ -8,12 +8,11 @@ const BoardSave = ({
     postId,
     savedBoards,
     boards,
-    setShowAddBoard
+    setShowAddBoard,
+    queryKey
     }) => {
 
     const { mutate } = useToggleBoard();
-    console.log('postid', postId)
-    console.log('saved boards', savedBoards)
 
     return (
         <div className='board-save'>
@@ -24,14 +23,26 @@ const BoardSave = ({
                         <Tooltip title='Remove from board'>
                         <div className='icon-circle' 
                             key={board._id + '-' + board.exists} 
-                            onClick={() => mutate({boardId: board._id, postId, remove: true})}>
+                            onClick={() => 
+                                mutate({
+                                    boardId: board._id, 
+                                    postId, 
+                                    remove: true,
+                                    queryKey
+                                })}>
                             <RemoveIcon/>
                         </div>
                         </Tooltip> :
                         <Tooltip title='Add to board'>
                         <div className='icon-circle' 
                             key={board._id + '-' + board.exists} 
-                            onClick={() => mutate({boardId: board._id, postId, remove: false})}>
+                            onClick={() => 
+                                mutate({
+                                    boardId: board._id, 
+                                    postId, 
+                                    remove: false,
+                                    queryKey
+                                })}>
                             <AddIcon/>
                         </div>
                         </Tooltip>

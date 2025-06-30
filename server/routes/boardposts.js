@@ -34,9 +34,11 @@ router.delete('/:postId/remove-post/:boardId', authenticateUser, async(req, res)
     await Board.findByIdAndUpdate(boardId, {$inc: {numSaved: -1}});
 
     const board = await Board.findById(boardId);
-    if (board?.coverRef === postId) {
+    let newCoverRef;
+    if (board?.coverRef.toString() === postId.toString()) {
         if (board.numSaved === 0) {
             await Board.findByIdAndUpdate(boardId, {coverRef: null});
+            newCoverRef = null;
         } else {
             const boardPost = await BoardPost
                                     .findOne({boardRef: boardId})
@@ -44,9 +46,11 @@ router.delete('/:postId/remove-post/:boardId', authenticateUser, async(req, res)
                                     .populate('postRef');
             const newPostId = boardPost.postRef._id;
             await Board.findByIdAndUpdate(boardId, {coverRef: newPostId});
+            newCoverRef = newPostId;
         }
     }
-    res.sendStatus(204);
+
+    res.json({newCoverRef})
 });
 
 router.post('/:postId/add-post/:boardId', authenticateUser, async(req, res) => {
@@ -55,10 +59,14 @@ router.post('/:postId/add-post/:boardId', authenticateUser, async(req, res) => {
     await BoardPost.create({postRef: postId, boardRef: boardId});
     await Board.findByIdAndUpdate(boardId, {$inc: {numSaved: 1}});
 
-    const board = await Board.findById(boardId)
-    if (!board?.coverRef) await Board.findByIdAndUpdate(boardId, {coverRef: postId});
+    const board = await Board.findById(boardId);
+    let newCoverRef;
+    if (!board?.coverRef) {
+        await Board.findByIdAndUpdate(boardId, {coverRef: postId});
+        newCoverRef = postId;
+    }
 
-    res.status(200).json({message: 'Post added to board'})
+    res.json({newCoverRef})
 });
 
 module.exports = router;

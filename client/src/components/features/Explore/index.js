@@ -1,5 +1,3 @@
-import TopBar from "../TopBar";
-import NavBar from "../NavBar";
 import './index.scss';
 import SearchBar from "../../reusable/SearchBar";
 import PostDetails from "../../popups/PostDetails";
