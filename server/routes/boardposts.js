@@ -55,8 +55,9 @@ router.delete('/:postId/remove-post/:boardId', authenticateUser, async(req, res)
 
 router.post('/:postId/add-post/:boardId', authenticateUser, async(req, res) => {
     const {postId, boardId} = req.params;
+    const {mongoId} = req.user;
 
-    await BoardPost.create({postRef: postId, boardRef: boardId});
+    await BoardPost.create({postRef: postId, boardRef: boardId, userRef: mongoId});
     await Board.findByIdAndUpdate(boardId, {$inc: {numSaved: 1}});
 
     const board = await Board.findById(boardId);

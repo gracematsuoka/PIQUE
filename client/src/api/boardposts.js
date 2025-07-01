@@ -28,11 +28,14 @@ export const fetchPosts = async ({cursor, boardIds}) => {
     return { postData, hasMore, nextCursor };
 }
 
-export const fetchBoardPosts = async ({boardId, cursor, boardIds}) => {
+export const fetchBoardPosts = async ({boardId, liked, cursor, boardIds}) => {
     const token = await auth.currentUser.getIdToken();
-    console.log('fetch:',boardIds)
 
-    const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/posts/${boardId}/posts?limit=20&${cursor ? `cursor=${cursor}` : ''}`, {
+    let query;
+    if (boardId) query = `boardId=${boardId}&`;
+    else if (liked) query = 'liked=true&';
+    console.log('fetch:',liked, query)
+    const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/posts/saved?${query}limit=20&${cursor ? `cursor=${cursor}` : ''}`, {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -41,7 +44,7 @@ export const fetchBoardPosts = async ({boardId, cursor, boardIds}) => {
         body: JSON.stringify({boardIds})
     })
     const data = await res.json();
-    console.log('data pi:', data)
+    console.log('data:', data)
     return data;
 }
 

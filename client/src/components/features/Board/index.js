@@ -21,7 +21,7 @@ import { useQueryClient } from "@tanstack/react-query";
 const Board = () => {
     const {boardId} = useParams();
 
-    const { data: boards = [] } = useBoard();
+    const { data: boards = [], isLoading: boardIsLoading } = useBoard();
 
     const {
         data,
@@ -31,7 +31,7 @@ const Board = () => {
         isLoading,
         isError,
         error
-    } = useSavedPosts(boardId);
+    } = useSavedPosts({boardId});
 
     const queryClient = useQueryClient();
     const { mutate } = useToggleLike();
@@ -75,115 +75,115 @@ const Board = () => {
 
     return (
         <div className="board-page">
-                    {showAddBoard &&
-                        <AddBoard
-                            mode='add'
-                            close={() => setShowAddBoard(false)}
-                            onSuccess={(newBoard) => {
-                                setShowAddBoard(false);
-                                queryClient.setQueryData(['boards'], prev => [...prev, newBoard]);
-                            }}
-                        />
-                    }
-                    {selectedPost && 
-                        <PostDetails
-                            selectedPost={selectedPost}
-                            setSelectedPost={setSelectedPost}
-                            mutate={mutate}
-                            boards={boards}
-                            savedBoards={posts.find(post => post._id === selectedPost._id)?.savedBoards || []}
-                        />}
+            {showAddBoard &&
+                <AddBoard
+                    mode='add'
+                    close={() => setShowAddBoard(false)}
+                    onSuccess={(newBoard) => {
+                        setShowAddBoard(false);
+                        queryClient.setQueryData(['boards'], prev => [...prev, newBoard]);
+                    }}
+                />
+            }
+            {selectedPost && 
+                <PostDetails
+                    selectedPost={selectedPost}
+                    setSelectedPost={setSelectedPost}
+                    mutate={mutate}
+                    boards={boards}
+                    savedBoards={posts.find(post => post._id === selectedPost._id)?.savedBoards || []}
+                />}
 
-                    {showEditBoard &&
-                        <AddBoard
-                            mode='edit'
-                            board={board}
-                            close={() => setShowEditBoard(false)}
-                            onSuccess={(newBoard) => {
-                                setShowEditBoard(false);
-                                queryClient.setQueryData(['boards'], 
-                                    prev => (prev.map(board => 
-                                        board._id === newBoard._id ? newBoard : board))
-                            )}}
-                        />
-                    }
-                    <div className="nav-content-wrapper">
-                        <div className='board-header'>
-                            <div className='board-title-edit'>
-                                <h1>{board?.title?.toUpperCase()}</h1>
-                                <EditIcon onClick={() => setShowEditBoard(true)}/>
-                            </div>
-                            <div className='numsaved'>
-                                <AttachFileIcon/>
-                                <p>{board?.numSaved} Saved</p>
-                            </div>
-                            <p className='board-desc'>{board?.description}</p>
-                        </div>
-                        <div className="search-bar-wrapper">
-                            <SearchBar/>
-                        </div>
-                        {isLoading ? (
-                            <Bouncy
-                                size="45"
-                                speed="1.75"
-                                color="#6B799F"
-                            /> 
-                        ) : (
-                            posts.length > 0 ? (
-                                <div className='posts'>
-                                    {posts.map(post => 
-                                        <div className='post' key={post._id}>
-                                            <img src={post.postURL} onClick={() => {
-                                                setSelectedPost(post);
-                                            }}/>
-                                            <div className={`post-save-bar ${activePostId === post._id ? 'active' : ''}`}>
-                                                <div className="like-btn" 
-                                                    onClick={() => 
-                                                        mutate({postId: post._id, 
-                                                                liked: post.likedByUser,
-                                                                queryKeys: [['posts'], ['savedPosts', boardId]]
-                                                                })}>
-                                                    {!post.likedByUser && <FavoriteBorderIcon/>}
-                                                    {post.likedByUser && <FavoriteIcon style={{fill: '#c23b0e'}}/>}
-                                                    <p>{post.likes}</p>
-                                                </div>
-                                                <div className="save-btn" 
-                                                    onClick={() =>  {
-                                                        handleOpen(post._id);
-                                                    }}>
-                                                    {activePostId === post._id ?
-                                                        <RemoveIcon/> :
-                                                        <AddIcon/> 
-                                                    }
-                                                    <p>SAVE</p>
-                                                </div>
-                                            </div>
-                                            {activePostId === post._id && 
-                                                <BoardSave 
-                                                    className='board-save'
-                                                    postId={activePostId}
-                                                    boards={boards}
-                                                    savedBoards={posts.find(post => post._id === activePostId)?.savedBoards || []}
-                                                    setShowAddBoard={setShowAddBoard}
-                                                    queryKey={[['posts'], ['savedPosts', boardId]]}
-                                                />
-                                            }
-                                        </div>
-                                    )}
-                                </div>
-                            ) : (
-                                <div className='empty'>
-                                    <p>You have no saved posts yet...</p>
-                                    <div className='empty-h1'>
-                                        <h1>Click <i>'Explore'</i> to get started</h1>
-                                    </div>
-                                </div>
-                            ))}
-                        {hasNextPage && 
-                            <div ref={sentinelRef}/>
-                        }
+            {showEditBoard &&
+                <AddBoard
+                    mode='edit'
+                    board={board}
+                    close={() => setShowEditBoard(false)}
+                    onSuccess={(newBoard) => {
+                        setShowEditBoard(false);
+                        queryClient.setQueryData(['boards'], 
+                            prev => (prev.map(board => 
+                                board._id === newBoard._id ? newBoard : board))
+                    )}}
+                />
+            }
+            <div className="nav-content-wrapper">
+                <div className='board-header'>
+                    <div className='board-title-edit'>
+                        <h1>{board?.title?.toUpperCase()}</h1>
+                        <EditIcon onClick={() => setShowEditBoard(true)}/>
                     </div>
+                    <div className='numsaved'>
+                        <AttachFileIcon/>
+                        <p>{board?.numSaved} Saved</p>
+                    </div>
+                    <p className='board-desc'>{board?.description}</p>
                 </div>
+                <div className="search-bar-wrapper">
+                    <SearchBar/>
+                </div>
+                {(isLoading || isFetchingNextPage || boardIsLoading) ? (
+                    <Bouncy
+                        size="45"
+                        speed="1.75"
+                        color="#6B799F"
+                    /> 
+                ) : (
+                    posts.length > 0 ? (
+                        <div className='posts'>
+                            {posts.map(post => 
+                                <div className='post' key={post._id}>
+                                    <img src={post.postURL} onClick={() => {
+                                        setSelectedPost(post);
+                                    }}/>
+                                    <div className={`post-save-bar ${activePostId === post._id ? 'active' : ''}`}>
+                                        <div className="like-btn" 
+                                            onClick={() => 
+                                                mutate({postId: post._id, 
+                                                        liked: post.likedByUser,
+                                                        queryKeys: [['posts'], ['savedPosts', {boardId}]]
+                                                        })}>
+                                            {!post.likedByUser && <FavoriteBorderIcon/>}
+                                            {post.likedByUser && <FavoriteIcon style={{fill: '#c23b0e'}}/>}
+                                            <p>{post.likes}</p>
+                                        </div>
+                                        <div className="save-btn" 
+                                            onClick={() =>  {
+                                                handleOpen(post._id);
+                                            }}>
+                                            {activePostId === post._id ?
+                                                <RemoveIcon/> :
+                                                <AddIcon/> 
+                                            }
+                                            <p>SAVE</p>
+                                        </div>
+                                    </div>
+                                    {activePostId === post._id && 
+                                        <BoardSave 
+                                            className='board-save'
+                                            postId={activePostId}
+                                            boards={boards}
+                                            savedBoards={posts.find(post => post._id === activePostId)?.savedBoards || []}
+                                            setShowAddBoard={setShowAddBoard}
+                                            queryKey={[['posts'], ['savedPosts', {boardId}]]}
+                                        />
+                                    }
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className='empty'>
+                            <p>You have no saved posts yet...</p>
+                            <div className='empty-h1'>
+                                <h1>Click <i>'Explore'</i> to get started</h1>
+                            </div>
+                        </div>
+                    ))}
+                {hasNextPage && 
+                    <div ref={sentinelRef}/>
+                }
+            </div>
+        </div>
     )
 }
 

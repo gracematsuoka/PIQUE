@@ -1,7 +1,6 @@
 import './index.scss';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-import Tooltip from '@mui/material/Tooltip';
 import { useToggleBoard } from '../../hooks/useToggleBoard';
 
 const BoardSave = ({
@@ -20,7 +19,6 @@ const BoardSave = ({
                 <div className='board-item' key={board._id}>
                     <p>{board.title.toUpperCase()}</p>
                     {savedBoards.includes(board._id) ?
-                        <Tooltip title='Remove from board'>
                         <div className='icon-circle' 
                             key={board._id + '-' + board.exists} 
                             onClick={() => 
@@ -31,9 +29,7 @@ const BoardSave = ({
                                     queryKey
                                 })}>
                             <RemoveIcon/>
-                        </div>
-                        </Tooltip> :
-                        <Tooltip title='Add to board'>
+                        </div> :
                         <div className='icon-circle' 
                             key={board._id + '-' + board.exists} 
                             onClick={() => 
@@ -45,7 +41,6 @@ const BoardSave = ({
                                 })}>
                             <AddIcon/>
                         </div>
-                        </Tooltip>
                     }
                 </div>
             )}

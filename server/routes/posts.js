@@ -32,14 +32,14 @@ router.post('/get-posts', authenticateUser, async (req, res) => {
     const docs = await Post.find(cursor ? {_id: {$lt: cursor}} : {})
                             .sort({_id: -1})
                             .limit(limit + 1)
-                            .select('likes _id postURL userId colors')
+                            .select('likes _id postURL userId')
                             .lean();
     
     const hasMore = docs.length > limit;
     const posts = hasMore ? docs.slice(0, limit) : docs;
 
-    const likedPostIds = await Like.distinct('postId', 
-        {userId: mongoId, postId: {$in: posts.map(post => post._id)}});
+    const likedPostIds = await Like.distinct('postRef', 
+        {userRef: mongoId, postRef: {$in: posts.map(post => post._id)}});
     const likedIdsSet = new Set(likedPostIds.map(id => id.toString()));
 
     const boardPosts = await BoardPost.find({
@@ -67,13 +67,19 @@ router.post('/get-posts', authenticateUser, async (req, res) => {
     res.json({postData, nextCursor, hasMore});
 })
 
-router.post('/:boardId/posts', authenticateUser, async (req, res) => {
+router.post('/saved', authenticateUser, async (req, res) => {
     const {mongoId} = req.user;
-    const {boardId} = req.params;
+    const {boardId, liked} = req.query;
     const {boardIds} = req.body;
+    console.log('reached')
 
-    const boardPostsRes = await BoardPost.find({boardRef: boardId}).select('postRef -_id');
-    const postIds = boardPostsRes.map(bp => bp.postRef);
+    const model = boardId ? BoardPost : Like;
+
+    const fetchedPosts = boardId ? await model.find({boardRef: boardId}).select('postRef -_id')
+                            : await model.find({userRef: mongoId}).select('postRef -_id');
+    console.log('fetchedos', fetchedPosts)
+
+    const postIds = fetchedPosts.map(bp => bp.postRef);
     if (postIds.length === 0) {
         return res.json({postData: [], nextCursor: null, hasMore: false});
     }
@@ -81,27 +87,30 @@ router.post('/:boardId/posts', authenticateUser, async (req, res) => {
     const limit = Math.min(parseInt(req.query.limit) || 20, 40);
     const cursor = req.query.cursor;
 
-    const filter = {_id: {$in: postIds}};
+    const filter = {postRef: {$in: postIds}};
     if (cursor) filter._id.$lt = cursor;
 
-    const docs = await Post.find(filter)
-                            .sort({_id: -1})
-                            .limit(limit + 1)
-                            .select('likes _id postURL userId colors')
-                            .lean();
-    
+    const allData = await model
+                .find(filter)
+                .sort({_id: -1})
+                .limit(limit + 1)
+                .populate('postRef', 'likes _id postURL userId')
+                .select('postRef -_id')
+                .lean();
+
+    const docs = allData.map(data => data?.postRef)
+
     const hasMore = docs.length > limit;
     const posts = hasMore ? docs.slice(0, limit) : docs;
 
-    const likedPostIds = await Like.distinct('postId', 
-        {userId: mongoId, postId: {$in: posts.map(post => post._id)}});
+    const likedPostIds = await Like.distinct('postRef', 
+        {userRef: mongoId, postRef: {$in: posts.map(post => post._id)}});
     const likedIdsSet = new Set(likedPostIds.map(id => id.toString()));
-
+    
     const boardPosts = await BoardPost.find({
         'postRef': { $in: posts.map(post => post._id)}, 
         'boardRef': { $in: boardIds }
     });
-    console.log('bp:', boardPosts)
 
     const postToBoard = {};
     for (const el of boardPosts) {
@@ -111,7 +120,6 @@ router.post('/:boardId/posts', authenticateUser, async (req, res) => {
         }
         postToBoard[postId].push(el.boardRef.toString());
     }
-    console.log('postboard:', postToBoard)
 
     const postData = posts.map(post => ({
         ...post,
@@ -120,8 +128,6 @@ router.post('/:boardId/posts', authenticateUser, async (req, res) => {
     }))
 
     const nextCursor = hasMore ? posts[limit - 1]._id : null;
-
-    console.log('postData:', postData)
 
     res.json({postData, nextCursor, hasMore});
 })
@@ -131,7 +137,7 @@ router.post('/:postId/like', authenticateUser, async (req, res) => {
     const {postId} = req.params;
 
     try {
-        await Like.create({userId: mongoId, postId});
+        await Like.create({userRef: mongoId, postRef: postId});
         await Post.findByIdAndUpdate(postId, {$inc: {likes: 1}});
         res.status(200).json({message: 'Added like'});
     } catch (err) {
@@ -144,7 +150,7 @@ router.delete('/:postId/unlike', authenticateUser, async (req, res) => {
     const {mongoId} = req.user;
     const {postId} = req.params;
 
-    const removed = await Like.findOneAndDelete({userId: mongoId, postId});
+    const removed = await Like.findOneAndDelete({userRef: mongoId, postRef: postId});
     if (!removed) return res.status(404).json({error: 'Already unliked'});
 
     await Post.findByIdAndUpdate(postId, {$inc: {likes: -1}});

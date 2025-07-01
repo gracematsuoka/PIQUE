@@ -1,0 +1,13 @@
+.favorites {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+    .nav-content-wrapper {
+        overflow-y: hidden;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        padding-top: 20px;
+    }
+}

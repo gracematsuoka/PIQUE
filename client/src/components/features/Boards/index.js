@@ -3,10 +3,11 @@ import outfit from '../../../assets/images/home/testoutfit.jpg';
 import EditIcon from '@mui/icons-material/Edit';
 import Tooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Bouncy } from 'ldrs/react';
 import AddBoard from '../../popups/AddBoard';
 import defaultCover from '../../../assets/images/home/pique_hold.png';
+import grey from '../../../assets/images/home/grey.png';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import ErrorIcon from '@mui/icons-material/Error';
@@ -77,8 +78,10 @@ const Boards = () => {
             boards.map(board => 
                 <div className="board" 
                     key={board._id} 
-                    onClick={() => navigate(`/saved/boards/${board._id}`)}>
-                    <img src={board?.coverRef?.postURL || defaultCover}/>
+                    onClick={(e) => {
+                        navigate(`/saved/boards/${board._id}`)
+                    }}>
+                    <img src={board?.coverRef?.postURL || grey}/>
                     <div className="board-title">
                         <div className="h1-wrap">
                             <h1>{board.title.toUpperCase()}</h1>
@@ -87,7 +90,8 @@ const Boards = () => {
                     </div>
                     <Tooltip title='Edit board'>
                     <div className="edit" 
-                        onClick={() => {
+                        onClick={(e) => {
+                            e.stopPropagation();
                             setSelectedBoard(board);
                             setShowEditBoard(true);
                     }}>

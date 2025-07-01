@@ -1,6 +1,4 @@
-import NavBar from "../NavBar";
-import TopBar from "../TopBar";
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import SearchBar from "../../reusable/SearchBar";
 import './index.scss';
 import { Outlet, NavLink, useLocation } from "react-router-dom";
@@ -18,10 +16,9 @@ const Saved = () => {
                             BOARDS
                         </NavLink>
                         <NavLink to='/saved/favorites' className={({ isActive }) => `nav ${isActive ? 'active' : ''}`}>
-                            <FavoriteBorderIcon/>
+                            <FavoriteIcon/>
                             <hr/>
                         </NavLink>
-                        <NavLink to='/saved/all'>ALL SAVED</NavLink>
                     </div>
                     <SearchBar/>
                 </div>

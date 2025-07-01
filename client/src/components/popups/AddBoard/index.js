@@ -28,8 +28,8 @@ const AddBoard = ({
                     body: JSON.stringify({title: newTitle, description: newDescription})
                 })
 
-                const { board } = await res.json();
-                return board;
+                const { board: newBoard } = await res.json();
+                return newBoard;
             } catch (err) {
                 console.log('Failed to create board:', err);
             }
@@ -50,8 +50,8 @@ const AddBoard = ({
                     body: JSON.stringify({title: newTitle, description: newDescription, coverURL: newCoverURL})
                 })
 
-                const {board} = await res.json();
-                return board;
+                const { board: newBoard } = await res.json();
+                return newBoard;
             } catch (err) {
                 console.log('Failed to update board:', err);
             }
