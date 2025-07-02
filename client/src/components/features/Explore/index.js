@@ -32,7 +32,6 @@ const Explore = () => {
         error
     } = usePost();
 
-    console.log('explore data:', data)
     const { mutate } = useToggleLike();
     const posts = data?.pages.flatMap(page => page.postData) || [];
     const [selectedPost, setSelectedPost] = useState(null);

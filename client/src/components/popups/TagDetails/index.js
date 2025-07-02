@@ -1,19 +1,18 @@
 import './index.scss';
 import {ReactComponent as Delete} from '../../../assets/images/icons/delete.svg'
 import React, { forwardRef, useEffect, useState, useRef } from 'react';
-import { auth } from '../../../firebase';
+import { useDeleteTag } from '../../hooks/useMutateTag';
 
 
 const TagDetails = forwardRef(({name, 
                                 setTagDivs, 
                                 setAddedTags, 
                                 id, 
-                                mongoId, 
-                                handlArrayChange,
-                                tagDivs,
-                                originalTags
+                                mongoId,
+                                style
                             }, ref) => {
     const [tagName, setTagName] = useState(name);
+    const deleteTag = useDeleteTag();
 
     const colors = {
         Red: '#FE9D97',
@@ -27,6 +26,9 @@ const TagDetails = forwardRef(({name,
         Beige: '#f5ede1'
     }
 
+    useEffect(() => {
+        console.log('opened')
+    }, [])
     const handleEditTagDiv = (e) => {
         if (e.key === 'Enter') {
             setTagDivs(prev => prev.map(div => 
@@ -48,6 +50,7 @@ const TagDetails = forwardRef(({name,
     }
 
     const handleDeleteTag = async () => {
+        console.log('handle del')
         setTagDivs(prev => prev
                                 .map(div => 
                                         div.id === id ? {...div, showDetails: false} : div
@@ -62,25 +65,24 @@ const TagDetails = forwardRef(({name,
                     )
 
         if (mongoId) {
-            const token = await auth.currentUser.getIdToken();
-            await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/delete-tag?tagId=${mongoId}`, {
-                method: 'DELETE',
-                headers: {
-                    Authorization: `Bearer ${token}`
-                },
-            })
+            deleteTag.mutate({tagId: mongoId});
         }
     }
 
     return (
-        <div className='popup-container add-tag tag-details' ref={ref}>
+        <div className='popup-container add-tag tag-details' ref={ref} style={style}>
             <input type='text' value={tagName} 
                 onChange={e => {
                         setTagName(e.target.value);
                     }}
                 onKeyDown={e => handleEditTagDiv(e)}
             />
-            <div className='sub-btn td-delete' onClick={handleDeleteTag}>
+            <div className='sub-btn td-delete' 
+                onClick={(e) => {
+                    e.stopPropagation();
+                    console.log('hedla')
+                    handleDeleteTag();
+                    }}>
                 <p>Delete</p>
                 <Delete/>
             </div>

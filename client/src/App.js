@@ -18,7 +18,6 @@ import Favorites from './components/features/Favorites';
 import Board from './components/features/Board';
 import MainOutlet from './components/outlets/MainOutlet';
 import { useAuth } from './contexts/AuthContext';
-import { ClosetProvider } from './contexts/ClosetContext';
 
 function App() {
   const { currentUser, loading } = useAuth();
@@ -104,21 +103,17 @@ function App() {
               <Route
                 path="/create"
                 element={
-                  <ClosetProvider>
                   <PrivateRoute>
                     <Create />
                   </PrivateRoute>
-                  </ClosetProvider>
                 }
               />
               <Route
                 path="/closet"
                 element={
-                  <ClosetProvider>
                   <PrivateRoute>
                     <Closet />
                   </PrivateRoute>
-                  </ClosetProvider>
                 }
               />
               <Route

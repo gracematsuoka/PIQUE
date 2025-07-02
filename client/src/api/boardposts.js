@@ -34,7 +34,6 @@ export const fetchBoardPosts = async ({boardId, liked, cursor, boardIds}) => {
     let query;
     if (boardId) query = `boardId=${boardId}&`;
     else if (liked) query = 'liked=true&';
-    console.log('fetch:',liked, query)
     const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/posts/saved?${query}limit=20&${cursor ? `cursor=${cursor}` : ''}`, {
         method: 'POST',
         headers: {
@@ -44,7 +43,6 @@ export const fetchBoardPosts = async ({boardId, liked, cursor, boardIds}) => {
         body: JSON.stringify({boardIds})
     })
     const data = await res.json();
-    console.log('data:', data)
     return data;
 }
 

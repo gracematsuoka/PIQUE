@@ -1,22 +1,10 @@
-.popup-container.add-tag.tag-details {
-    width: 90px;
-    align-items: unset;
-}
 
-.popup-container.add-tag.tag-details input {
-    width: 90%
-}
-
-.popup-container.add-tag.tag-details .sub-btn {
-    padding: 1px 4px 1px 4px
-}
-
-.popup-container.add-tag.tag-details .sub-btn:hover {
-    background-color: rgba(0, 0, 0, 0.034);
-}
 
 .td-delete {
     display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 100%;
     gap: 5px;
     padding-top: 5px;
     font-size: 13px;
@@ -33,6 +21,7 @@
     justify-content: flex-start;
     width: 100%;
     gap: 7px;
+    overflow: auto;
 }
 
 .td-color .colorsP {
@@ -44,6 +33,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    box-sizing: border-box;
     width: 100%;
 }
 

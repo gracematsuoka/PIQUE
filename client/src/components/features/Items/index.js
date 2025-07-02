@@ -6,62 +6,69 @@ import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import addClothes from "../../../assets/images/icons/addclothes.png";
 import { Bouncy } from 'ldrs/react';
 import 'ldrs/react/Bouncy.css';
-import { useCloset } from '../../../contexts/ClosetContext';
 import {ReactComponent as CloseIcon} from '../../../assets/images/icons/close.svg';
-import { auth } from '../../../firebase';
+import { useItems } from '../../hooks/useItems';
+import { useDeleteItem } from '../../hooks/useMutateItems';
 
-const Items = ({onSelectItem, reload, updatedItem, addedItem, setSelectedItem}) => {
-    const { closetItems, setClosetItems, loading, setLoading } = useCloset();
+const Items = ({onSelectItem, tab}) => {
+    console.log('tab', tab)
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading,
+        isError,
+        error
+    } = useItems(tab)
+
+    console.log('items:',data)
+    const deleteItem = useDeleteItem();
+    const items = data?.pages.flatMap(page => page.items) || [];
+    console.log('items', items)
     const [selectedId, setSelectedId] = useState(null);
     const [deleteId, setDeleteId] = useState(null);
+    const sentinelRef = useRef(null);
 
     useEffect(() => {
-        if (!updatedItem || !updatedItem._id) return;
+        if (!hasNextPage) return;
 
-        setClosetItems(prev => 
-                prev.map(item => 
-                    item._id === updatedItem._id ? updatedItem : item
-        ))
-        setSelectedItem(null);
-    }, [updatedItem]) 
-
-    useEffect(() => {
-        if (!addedItem || !addedItem._id) return;
-
-        setClosetItems(prev => [...prev, addedItem])
-    }, [addedItem])
-
-    const handleDelete = async () => {
-        const token = await auth.currentUser.getIdToken();
-
-        console.log('front:', deleteId)
-        await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/useritems/delete-item?itemId=${deleteId}`, {
-            method: 'DELETE',
-            headers: {
-                Authorization: `Bearer ${token}`
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    fetchNextPage();
+                }
+            },
+            {
+                root: null,
+                rootMargin: '0px',
+                threshold: 1.0
             }
-        })
-        setDeleteId(null);
-        setSelectedId(null);
-    }
+        )
+        if (sentinelRef.current){
+            observer.observe(sentinelRef.current)
+        };
+
+        return () => observer.disconnect();
+    }, [hasNextPage]);
 
     return (
         <div className='items'>
-            {loading ? (
+            {(isLoading || isFetchingNextPage) ? (
                 <Bouncy
                     size="45"
                     speed="1.75"
                     color="#6B799F"
                     />
-            ) : closetItems.length > 0 ? (
-                closetItems.map(item => 
+            ) : items.length > 0 ? (
+                items.map(item => 
                     <div className='item-wrapper' key={item._id}>
                         <img loading='lazy' 
                             src={item.itemRef?.imageURL.replace('/public', '/300')}
                             alt={item.name}
                             />
                         <div className='item-label'>
-                            <circle style={{backgroundColor: item.colors[0].hex}}/>
+                            {/* <circle style={{backgroundColor: item.colors[0].hex}}/> */}
                             <p>{item.name}</p>
                         </div>
                         <div className='more' onClick={e => setSelectedId(prev => prev === item._id ? null : item._id)}>
@@ -89,7 +96,7 @@ const Items = ({onSelectItem, reload, updatedItem, addedItem, setSelectedItem}) 
                                     <div className='popup-content'>
                                         <p className='popup-name'>🚨 Warning</p>
                                         <p>Deleting an item cannot be undone</p>
-                                        <button className='sub-btn' onClick={handleDelete}>Delete Item</button>
+                                        <button className='sub-btn' onClick={deleteItem.mutate({itemId: deleteId, tab})}>Delete Item</button>
                                         <button className='sub-btn cancel' onClick={() => setDeleteId(null)}>Cancel</button>
                                     </div>
                                 </div>
@@ -110,6 +117,9 @@ const Items = ({onSelectItem, reload, updatedItem, addedItem, setSelectedItem}) 
                     <h1>↪</h1>
                 </div>
             )}
+            {hasNextPage && 
+                <div ref={sentinelRef}/>
+            }
         </div>
     )
 }

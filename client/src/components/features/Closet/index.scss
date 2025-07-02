@@ -96,6 +96,19 @@
     border-radius: 30px;
 }
 
+.toast.error {
+    background-color: rgb(241, 199, 199);
+    color: rgb(178, 37, 37);
+    font-size: 14px;
+    flex-direction: row;
+    align-items: center;
+
+    svg {
+        height: 18px;
+        width: 18px;
+    }
+}
+
 .closet .progress-bar {
     height: 3px;
     border-radius: 10px;

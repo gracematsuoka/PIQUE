@@ -142,21 +142,20 @@ const AddItem = ({onClose,
                         <input {...getInputProps()} />
                     </div>
                 }
-
-                {isLoading && 
-                    <div className='loading'>
-                        <div className='progress-bar' style={{width: `${filled}%`}}/>
-                        <p>Removing background from image...</p>
-                    </div>
-                }
                 {!isLoading && isDragActive && 
                     <div className='active-drag'>
                         <h1>Drop image</h1>
                     </div>
                 }
                 </div>
+
+                {isLoading && 
+                    <div className='loading overlay'>
+                        <div className='progress-bar' style={{width: `${filled}%`}}/>
+                        <p>Removing background from image...</p>
+                    </div>
+                }
             </div>
-            
             </>
     )
 }

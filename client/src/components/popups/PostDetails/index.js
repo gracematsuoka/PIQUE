@@ -315,7 +315,7 @@ const PostDetails = ({
                                                     {selectedItem?.brand || '---'}
                                                 </p>
                                                 <div className='item-link'>
-                                                    <a href={selectedItem?.link}
+                                                    <a href={selectedItem?.link.startsWith('http') ? selectedItem?.link : `https://${selectedItem?.link}`}
                                                         id='link'
                                                         target="_blank"
                                                         rel="noopener noreferrer"

@@ -67,21 +67,34 @@
     display: none
 }
 
-.loading {
-    z-index: 100;
+.loading.overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    align-items: center;
+    z-index: 145;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    text-align: center;
     gap: 10px;
-    width: 100%;
+    width: 240px;
+
+    background-color: #23325A;
+    padding: 10px 20px 10px 20px;
+    color: white;
+    font-size: 13px;
+    border-radius: 30px;
 }
 
-.progress-bar {
-    height: 20px;
+.add-item .loading .progress-bar {
+    height: 10px;
     border-radius: 10px;
-    background-color: #6B799F;
     transition: width 0.5s ease;
+    background-color: white;
 }
 
 .active-drag {

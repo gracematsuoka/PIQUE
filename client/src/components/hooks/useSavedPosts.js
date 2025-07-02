@@ -3,7 +3,6 @@ import { fetchBoardPosts } from "../../api/boardposts"
 import { useBoard } from "./useBoard";
 
 export const useSavedPosts = ({boardId, liked}) => {
-    console.log('liked:', liked)
     const { data: boards = [], isLoading } = useBoard();
     const boardIds = boards.map(board => board._id);
 

@@ -211,10 +211,14 @@ router.post('/create-tag', authenticateUser, async (req, res) => {
     const { mongoId } = req.user;
 
     const user = await User.findById(mongoId);
+    const prevNumTags = user.tags.length;
+
     user.tags.push(...tags);
     await user.save();
 
-    res.status(200).json({message: 'Tags added'});
+    const addedTags = user.tags.slice(prevNumTags);
+
+    res.status(200).json({addedTags});
 })
 
 router.get('/get-tags', authenticateUser, async (req, res) => {
@@ -236,7 +240,7 @@ router.delete('/delete-tag', authenticateUser, async (req, res) => {
     const user = await User.findById(mongoId);
     user.tags = user.tags.filter(tag => tag._id.toString() !== tagId);
     await user.save();
-    res.status(200).json({message: 'Tag deleted'});
+    res.status(200).json({tagId});
 })
 
 router.put('/update-tags', authenticateUser, async (req, res) => {
@@ -244,17 +248,19 @@ router.put('/update-tags', authenticateUser, async (req, res) => {
     const { mongoId } = req.user;
 
     const user = await User.findById(mongoId);
+    const updatedTags = [];
     
     tags.forEach(updatedTag => {
         const tag = user.tags.id(updatedTag.mongoId);
         if (tag) {
             tag.name = updatedTag.content;
             tag.hex = updatedTag.color;
+            updatedTags.push(tag);
         }
     })
 
     await user.save();
-    res.status(200).json({message: 'Tags updated'});
+    res.status(200).json({updatedTags});
 })
 
 module.exports = router;

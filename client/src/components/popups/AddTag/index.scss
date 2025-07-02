@@ -1,32 +1,10 @@
 .popup-container.add-tag {
     border-radius: 10px;
+    overflow: hidden;
 }
 
 .popup-container.add-tag input {
     outline: 0.5px solid rgba(128, 128, 128, 0.433);
-}
-
-.tag-detail {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding-top: 1px;
-    padding-bottom: 1px;
-}
-
-.tag-details {
-    display: flex;
-    position: absolute;
-    height: fit-content;
-    top: 20px;
-}
-
-.tag-detail-wrapper {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    position: relative;
 }
 
 .create-tag {
@@ -36,6 +14,24 @@
 
 .more-details {
     position: relative;
+}
+
+.tag-detail-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    position: relative;
+    height: 100%;
+    overflow: auto;
+}
+
+.tag-detail {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding-top: 1px;
+    padding-bottom: 1px;
 }
 
 .tag-detail .sub-btn {

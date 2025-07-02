@@ -1,15 +1,28 @@
 const express = require("express");
 const router = express.Router();
 const UserItem = require("../models/UserItem");
+const Item = require('../models/Item');
 const authenticateUser = require("../middleware/authenticateUser");
 
 router.post('/create-item', authenticateUser, async (req, res) => {
     const { mongoId } = req.user;
-    const {name, colors, category, brand, price, link, itemRef, tags, tab} = req.body;
+    const {name, colors, category, brand, price, link, tags, tab, imageURL} = req.body;
+
+    const item = await Item.create({
+        uploaderId: mongoId,
+        imageURL,
+        public: false,
+        name,
+        colors,
+        category,
+        brand,
+        price,
+        link
+    })
 
     const userItem = new UserItem({
         ownerId: mongoId,
-        itemRef, 
+        itemRef: item._id, 
         name,
         colors,
         category,
@@ -18,18 +31,45 @@ router.post('/create-item', authenticateUser, async (req, res) => {
         link,
         tags,
         tab
-    });
+    })
 
     await userItem.save();
-    const popItem = userItem.populate('itemRef');
-    res.status(201).json({message: 'User item created', popItem});
+    await userItem.select('name _id itemRef').populate('itemRef', 'imageURL _id');
+
+    console.log('back added', userItem)
+    res.status(201).json({userItem});
 })
 
-router.get('/get-closet', authenticateUser, async (req, res) => {
+router.get('/get-items', authenticateUser, async (req, res) => {
     const { mongoId } = req.user;
+    const { tab, cursor } = req.query;
+    const limit = Math.min(parseInt(req.query.limit) || 20, 40);
 
-    const items = await UserItem.find({ownerId: mongoId, tab: 'closet'}).populate('itemRef', 'imageURL');
-    res.status(200).json({message: 'Closet items retrieved', items})
+    const filter = {ownerId: mongoId, tab};
+    if (cursor) filter._id.$lt = cursor;
+
+    const docs = await UserItem
+        .find(filter)
+        .sort({_id: -1})
+        .limit(limit + 1)
+        .populate('itemRef', 'imageURL')
+        .select('itemRef name'); // eventually add color here for closet name
+    
+    const hasMore = docs.length > 20;
+    const items = hasMore ? docs.slice(0, limit) : docs;
+
+    const nextCursor = hasMore ? items[limit - 1]._id : null;
+    
+    res.status(200).json({items, nextCursor, hasMore});
+})
+
+router.get('/:itemId/get-item', authenticateUser, async (req,res) => {
+    const {itemId} = req.params;
+
+    const item = await UserItem.findById(itemId).populate('itemRef');
+    if (!item) return res.status(404).json({message: 'Selected item not found'});
+
+    res.json({item});
 })
 
 router.patch('/update-item/:id', authenticateUser, async (req, res) => {
@@ -38,8 +78,7 @@ router.patch('/update-item/:id', authenticateUser, async (req, res) => {
 
     try {
         const item = await UserItem
-                    .findById(id)
-                    .populate('itemRef');
+                    .findById(id);
 
         if (!item) {
             return res.status(404).json({ error: 'Item not found' });
@@ -54,7 +93,14 @@ router.patch('/update-item/:id', authenticateUser, async (req, res) => {
         if (changedField.link) item.link = changedField.link;
 
         await item.save();
-        res.status(200).json({message: 'Item updated', item});
+
+        const updatedItem = await UserItem
+                    .findById(id)
+                    .select('itemRef name _id')
+                    .populate('itemRef', 'imageURL _id');
+
+        console.log('back update', updatedItem)
+        res.status(200).json({updatedItem});
     } catch (err) {
         console.error('Failed to update item:', err);
         res.status(500).json({error: 'Server error'});
@@ -64,9 +110,13 @@ router.patch('/update-item/:id', authenticateUser, async (req, res) => {
 router.delete('/delete-item', authenticateUser, async (req, res) => {
     const { itemId } = req.query;
 
-    await UserItem.findByIdAndDelete(itemId);
+    const userItem = await UserItem.findByIdAndDelete(itemId);
+    const item = Item.findById(userItem.itemRef);
+    if (!item.public) {
+        await Item.findByIdAndDelete(userItem.itemRef);
+    }
 
-    res.status(200).json({message: 'Deleted item'})
+    res.status(200).json({userItem});
 })
 
 module.exports = router;

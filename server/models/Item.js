@@ -1,16 +1,16 @@
 const mongoose = require('mongoose');
 
-const ColorSchema = new mongoose.Schema({
-    color: String,
-    hex: String
-})
+// const ColorSchema = new mongoose.Schema({
+//     color: String,
+//     hex: String
+// })
 
 const ItemSchema = new mongoose.Schema({
     uploaderId: mongoose.Types.ObjectId,
     imageURL: String,
     public: Boolean,
     name: String, 
-    colors: [ColorSchema],
+    colors: Array,
     category: String,
     brand: String,
     price: Number,

@@ -4,26 +4,41 @@ import {ReactComponent as Edit} from '../../../assets/images/icons/edit.svg'
 import {ReactComponent as Add} from '../../../assets/images/icons/add.svg'
 import {ReactComponent as Remove} from '../../../assets/images/icons/remove.svg'
 import AddTag from '../AddTag'
-import { useState, useEffect, useRef, use } from 'react'
-import { auth } from '../../../firebase';
-
+import { useState, useEffect, useRef } from 'react'
+import { useCreateItem, useUpdateItem } from '../../hooks/useMutateItems';
+import { useAddTag, useUpdateTag } from '../../hooks/useMutateTag'
+import Select, {components} from 'react-select';
+import { useTag } from '../../hooks/useTag';
+import { useQuery } from '@tanstack/react-query';
+import { fetchSelectedItem } from '../../../api/items';
+import TagDetails from '../TagDetails';
+import {createPortal} from 'react-dom';
 
 const ItemDetails = ({ mode, 
                     setShowItemDetails,
                     processedUrl,
                     tab,
-                    setReloadItems,
-                    selectedItem,
+                    selectedItemId,
+                    setSelectedItemId,
                     setLoading,
-                    setUpdatedItem,
-                    setAddedItem
+                    handleError
                  }) => {
+
+    const createItem = useCreateItem();
+    const updateItem = useUpdateItem();
+    const addTag = useAddTag();
+    const updateTag = useUpdateTag();
+    const {data: tags = []} = useTag();
+    const {data: selectedItem} = useQuery({
+        queryKey: ['item', selectedItemId],
+        queryFn: () => fetchSelectedItem({itemId: selectedItemId}),
+        enabled: !!selectedItemId
+    });
     const [name, setName] = useState('');
-    const [category, setCategory] = useState('');
+    const [category, setCategory] = useState('Tops');
     const [brand, setBrand] = useState('');
     const [price, setPrice] = useState('');
     const [link, setLink] = useState('');
-    const [colorDivs, setColorDivs] = useState([createColorDiv('none')]);
     const [showAddTag, setShowAddTag] = useState(false);
     const [tagDivs, setTagDivs] = useState([]);
     const [addedTags, setAddedTags] = useState([]);
@@ -33,20 +48,19 @@ const ItemDetails = ({ mode,
     const [originalField, setOriginalField] = useState(null);
     const [changedField, setChangedField] = useState({});
     const [editLink, setEditLink] = useState(false);
+    const [colors, setColors] = useState([]);
+    const detailsRefs = useRef({});
+    const [tagDetailsPos, setTagDetailsPos] = useState({});
 
     useEffect(() => {
         if (mode === 'edit' && selectedItem) {
             setName(selectedItem.name);
             setCategory(selectedItem.category);
             setBrand(selectedItem.brand);
-            setPrice(selectedItem.price);
+            setPrice(selectedItem?.price || '');
             setLink(selectedItem.link);
-            setColorDivs(selectedItem.colors.map((color, index) => ({
-                id: color._id,
-                colorGroup: color.color,
-                color: color.hex,
-                displayRem: index === 0 ? 'none' : ''
-            })));
+            if (selectedItem.link) setEditLink(false);
+            setColors(selectedItem.colors);
             setOriginalField(selectedItem);
             setAddedTags(selectedItem.tags.map(tag => ({
                 id: tag.id,
@@ -59,21 +73,6 @@ const ItemDetails = ({ mode,
         }
 
     }, [mode, selectedItem])
-
-    useEffect(() => {
-        if (originalField?.colors) {
-        handleArrayChange(
-            originalField.colors.map(color => ({
-                color: color.colorGroup,
-                hex: color.color
-            })), 
-            colorDivs.map(colorDiv => ({
-                color: colorDiv.colorGroup,
-                hex: colorDiv.color
-            })), 
-            'colors');
-        }
-    }, [colorDivs]);
 
     useEffect(() => {
         if (originalField?.tags) {
@@ -91,7 +90,6 @@ const ItemDetails = ({ mode,
     }, [addedTags]);
 
     const handleChange = (field, value) => {
-        console.log('original:', originalField)
         if (originalField[field] !== value) {
             setChangedField(prev => ({...prev, [field]: value}))
         } else {
@@ -101,7 +99,6 @@ const ItemDetails = ({ mode,
             return fieldCopy;
             })
         }
-        console.log('field changed:', changedField)
     }
 
     const handleArrayChange = (originalArray, changedArray, field) => {
@@ -114,7 +111,6 @@ const ItemDetails = ({ mode,
                 return fieldCopy;
             })
         }
-        console.log('array changed:', changedField)
     }
 
     const arraysEqual = (a, b) => {
@@ -125,230 +121,99 @@ const ItemDetails = ({ mode,
     }
 
     const handlePopulateTags = async () => {
-        try {
-            const token = await auth.currentUser.getIdToken();
-
-            const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/get-tags`, {
-                method: 'GET',
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
-
-            const data = await res.json();
-            const tags = data.tags.map(tag => ({
-                    id: tag._id,
-                    content: tag.name,
-                    color: tag.hex,
-                    showDetails: false,
-                    updated: false
-            }));
-            setTagDivs(tags);
-        } catch (err) {
-            console.log('Failed to populate tags:', err);
-        }
+        setTagDivs(tags.map(tag => ({
+                mongoId: tag._id,
+                id: tag._id,
+                content: tag.name,
+                color: tag.hex,
+                showDetails: false,
+                updated: false
+        })));
     }
 
-    const handleCreateItem = async (selectedTab) => {
+    const handleCreateItem = async (tab) => {
         setLoading(true);
         setShowItemDetails(false);
-        window.onbeforeunload = () => 'Saving in progress…';
+        const itemTags = addedTags.map(tag => ({
+            name: tag.content,
+            hex: tag.color
+        }))
+        console.log('item tags', itemTags)
 
+        console.log('tab to update:', tab)
         try {
-            const token = await auth.currentUser.getIdToken();
-            const tagsPromise = handleSaveTags(token);
-            const imageURLPromise = handleSaveImage();
-
-            await tagsPromise;
-            const imageURL = await imageURLPromise;
-            const itemRef = await handleSaveItem(imageURL, token);
-
-            const userItem = await handleSaveUserItem(itemRef, selectedTab, token);
-            setAddedItem({...userItem});
-            console.log('just added:', userItem)
-        } catch (err) {
-            console.log('Error saving item:', err);
+            await createItem.mutateAsync(
+                {processedUrl, name, colors, category, brand, price, link, tags: itemTags, tab},
+                {
+                    onSettled: () => setLoading(false),
+                    onError: () => handleError()
+                }
+            );
+        } catch {
+            handleError()
         } finally {
-            setLoading(false);
-            window.onbeforeunload = null;
+            setLoading(false)
         }
     }
 
     const handleSaveChanges = async () => {
-        setLoading(true);
+        const itemId = selectedItemId;
+        const changes = {...changedField}
+
+        console.log('mutating')
+        console.log('changed:', changedField)
+        console.log('will run', Object.keys(changedField).length > 0)
+        setSelectedItemId(null);
         setShowItemDetails(false);
-        window.onbeforeunload = () => 'Saving in progress…';
-
         await handleSaveTags();
-
-        if (Object.keys(changedField).length > 0) {
-            try {
-                const token = await auth.currentUser.getIdToken();
-
-                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/useritems/update-item/${selectedItem._id}`, {
-                    method: 'PATCH',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(changedField)
-                })
-
-                const data = await res.json();
-                const item = data.item;
-                setUpdatedItem({...item});
-            } catch (err) {
-                console.log('Failed to save updates:', err);
-            } finally {
-                setLoading(false);
-                window.onbeforeunload = null;
-            }
+        try {
+            if (Object.keys(changedField).length > 0) {
+                await updateItem.mutateAsync(
+                    {itemId, tab, changedField: changes},
+                    {
+                        onSettled: () => setLoading(false),
+                        onError: () => handleError()
+                    }
+                );
+        }} catch {
+            handleError();
         }
     }
 
     // save tags to mongo (for user)
-    const handleSaveTags = async (token) => {
-        try {
-            const tagsCreate = [];
-            const tagsUpdate = [];
-            tagDivs.map(div => {
-                if (div.id && div.updated) {
-                    tagsUpdate.push({name: div.content, hex: div.color});
-                } else if (!div.id) {
-                    tagsCreate.push({name: div.content, hex: div.color});
-                }
-            })
-
-            if (tagsCreate.length > 0) {
-                await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/create-tag`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`
-                    },
-                    body: JSON.stringify({tags: tagsCreate})
-                });
+    const handleSaveTags = async () => {
+        console.log('running tags')
+        const tagsCreate = [];
+        const tagsUpdate = [];
+        console.log('save tagdivs', tagDivs)
+        tagDivs.map(div => {
+            if (div.mongoId && div.updated) {
+                tagsUpdate.push({name: div.content, hex: div.color});
+            } else if (!div.mongoId) {
+                tagsCreate.push({name: div.content, hex: div.color});
             }
+        })
 
-            if (tagsUpdate.length > 0) {
-                await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/update-tag`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`
-                    },
-                    body: JSON.stringify({tags: tagsUpdate})
-                });
-            }
-        } catch (err) {
-            console.log('Failed to update/create tags:', err);
-        }
-    }
+        const promises = [];
+        console.log('create', tagsCreate)
+        console.log('update', tagsUpdate)
 
-    // save image to cf
-    const handleSaveImage = async () => {
-        try {
-            const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/images/get-upload-url`);
-            const {uploadURL} = await res.json();
-            const blob = await fetch(processedUrl).then(res => res.blob());
+        if (tagsCreate.length > 0) {
+            promises.push(addTag.mutateAsync({tags: tagsCreate}));
+        };
 
-            const formData = new FormData();
-            formData.append('file', blob);
+        if (tagsUpdate.length > 0) {
+            promises.push(updateTag.mutateAsync({tags: tagsUpdate}));
+        };
 
-            const uploadRes = await fetch(uploadURL, {
-                method: 'POST',
-                body: formData
-            });
-
-            const data = await uploadRes.json();
-            const imageId = data.result?.id;
-            const publicURL = `https://imagedelivery.net/${process.env.REACT_APP_CF_HASH}/${imageId}/public`;
-            return publicURL;
-        } catch (err) {
-            console.log('Failed to save image to cf:', err);
-        }
-    }
-
-    // save item to general database
-    const handleSaveItem = async (imageURL, token) => {
-        try { 
-            const colors = colorDivs.map(color => ({
-                color: color.colorGroup,
-                hex: color.color
-            }));
-
-            const numPrice = price === '' ? null : parseFloat(price);
-
-            const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/items/create-item`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    imageURL,
-                    name, 
-                    colors,
-                    category,
-                    brand,
-                    price: numPrice,
-                    link
-                })
-            });
-
-            const data = await res.json();
-            const itemRef = data.item._id;
-            return itemRef;
-        } catch (err) {
-            console.log('Failed to save item details to general database:', err);
-        }
-    }
-
-    // save item to user's "closet"
-    const handleSaveUserItem = async (itemRef, selectedTab, token) => {
-        try { 
-            const colors = colorDivs.map(color => ({
-                color: color.colorGroup,
-                hex: color.color
-            }));
-            const tags = addedTags.map(tag => ({
-                name: tag.content,
-                hex: tag.color
-            }))
-
-            const numPrice = price === '' ? null : parseFloat(price);
-
-            const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/useritems/create-item`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    name, 
-                    colors,
-                    category,
-                    brand,
-                    price: numPrice,
-                    link,
-                    tags,
-                    itemRef,
-                    tab: selectedTab
-                })
-            });
-
-            const data = await res.json();
-            const userItem = data.popItem;
-            console.log('user item:', userItem)
-            return userItem;
-        } catch (err) {
-            console.log('Failed to save item details to general database:', err);
-        }
+        await Promise.all(promises);
     }
 
     useEffect(() => {
         const handleClickOutside = (e) => {
-            if (addTagRef.current && !addTagRef.current.contains(e.target)){
+            const clickedInAddTag = addTagRef.current?.contains(e.target);
+            const clickedInAnyDetails = Object.values(detailsRefs.current).some(ref => ref?.contains(e.target));
+            if (!clickedInAddTag && !clickedInAnyDetails){
                 setShowAddTag(false);
             }
             if (editLinkRef.current && 
@@ -356,6 +221,7 @@ const ItemDetails = ({ mode,
                 linkInputRef.current &&
                 !linkInputRef.current.contains(e.target)
             ) {
+                console.log('link',link)
                 setEditLink(false);
             }
         }
@@ -369,122 +235,166 @@ const ItemDetails = ({ mode,
         }
     }, [])
 
-    function createColorDiv(displayRem) {
-        return {
-            id: Date.now() + Math.random(),
-            color: '#F35050',
-            colorGroup: 'red',
-            displayRem: displayRem
-        }
-    }
-
-    const addColorDiv = () => {
-        setColorDivs(prev => [...prev, createColorDiv('')])
-    }
-
-    const handleDeleteColorDiv = (id) => {
-        setColorDivs(prev => prev.filter(colorDiv => colorDiv.id !== id))
-    }
-
-    const itemOptions = ['Tops', 'Bottoms', 'Outerwear', 'Shoes', 
+    const itemArray = ['Tops', 'Bottoms', 'Outerwear', 'Shoes', 
         'Jewelry', 'Bags', 'Accessories', 'Other'
     ]
 
-    const colorOptions = {
-        Red: '#F35050',
-        Orange: '#EEA34E',
-        Yellow: '#F5D928',
-        Green: '#91D58C',
-        Blue: '#81AAEA',
-        Purple: '#BE9FE5',
-        Pink: '#F1AFD6',
-        Black: '#000000',
-        White: '#FFFFFF',
-        Grey: '#868585',
-        Beige: '#E9E0B6',
-        Brown: '#A26D2C',
+    const itemOptions = itemArray.map(item => ({
+        label: item,
+        value: item
+    }))
+
+    const colorMap = {
+        'Red': '#F35050',
+        'Orange': '#EEA34E',
+        'Yellow': '#F5D928',
+        'Green': '#91D58C',
+        'Blue': '#81AAEA',
+        'Purple': '#BE9FE5',
+        'Pink': '#F1AFD6',
+        'Black': '#000000',
+        'Grey': '#868585',
+        'White': '#FFFFFF',
+        'Beige': '#E9E0B6',
+        'Brown': '#A26D2C',
+        'Gold': '#D6CE85',
+        'Silver': '#E8E5E0',
+        'Rose Gold': '#D6AA90'
     }
 
-    // user selects color from drop down, color picker changes accordingly
-    const handleCPChange = (id, colorGroup) => {
-        let colorPick = colorOptions[colorGroup];
+    const colorOptions = Object.keys(colorMap)
+                                .map(key => ({
+                                    label: key,
+                                    value: key,
+                                    hex: colorMap[key]
+                                }));
+    
+    const CustomOption = (props) => {
+        return (
+            <components.Option {...props}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span
+                style={{
+                    backgroundColor: props.data.hex,
+                    borderRadius: '50%',
+                    width: 12,
+                    height: 12,
+                    marginRight: 8,
+                    border: '1px solid #ccc',
+                }}
+                />
+                <span style={{ color: '#000' }}>{props.data.label}</span>
+            </div>
+            </components.Option>
+        );
+    };
 
-        setColorDivs(prev => prev.map(colorDiv => 
-            colorDiv.id === id ? {
-                ...colorDiv, 
-                color: colorPick,
-                colorGroup: colorGroup
-            } : colorDiv
-        )); 
+    const CustomMultiValueLabel = (props) => {
+        return (
+          <components.MultiValueLabel {...props}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span
+                style={{
+                  backgroundColor: props.data.hex,
+                  borderRadius: '50%',
+                  width: 10,
+                  height: 10,
+                  marginRight: 5,
+                  border: '1px solid #f7f7f7',
+                }}
+              />
+              {props.data.label}
+            </div>
+          </components.MultiValueLabel>
+        );
+    };
+
+    const customStyles = {
+        container: (provided) => ({
+            ...provided,
+            width: '100%'
+        }),
+        control: (provided, state) => ({
+            ...provided,
+            minHeight: '35px',
+            height: 'auto',
+            fontSize: '14px',
+            borderColor: state.isFocused ? '0.5px solid rgba(128, 128, 128, 0.433)' : 'none',
+            boxShadow: state.isFocused ? '0 0 0 1px rgba(128, 128, 128, 0.433)' : 'none',
+            '&:hover': {
+                borderColor: 'rgba(128, 128, 128, 0.433)',
+              },
+            border: 'none',
+            padding: '0 0 0 4px',
+            minWidth: '100%',
+            width: '100%'
+        }),
+        valueContainer: (provided) => ({
+            ...provided,
+            padding: '0',
+            display: 'flex',
+            flexWrap: 'wrap',
+        }),
+        input: (provided) => ({
+            ...provided,
+            margin: 0,
+            padding: 0,
+        }),
+        multiValue: (provided) => ({
+            ...provided,
+            height: '22px',          
+            margin: '2px',
+            display: 'flex',
+            alignItems: 'center',
+            maxWidth: '100%',
+            fontSize: '14px',
+            borderRadius: '25px',
+            backgroundColor: 'rgba(226, 226, 226, 0.43)'
+        }),
+        multiValueLabel: (provided) => ({
+            ...provided,
+            padding: 0,
+            paddingLeft: '6px',
+            paddingRight: '6px',
+            fontSize: '14px',
+        }),
+        multiValueRemove: (provided, state) => ({
+            ...provided,
+            color: '#fff',
+            ':hover': {
+                backgroundColor: 'transparent',
+                color: '#666', // prevent it from turning red
+            },
+        }),
+        menuList: (provided) => ({
+            ...provided, 
+            overflow: 'auto',
+            maxHeight: '100px'
+        }),
+        indicatorsContainer: (provided) => ({
+            ...provided,
+            height: '32px',
+            borderRadius: '15px'
+        }),
+        clearIndicator: (provided) => ({
+            ...provided,
+            padding: '0 4px'
+        }),
+        dropdownIndicator: (provided) => ({
+            ...provided,
+            padding: '0 0 0 4px',
+        }),
+        option: (provided, state) => ({
+            ...provided,
+            fontSize: '14px',
+            display: 'flex',
+            justifyContent: 'flex-start', 
+            alignItems: 'center',
+            textAlign: 'left', 
+            backgroundColor: state.isFocused ? 'rgb(236, 236, 236)' : 'none',
+            color: state.isSelected ? 'rgb(174, 174, 174)' : 'none',
+        })
     }
-
-    // user uses color picker, drop down changes accordingly
-    const handleCGChange = (id, color) => {
-        const colorGroup = getColorGroup(color);
-        setColorDivs(prev => prev.map(colorDiv => 
-            colorDiv.id === id ? {
-                ...colorDiv,
-                color: color,
-                colorGroup: colorGroup
-            } : colorDiv
-        ))
-    }
-
-    const getColorGroup = (hex) => {
-        const {r, g, b} = hexToRgb(hex);
-        const {h, s, l} = rgbToHsl(r, g, b);
-
-        if (r === g && g === b) {
-            if (r < 30) return 'Black';
-            if (r > 225) return 'White';
-            return 'Grey';
-        }
-
-        if (h >= 20 && h <= 60 && 
-            s >= 5 && s <= 35 &&  
-            l >= 70     
-        ) return 'Beige';
-
-        if (h >= 15 && h <= 45 && s > 30 && l < 50) return 'brown';
-
-        if (h < 15 || h >= 345) return 'Red';
-        if (h < 45) return 'Orange';
-        if (h < 70) return 'Yellow';
-        if (h < 170) return 'Green';
-        if (h < 250) return 'Blue';
-        if (h < 290) return 'Purple';
-        if (h < 345) return 'Pink';
-
-        return 'multi-color';
-    }
-
-    const hexToRgb = (hex) => {
-        const r = parseInt(hex.substr(1, 2), 16);
-        const g = parseInt(hex.substr(3, 2), 16);
-        const b = parseInt(hex.substr(5, 2), 16);
-        return { r, g, b };
-    }
-
-    const rgbToHsl = (r, g, b) => {
-        r /= 255; g /= 255; b /= 255;
-        const max = Math.max(r, g, b), min = Math.min(r, g, b);
-        let h, s, l = (max + min) / 2;
-
-        if (max === min) {
-            h = s = 0; 
-        } else {
-            const d = max - min;
-            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-            switch (max) {
-            case r: h = ((g - b) / d + (g < b ? 6 : 0)); break;
-            case g: h = ((b - r) / d + 2); break;
-            case b: h = ((r - g) / d + 4); break;
-            }
-            h *= 60;
-        }
-
-        return { h, s: s * 100, l: l * 100 };
-    } 
 
     const handleRemoveTag = (id) => {
         setAddedTags(prev => prev
@@ -502,13 +412,17 @@ const ItemDetails = ({ mode,
                     <div className='popup-content'>
                         <div className='popup-header'>
                             <p className='popup-title'>ITEM DETAILS</p>
-                            <div className='close' onClick={e => setShowItemDetails(false)}>
+                            <div className='close' 
+                                    onClick={e => {
+                                        if (mode === 'edit') setSelectedItemId(null);
+                                        setShowItemDetails(false);
+                                    }}>
                                 <CloseIcon/>
                             </div>
                         </div>
                         <hr/>
                         <div className='popup-content bottom'>
-                            <img src={processedUrl || null}/>
+                            <img src={processedUrl || selectedItem?.itemRef?.imageURL}/>
                             <div className='item-field-wrapper'>
                                 <div className='item-field'>
                                     <h1 className='field-name'>NAME</h1>
@@ -525,52 +439,32 @@ const ItemDetails = ({ mode,
                                 <div className='item-field color'>
                                     <h1 className='field-name'>COLOR</h1>
                                     <div className='edit-color-wrapper'>
-                                        {colorDivs.map(colorDiv => (
-                                        <div className='edit-color-field' key={colorDiv.id}>
-                                            <div className='edit-color'>
-                                                <input type='color' 
-                                                        id='colorPicker' 
-                                                        className='color-input' 
-                                                        value={colorDiv.color} 
-                                                        onChange={e => {
-                                                            handleCGChange(colorDiv.id, e.target.value);
-                                                            }}/>
-                                            </div>
-                                            <select name='colors' 
-                                                    id='colorGroup' 
-                                                    value={colorDiv.colorGroup} 
-                                                    onChange={e => {
-                                                            handleCPChange(colorDiv.id, e.target.value);
-                                                            }}>
-                                                {Object.keys(colorOptions).map(color => 
-                                                    <option value={color}>{color}</option>
-                                                )}
-                                            </select>
-                                            <Remove style={{display: colorDiv.displayRem}} 
-                                                    onClick={e => {
-                                                        handleDeleteColorDiv(colorDiv.id);
-                                                        }}/>
-                                        </div>
-                                        ))}
+                                        <Select 
+                                            closeMenuOnSelect={false}
+                                            value={colors.map(color => ({label: color, value: color, hex: colorMap[color]}))}
+                                            isMulti
+                                            options={colorOptions}
+                                            components={{Option: CustomOption, MultiValueLabel: CustomMultiValueLabel}}
+                                            styles={customStyles}
+                                            onChange={(selected) => {
+                                                setColors(selected.map(opt => opt.value));
+                                                mode === 'edit' && handleChange('colors', selected.map(opt => opt.value));
+                                            }}
+                                        />
                                     </div>
-                                    <Add className='right-icon' 
-                                        onClick={e => {
-                                            addColorDiv();
-                                        }}
-                                    />
                                 </div>
                                 <div className='item-field category'>
                                     <h1 className='field-name'>CATEG.</h1>
-                                    <select name='category' 
-                                            value={category} 
-                                            onChange={e => {
-                                                    setCategory(e.target.value);
-                                                    mode === 'edit' && handleChange('category', e.target.value);
-                                                    }}>
-                                        {itemOptions.map(item =>
-                                            <option value={item}>{item}</option>
-                                        )}
-                                    </select>
+                                    <Select 
+                                        placeholder='Select...'
+                                        value={{label: category, value: category}}
+                                        options={itemOptions}
+                                        styles={customStyles}
+                                        onChange={(selected) => {
+                                            setCategory(selected.value);
+                                            mode === 'edit' && handleChange('category', selected.value);
+                                        }}
+                                    />
                                 </div>
                                 <div className='item-field'>
                                     <h1 className='field-name'>BRAND</h1>
@@ -594,19 +488,46 @@ const ItemDetails = ({ mode,
                                                 </div>
                                         )}
                                     </div>
-                                    {showAddTag && <AddTag 
-                                                        className='add-tag' 
-                                                        tagDivs={tagDivs}
-                                                        setTagDivs={setTagDivs}
-                                                        addedTags={addedTags}
-                                                        setAddedTags={setAddedTags}
-                                                        showAddTag={showAddTag}
-                                                        setShowAddTag={setShowAddTag}
-                                                        handleArrayChange={handleArrayChange}
-                                                        setChangedField={setChangedField}
-                                                        originalTags={originalField.tags}
-                                                        ref={addTagRef}
-                                                    />}
+                                    {showAddTag && (
+                                    <>
+                                        <AddTag 
+                                            className='add-tag' 
+                                            tagDivs={tagDivs}
+                                            setTagDivs={setTagDivs}
+                                            addedTags={addedTags}
+                                            setAddedTags={setAddedTags}
+                                            showAddTag={showAddTag}
+                                            setShowAddTag={setShowAddTag}
+                                            handleArrayChange={handleArrayChange}
+                                            setChangedField={setChangedField}
+                                            ref={addTagRef}
+                                            detailsRefs={detailsRefs}
+                                            setTagDetailsPos={setTagDetailsPos}
+                                        />
+                                        {tagDivs.map(div => 
+                                            div.showDetails && createPortal(
+                                                <TagDetails 
+                                                    className='tag-details' 
+                                                    ref={el => (detailsRefs.current[div.id] = el)} 
+                                                    name={div.content} 
+                                                    setTagDivs={setTagDivs} 
+                                                    setAddedTags={setAddedTags} 
+                                                    id={div.id} 
+                                                    mongoId={div.mongoId}
+                                                    handleArrayChange={handleArrayChange}
+                                                    tagDivs={tagDivs}
+                                                    style={{
+                                                        position: 'fixed',
+                                                        top: `${tagDetailsPos.top}px`,
+                                                        left: `${tagDetailsPos.left}px`,
+                                                        zIndex: 9999
+                                                    }}
+                                                />,
+                                                document.body
+                                            )
+                                        )}
+                                    </>)
+                                    }
                                     {!showAddTag && <Add className='right-icon' onClick={e => {
                                         setShowAddTag(!showAddTag);
                                         }}/>}
@@ -630,34 +551,40 @@ const ItemDetails = ({ mode,
                                 </div>
                                 <div className='item-field'>
                                     <h1 className='field-name'>LINK</h1>
-                                    {editLink && <input type='url' 
+                                    {(editLink) ? ( 
+                                        <input type='url' 
                                             value={link} 
                                             id='link' 
                                             placeholder='Empty'
                                             onChange={e => {
                                                 setLink(e.target.value);
                                                 mode === 'edit' && handleChange('link', e.target.value);
-                                            }}/>}
-                                    {!editLink && <a href={link}
-                                                     target="_blank"
-                                                     rel="noopener noreferrer"
-                                                     onClick={(e) => {
-                                                       if (!link) e.preventDefault(); 
-                                                     }}>{link}</a>
-                                    }
+                                            }}/>
+                                        ) : (
+                                        <a href={link?.startsWith('http') ? link : `https://${link}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            onClick={(e) => {
+                                                if (!link) e.preventDefault(); 
+                                            }}>
+                                            {link}
+                                        </a>
+                                    )}
                                     <label htmlFor='link' ref={editLinkRef} className='right-icon' onClick={() => setEditLink(true)}><Edit/></label>
                                 </div>
                             </div>
                         </div>
                         {mode === 'create' && 
                             <div className='buttons'>
-                                <button className='basic-btn' onClick={() => handleCreateItem('closet')} style={{backgroundColor: '#6B799F', color: '#ffffff'}}>Save to Closet</button>
+                                <button className='basic-btn blue' onClick={() => handleCreateItem('closet')}>Save to Closet</button>
                                 <button className='basic-btn' onClick={() => handleCreateItem('wishlist')}>Save to Wishlist</button>
                             </div>
                         }
                         {mode === 'edit' &&
                             <>
-                                <button className='basic-btn' onClick={() => handleSaveChanges()}>Save Changes</button>
+                                <button type='button' className='basic-btn' id='edit' onClick={() => 
+                                    {console.log('clicked')
+                                        handleSaveChanges()}}>Save Changes</button>
                             </>
                         }
                 </div>

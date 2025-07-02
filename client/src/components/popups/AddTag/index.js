@@ -11,11 +11,10 @@ const AddTag = forwardRef(({tagDivs,
                             showAddTag, 
                             setShowAddTag, 
                             handleArrayChange,
-                            setChangedField,
-                            originalTags
+                            detailsRefs,
+                            setTagDetailsPos
                         },ref) => {
     const [tagName, setTagName] = useState('');
-    const detailsRefs = useRef({});
     const moreRefs = useRef({});
 
     useEffect(() => {
@@ -51,13 +50,31 @@ const AddTag = forwardRef(({tagDivs,
     }
 
     const toggleDetails = (id) => {
+        console.log('details toggling')
+        const moreEl = moreRefs.current[id];
+        if (moreEl) {
+            const rect = moreEl.getBoundingClientRect();
+            console.log('top', rect.top)
+            setTagDetailsPos({
+                id,
+                top: rect.bottom + window.scrollY,
+                left: rect.left + window.scrollX,
+                width: rect.width,
+            });
+        }
+
         setTagDivs(prev => prev.map(div => {
             if (div.id === id) {
+                console.log(div.showDetails)
                 return { ...div, showDetails: !div.showDetails };
+
             }
             return { ...div, showDetails: false };
         }))
     }
+    useEffect(() => {
+        console.log('effect tagdivs', tagDivs)
+    }, [tagDivs])
 
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') {
@@ -65,15 +82,18 @@ const AddTag = forwardRef(({tagDivs,
             addDiv(tagDiv);
             addTag(tagDiv);
             setShowAddTag(!showAddTag);
+            console.log('tagdivs', tagDivs)
         }
     }
 
     const addDiv = (tagDiv) => {
         setTagDivs(prev => [...prev, tagDiv]);
+        console.log('tagdiv added', tagDiv)
     }
 
     const addTag = (tagDiv) => {
         setAddedTags(prev => [...prev, tagDiv]);
+        console.log('tag added', tagDiv)
     }
 
     const tagAdded = (id) => {
@@ -88,7 +108,7 @@ const AddTag = forwardRef(({tagDivs,
                             <div className='sub-btn' 
                                 onClick={e => {
                                     if(!tagAdded(div.id)) {
-                                    addTag(div) 
+                                        addTag(div) 
                                     }}
                                     }>
                                 <div className='tag' style={{backgroundColor: div.color}}>
@@ -99,18 +119,7 @@ const AddTag = forwardRef(({tagDivs,
                                 <div onClick={e => toggleDetails(div.id)} ref={el => (moreRefs.current[div.id] = el)}>
                                     <More/>
                                 </div>
-                                {div.showDetails && <TagDetails 
-                                                        className='tag-details' 
-                                                        ref={el => (detailsRefs.current[div.id] = el)} 
-                                                        name={div.content} 
-                                                        setTagDivs={setTagDivs} 
-                                                        setAddedTags={setAddedTags} 
-                                                        id={div.id} 
-                                                        mongoId={div.mongoId}
-                                                        handleArrayChange={handleArrayChange}
-                                                        tagDivs={tagDivs}
-                                                        originalTags={originalTags}
-                                                        />}
+                                
                             </div>
                         </div>
                     )}

@@ -8,10 +8,10 @@ import { useRef, useState, useEffect } from "react";
 import Select, {components} from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 import {Canvas, FabricImage, Textbox, FabricObject, Point, FabricText} from "fabric";
-import { useCloset } from "../../../contexts/ClosetContext";
 import CanvasHistory from "../../../utils/CanvasHistory";
 import Tooltip from "@mui/material/Tooltip";
 import Congrats from "../../popups/Congrats";
+import { useItems } from "../../hooks/useItems";
 // toolbar
 import CropRoundedIcon from '@mui/icons-material/CropRounded';
 import TextFieldsRoundedIcon from '@mui/icons-material/TextFieldsOutlined';
@@ -29,11 +29,11 @@ import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { multiFactor } from "firebase/auth";
+
 import PostPrev from "../../popups/PostPrev";
 
 const Create = () => {
-    const {closetItems} = useCloset();
+    const {data: items = []} = useItems('closet');
     const canvasRef = useRef(null);
     const fabricRef = useRef(null);
     const [isEmpty, setIsEmpty] = useState(false);
@@ -192,8 +192,8 @@ const Create = () => {
     }, [reload])
 
     useEffect(() => {
-        closetItems.length > 0 ? setIsEmpty(false) : setIsEmpty(true)
-    }, closetItems)
+        items.length > 0 ? setIsEmpty(false) : setIsEmpty(true)
+    }, items)
 
     useEffect(() => {
         if (!canvas) return;
@@ -745,7 +745,7 @@ const Create = () => {
                                     <p>Bring forward</p>
                                 </li>
                                 <li onClick={() => {canvas.sendObjectBackwards(menu.target)}}>
-                                    <KeyboardArrowUpIcon/>
+                                    <KeyboardArrowDownIcon/>
                                     <p>Send backward</p>
                                 </li>
                                 <li onClick={() => {canvas.sendObjectToBack(menu.target)}}>
@@ -772,7 +772,7 @@ const Create = () => {
                         </div>
                         {!isEmpty && 
                             <div className="image-database">
-                                {closetItems.map(item => 
+                                {items.map(item => 
                                     <div className="item-img-wrapper" 
                                         key={item._id}
                                         draggable
