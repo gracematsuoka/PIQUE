@@ -1,0 +1,22 @@
+.create-outlet {
+    // outline: 1px solid red;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    // overflow: hidden;
+}
+
+.nav-content-wrapper.basic {
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    gap: 5px;
+    padding-top: 80px;
+    padding-left: 120px;
+    padding-right: 0px;
+    box-sizing: border-box;
+    height: 100%;
+    // border-color: 1px solid green;
+    // background-color: green;
+    // overflow: hidden;
+}

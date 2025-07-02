@@ -5,12 +5,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import addClothes from "../../../assets/images/icons/addclothes.png";
 import { Bouncy } from 'ldrs/react';
-import 'ldrs/react/Bouncy.css';
 import {ReactComponent as CloseIcon} from '../../../assets/images/icons/close.svg';
 import { useItems } from '../../hooks/useItems';
 import { useDeleteItem } from '../../hooks/useMutateItems';
 
-const Items = ({onSelectItem, tab}) => {
+const Items = ({onSelectItem, tab, handleError}) => {
     console.log('tab', tab)
     const {
         data,
@@ -75,7 +74,7 @@ const Items = ({onSelectItem, tab}) => {
                             <More />
                             {(selectedId === item._id) && 
                             <div className='mini-pop'>
-                                <div className='sub-btn' onClick={e => setDeleteId(prev => prev === item._id ? null : item._id)}>
+                                <div className='sub-btn' onClick={e => setDeleteId(item._id)}>
                                     <DeleteIcon/>
                                     <p>Delete</p>
                                 </div>
@@ -96,7 +95,18 @@ const Items = ({onSelectItem, tab}) => {
                                     <div className='popup-content'>
                                         <p className='popup-name'>🚨 Warning</p>
                                         <p>Deleting an item cannot be undone</p>
-                                        <button className='sub-btn' onClick={deleteItem.mutate({itemId: deleteId, tab})}>Delete Item</button>
+                                        <button className='sub-btn' 
+                                                onClick={() => 
+                                                    deleteItem.mutate(
+                                                        {itemId: deleteId, tab},
+                                                        {
+                                                            onError: (err) => handleError(err),
+                                                            onSettled: () => setDeleteId(null)
+                                                        }
+                                                    )
+                                                }>
+                                            Delete Item
+                                        </button>
                                         <button className='sub-btn cancel' onClick={() => setDeleteId(null)}>Cancel</button>
                                     </div>
                                 </div>
@@ -106,7 +116,7 @@ const Items = ({onSelectItem, tab}) => {
                 )
             ) : (
                 <div className='empty'>
-                    <p>You have no items in your closet yet...</p>
+                    <p>You have no items in your {tab} yet...</p>
                     <div className='empty-h1'>
                         <h1>Click </h1>
                         <div className='add-icon'>

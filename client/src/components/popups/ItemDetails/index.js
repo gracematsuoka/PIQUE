@@ -21,7 +21,9 @@ const ItemDetails = ({ mode,
                     selectedItemId,
                     setSelectedItemId,
                     setLoading,
-                    handleError
+                    handleError,
+                    itemArray,
+                    colorMap
                  }) => {
 
     const createItem = useCreateItem();
@@ -146,11 +148,11 @@ const ItemDetails = ({ mode,
                 {processedUrl, name, colors, category, brand, price, link, tags: itemTags, tab},
                 {
                     onSettled: () => setLoading(false),
-                    onError: () => handleError()
+                    onError: (err) => handleError(err)
                 }
             );
-        } catch {
-            handleError()
+        } catch (err) {
+            handleError(err)
         } finally {
             setLoading(false)
         }
@@ -172,11 +174,11 @@ const ItemDetails = ({ mode,
                     {itemId, tab, changedField: changes},
                     {
                         onSettled: () => setLoading(false),
-                        onError: () => handleError()
+                        onError: (err) => handleError(err)
                     }
                 );
-        }} catch {
-            handleError();
+        }} catch (err) {
+            handleError(err);
         }
     }
 
@@ -235,32 +237,12 @@ const ItemDetails = ({ mode,
         }
     }, [])
 
-    const itemArray = ['Tops', 'Bottoms', 'Outerwear', 'Shoes', 
-        'Jewelry', 'Bags', 'Accessories', 'Other'
-    ]
+    
 
     const itemOptions = itemArray.map(item => ({
         label: item,
         value: item
     }))
-
-    const colorMap = {
-        'Red': '#F35050',
-        'Orange': '#EEA34E',
-        'Yellow': '#F5D928',
-        'Green': '#91D58C',
-        'Blue': '#81AAEA',
-        'Purple': '#BE9FE5',
-        'Pink': '#F1AFD6',
-        'Black': '#000000',
-        'Grey': '#868585',
-        'White': '#FFFFFF',
-        'Beige': '#E9E0B6',
-        'Brown': '#A26D2C',
-        'Gold': '#D6CE85',
-        'Silver': '#E8E5E0',
-        'Rose Gold': '#D6AA90'
-    }
 
     const colorOptions = Object.keys(colorMap)
                                 .map(key => ({

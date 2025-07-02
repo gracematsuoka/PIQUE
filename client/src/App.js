@@ -17,6 +17,7 @@ import Boards from './components/features/Boards';
 import Favorites from './components/features/Favorites';
 import Board from './components/features/Board';
 import MainOutlet from './components/outlets/MainOutlet';
+import CreateOutlet from './components/outlets/CreateOutlet';
 import { useAuth } from './contexts/AuthContext';
 
 function App() {
@@ -100,16 +101,33 @@ function App() {
                   path='favorites' 
                   element={<Favorites/>}/>
               </Route>
-              <Route
-                path="/create"
+              <Route 
+                path='/create'
                 element={
                   <PrivateRoute>
-                    <Create />
+                    <CreateOutlet/>
+                  </PrivateRoute>
+                }
+              >
+                <Route
+                  index
+                  element={
+                    <PrivateRoute>
+                      <Create />
+                    </PrivateRoute>
+                  }
+                />
+              </Route>
+              <Route
+                path="/closet"
+                element={
+                  <PrivateRoute>
+                    <Closet />
                   </PrivateRoute>
                 }
               />
               <Route
-                path="/closet"
+                path="/closet/wishlist"
                 element={
                   <PrivateRoute>
                     <Closet />

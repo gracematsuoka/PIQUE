@@ -34,10 +34,13 @@ router.post('/create-item', authenticateUser, async (req, res) => {
     })
 
     await userItem.save();
-    await userItem.select('name _id itemRef').populate('itemRef', 'imageURL _id');
 
-    console.log('back added', userItem)
-    res.status(201).json({userItem});
+    const populatedItem = await UserItem.findById(userItem._id)
+        .select('name _id itemRef')
+        .populate('itemRef', 'imageURL _id');
+
+    console.log('back added', populatedItem)
+    res.status(201).json({userItem: populatedItem});
 })
 
 router.get('/get-items', authenticateUser, async (req, res) => {
@@ -111,12 +114,13 @@ router.delete('/delete-item', authenticateUser, async (req, res) => {
     const { itemId } = req.query;
 
     const userItem = await UserItem.findByIdAndDelete(itemId);
-    const item = Item.findById(userItem.itemRef);
+    if (!userItem) return res.status(404).json({message: 'user item not found'});
+    const item = await Item.findById(userItem.itemRef);
     if (!item.public) {
         await Item.findByIdAndDelete(userItem.itemRef);
     }
 
-    res.status(200).json({userItem});
+    res.sendStatus(204);
 })
 
 module.exports = router;

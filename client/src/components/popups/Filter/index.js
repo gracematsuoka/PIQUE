@@ -4,21 +4,6 @@ import {ReactComponent as Check} from '../../../assets/images/icons/check.svg';
 
 const Filter = ({className, setShowFilter, colors, setColors, tags, setTags}) => {
 
-    const colorOptions = {
-        Red: '#F35050',
-        Orange: '#EEA34E',
-        Yellow: '#F5D928',
-        Green: '#91D58C',
-        Blue: '#81AAEA',
-        Purple: '#BE9FE5',
-        Pink: '#F1AFD6',
-        Black: '#000000',
-        White: '#FFFFFF',
-        Grey: '#868585',
-        Beige: '#E9E0B6',
-        Brown: '#A26D2C',
-    }
-
     const toggleTagChecked = (key) => {
         setTags(prev => prev.map(tag => 
             tag.key === key ? {...tag, checked: !tag.checked} : tag

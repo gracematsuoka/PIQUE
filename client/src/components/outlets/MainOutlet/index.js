@@ -5,7 +5,7 @@ import NavBar from '../../features/NavBar';
 
 const MainOutlet = () => {
     return (
-        <div className='main-outlet'>
+        <div className='main-outlet' style={{height: '100vh'}}>
             <TopBar/>
             <div className="nav-content">
                 <NavBar/>

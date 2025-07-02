@@ -11,6 +11,7 @@ import {ReactComponent as FilterIcon} from '../../../assets/images/icons/filter.
 import Tooltip from "@mui/material/Tooltip";
 import { useTag } from "../../hooks/useTag"
 import ErrorIcon from '@mui/icons-material/Error';
+import { NavLink, useLocation } from "react-router-dom"
 
 const Closet = () => {
     const {mongoUser} = useAuth();
@@ -21,28 +22,37 @@ const Closet = () => {
     const [colors, setColors] = useState([]);
     const [showItemDetails, setShowItemDetails] = useState(false);
     const [processedUrl, setProcessedUrl] = useState('');
-    const [reloadItems, setReloadItems] = useState(false);
     const [selectedItemId, setSelectedItemId] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(false);
+    const [error, setError] = useState('');
     const [filled, setFilled] = useState(0);
-    const [updatedItem, setUpdatedItem] = useState(null);
-    const [addedItem, setAddedItem] = useState(null);
+    const location = useLocation();
 
-    const colorOptions = {
-        Red: '#F35050',
-        Orange: '#EEA34E',
-        Yellow: '#F5D928',
-        Green: '#91D58C',
-        Blue: '#81AAEA',
-        Purple: '#BE9FE5',
-        Pink: '#F1AFD6',
-        Black: '#000000',
-        White: '#FFFFFF',
-        Grey: '#868585',
-        Beige: '#E9E0B6',
-        Brown: '#A26D2C',
-    } 
+    useEffect(() => {
+        location.pathname === '/closet' ? setTab('closet') : setTab('wishlist');
+    }, [location])
+
+    const colorMap = {
+        'Red': '#F35050',
+        'Orange': '#EEA34E',
+        'Yellow': '#F5D928',
+        'Green': '#91D58C',
+        'Blue': '#81AAEA',
+        'Purple': '#BE9FE5',
+        'Pink': '#F1AFD6',
+        'Black': '#000000',
+        'Grey': '#868585',
+        'White': '#FFFFFF',
+        'Beige': '#E9E0B6',
+        'Brown': '#A26D2C',
+        'Gold': '#D6CE85',
+        'Silver': '#E8E5E0',
+        'Rose Gold': '#D6AA90'
+    }
+
+    const itemArray = ['Tops', 'Bottoms', 'Dresses/Rompers', 'Outerwear', 'Shoes', 'Swimwear', 'Loungewear',
+        'Sets', 'Undergarments', 'Jewelry', 'Bags', 'Accessories', 'Other'
+    ]
 
     const {data: dbTags=[]} = useTag();
 
@@ -57,14 +67,14 @@ const Closet = () => {
         }
 
         populateTags();
-        const colorMap = Object.keys(colorOptions)
+        const colorCheckMap = Object.keys(colorMap)
             .map(color => ({
                     color,
-                    hex: colorOptions[color],
+                    hex: colorMap[color],
                     checked: false
                 })
         );
-        setColors(colorMap)
+        setColors(colorCheckMap)
     }, []) 
 
     useEffect(() => {
@@ -73,11 +83,11 @@ const Closet = () => {
         }
     }, [filled, loading])
 
-    const handleError = () => {
-        setError(true);
+    const handleError = (err) => {
+        setError(err);
 
         setTimeout(() => {
-            setError(false)
+            setError(null);
         }, 30000);
     }
 
@@ -97,37 +107,29 @@ const Closet = () => {
                                 processedUrl={processedUrl}
                                 setProcessedUrl={setProcessedUrl}
                                 tab={tab}
-                                setReloadItems={setReloadItems}
                                 />}
             <div className="nav-content-wrapper">
                 <p className="welcome-header">Welcome to your closet, {mongoUser?.name || 'Name'}</p>
                 <div className="basic-nav">
-                    <p className={tab === 'closet' ? 'active' : ''}>MY CLOSET</p>
-                    <p className={tab === 'wishlist' ? 'active' : ''}>MY WISHLIST</p>
-                    {/* <p className={tab === 'collections' ? 'active' : ''}>COLLECTIONS</p> */}
+                    <NavLink to='/closet' className={() => `nav ${location.pathname === '/closet' ? 'active' : ''}`}>
+                        MY CLOSET
+                    </NavLink>
+                    <NavLink to='/closet/wishlist' className={({ isActive }) => `nav ${isActive ? 'active' : ''}`}>
+                        MY WISHLIST
+                    </NavLink>
                 </div>
-                <SearchBar/>
-                <Tooltip title='New item'>
-                <div className="add" onClick={toggleAddPopup}>
-                    <img src={addClothes}/>
-                </div>
-                </Tooltip>
-                <div className="nav-filter-wrapper">
-                    <div className="basic-nav sub">
-                        <p>ALL</p>
-                        <p>TOPS</p>
-                        <p>BOTTOMS</p>
-                        <p>OUTERWEAR</p>
-                        <p>SHOES</p>
-                        <p>JEWELRY</p>
-                        <p>BAGS</p>
-                        <p>ACCESSORIES</p>
-                    </div>
+                <div className="search-filter">
+                    <SearchBar/>
                     <div className="filter" onClick={e => setShowFilter(!showFilter)}>
                         <p>Filter</p>
                         <FilterIcon/>
                     </div>
                 </div>
+                <Tooltip title='New item'>
+                <div className="add" onClick={toggleAddPopup}>
+                    <img src={addClothes}/>
+                </div>
+                </Tooltip>
                 <div className="items-wrapper">
                     <Items 
                         tab={tab}
@@ -135,6 +137,7 @@ const Closet = () => {
                             setSelectedItemId(item._id);
                             setShowItemDetails(true);
                         }}
+                        handleError={handleError}
                         />
                 </div>
                 {loading && 
@@ -148,7 +151,7 @@ const Closet = () => {
                 {error && 
                     <div className="toast error">
                         <ErrorIcon/>
-                        <p>Error saving item</p>
+                        <p>Error: {error.message}</p>
                     </div>
                 }
                 <Filter className={`popup-container filter ${showFilter ? 'open' : ''}`} 
@@ -163,9 +166,10 @@ const Closet = () => {
                                         setShowItemDetails={setShowItemDetails}
                                         processedUrl={processedUrl}
                                         tab={tab}
-                                        setReloadItems={setReloadItems}
                                         setLoading={setLoading}
                                         handleError={handleError}
+                                        itemArray={itemArray}
+                                        colorMap={colorMap}
                                         />}
                 {showItemDetails && selectedItemId && 
                                     <ItemDetails 
@@ -177,6 +181,8 @@ const Closet = () => {
                                         onClose={handleCloseDetails}
                                         setLoading={setLoading}
                                         handleError={handleError}
+                                        itemArray={itemArray}
+                                        colorMap={colorMap}
                                         />}
             </div>
         </div>

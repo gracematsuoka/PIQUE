@@ -39,7 +39,7 @@ export const fetchSelectedItem = async ({itemId}) => {
 export const deleteItem = async ({itemId}) => {
     const token = await auth.currentUser.getIdToken();
 
-    const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/useritems/delete-item?itemId=${itemId}`, {
+    await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/useritems/delete-item?itemId=${itemId}`, {
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token}`

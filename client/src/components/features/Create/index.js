@@ -1,5 +1,3 @@
-import NavBar from "../NavBar";
-import TopBar from "../TopBar";
 import './index.scss';
 import {ReactComponent as ShirtIcon} from '../../../assets/images/icons/shirt.svg';
 import SearchBar from "../../reusable/SearchBar";
@@ -29,14 +27,23 @@ import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-
 import PostPrev from "../../popups/PostPrev";
+import { Bouncy } from 'ldrs/react';
 
 const Create = () => {
-    const {data: items = []} = useItems('closet');
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading,
+        isError,
+        error
+    } = useItems('closet');
+    const items = data?.pages.flatMap(page => page.items) || [];
+    console.log('items', items)
     const canvasRef = useRef(null);
     const fabricRef = useRef(null);
-    const [isEmpty, setIsEmpty] = useState(false);
     const [canvas, setCanvas] = useState(null);
     const [canvasHistory, setCanvasHistory] = useState(null);
     const [showTextOptions, setShowTextOptions] = useState(false);
@@ -60,6 +67,30 @@ const Create = () => {
     const [canvasJSON, setCanvasJSON] = useState('');
     const [showCongrats, setShowCongrats] = useState(false);
     const [reload, setReload] = useState(false);
+    const sentinelRef = useRef(null);
+
+    useEffect(() => {
+        if (!hasNextPage) return;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    fetchNextPage();
+                }
+            },
+            {
+                root: null,
+                rootMargin: '0px',
+                threshold: 1.0
+            }
+        )
+        if (sentinelRef.current){
+            observer.observe(sentinelRef.current)
+        };
+
+        return () => observer.disconnect();
+    }, [hasNextPage]);
+
     const hexCodes = ['#A36361', '#C96349', '#F7A87B', '#E9CE83', 
             '#919568', '#8FAE95', '#B4D2C0', '#F9D994',
             '#5E99A3', '#84BAC0', '#B7D2D7', '#CBBCCF', 
@@ -190,10 +221,6 @@ const Create = () => {
             }
         }
     }, [reload])
-
-    useEffect(() => {
-        items.length > 0 ? setIsEmpty(false) : setIsEmpty(true)
-    }, items)
 
     useEffect(() => {
         if (!canvas) return;
@@ -543,7 +570,7 @@ const Create = () => {
 
     return (
         <div className="create">
-            <div className="nav-content-wrapper">
+            {/* <div className="nav-content-wrapper"> */}
                 {showCongrats && <Congrats
                                     setShowCongrats={setShowCongrats}
                                     setReload={setReload}
@@ -556,10 +583,6 @@ const Create = () => {
                                 setShowPost={setShowPost}
                                 setShowCongrats={setShowCongrats}
                 />}
-                <div className="basic-nav create">
-                    <p>CREATE</p>
-                    <p>DRAFTS</p>
-                </div>
                 <hr/>
                 <div className="create-wrapper">
                     <div className="create-board">
@@ -770,9 +793,15 @@ const Create = () => {
                             <SearchBar/>
                             {/* <Filter /> */}
                         </div>
-                        {!isEmpty && 
-                            <div className="image-database">
-                                {items.map(item => 
+                        <div className="items">
+                            {(isLoading || isFetchingNextPage) ? (
+                                <Bouncy
+                                    size="45"
+                                    speed="1.75"
+                                    color="#6B799F"
+                                    />
+                            ) : items.length > 0 ? (
+                                items.map(item => 
                                     <div className="item-img-wrapper" 
                                         key={item._id}
                                         draggable
@@ -784,17 +813,19 @@ const Create = () => {
                                             alt={item.name}
                                         />
                                     </div>
-                                )}
-                            </div>
-                        }
-                        {isEmpty && 
-                            <div className="empty-closet">
-                                <p>You have no items in your closet, navigate to 'closet' to start adding items</p>
-                            </div>
-                        }
+                                )
+                            ) : (
+                                <div className="empty-closet">
+                                    <p>You have no items in your closet, navigate to 'closet' to start adding items</p>
+                                </div>
+                            )}
+                            {hasNextPage && 
+                                <div ref={sentinelRef}/>
+                            }
+                        </div>
                     </div>
                 </div>
-            </div>
+            {/* </div> */}
         </div>
     )
 }

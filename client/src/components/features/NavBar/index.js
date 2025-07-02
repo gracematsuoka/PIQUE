@@ -32,9 +32,9 @@ const NavBar = () => {
                     <p>Create</p>
                 </Link>
             </div>
-            <div className={`icon-wrapper shirt ${location.pathname === '/closet' ? 'active' : ''}`}>
+            <div className={`icon-wrapper shirt ${location.pathname .includes('/closet') ? 'active' : ''}`}>
                 <Link to='/closet'>
-                    <img src={location.pathname === '/closet' ? WhiteShirt : BlackShirt}/>
+                    <img src={location.pathname.includes('/closet') ? WhiteShirt : BlackShirt}/>
                     <p>Closet</p>
                 </Link>
             </div>

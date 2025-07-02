@@ -9,15 +9,19 @@ export const useCreateItem = () => {
         },
         onSuccess: (userItem, {tab}) => {
             console.log('created', userItem)
-            qc.setQueryData(['items', tab], prev =>
-                prev.map((page, index) => {
-                    if (index === 0) {
-                        return {
-                            ...page,
-                            items: [userItem, ...page.items]
+            qc.setQueryData(['items', tab], prev => 
+                prev && {
+                    ...prev,
+                    pages: prev.pages.map((page, index) => {
+                        if (index === 0) {
+                            return {
+                                ...page,
+                                items: [userItem, ...page.items]
+                            }
                         }
-                    }
-                })
+                        return page;
+                    })
+                }
             )
         }
     })
@@ -53,7 +57,7 @@ export const useDeleteItem = () => {
                     ...prev, 
                     pages: prev.pages.map(page => ({
                         ...page,
-                        items: page.items.filter(item => item._id === itemId)
+                        items: page.items.filter(item => item._id !== itemId)
                 }))
         }
     )}})

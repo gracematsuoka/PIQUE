@@ -6,7 +6,6 @@ import AddIcon from '@mui/icons-material/Add';
 import { useState } from 'react';
 import { Bouncy } from 'ldrs/react';
 import AddBoard from '../../popups/AddBoard';
-import defaultCover from '../../../assets/images/home/pique_hold.png';
 import grey from '../../../assets/images/home/grey.png';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
