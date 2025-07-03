@@ -17,7 +17,7 @@ const BoardSave = ({
         <div className='board-save'>
             {boards.map(board => 
                 <div className='board-item' key={board._id}>
-                    <p>{board.title.toUpperCase()}</p>
+                    <p>{board.title}</p>
                     {savedBoards.includes(board._id) ?
                         <div className='icon-circle' 
                             key={board._id + '-' + board.exists} 

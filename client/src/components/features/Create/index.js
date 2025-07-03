@@ -10,6 +10,8 @@ import CanvasHistory from "../../../utils/CanvasHistory";
 import Tooltip from "@mui/material/Tooltip";
 import Congrats from "../../popups/Congrats";
 import { useItems } from "../../hooks/useItems";
+import {ReactComponent as FilterIcon} from '../../../assets/images/icons/filter.svg'
+import { useTag } from '../../hooks/useTag';
 // toolbar
 import CropRoundedIcon from '@mui/icons-material/CropRounded';
 import TextFieldsRoundedIcon from '@mui/icons-material/TextFieldsOutlined';
@@ -29,19 +31,9 @@ import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrow
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import PostPrev from "../../popups/PostPrev";
 import { Bouncy } from 'ldrs/react';
+import { useQueryClient } from '@tanstack/react-query';
 
 const Create = () => {
-    const {
-        data,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-        isLoading,
-        isError,
-        error
-    } = useItems('closet');
-    const items = data?.pages.flatMap(page => page.items) || [];
-    console.log('items', items)
     const canvasRef = useRef(null);
     const fabricRef = useRef(null);
     const [canvas, setCanvas] = useState(null);
@@ -68,7 +60,35 @@ const Create = () => {
     const [showCongrats, setShowCongrats] = useState(false);
     const [reload, setReload] = useState(false);
     const sentinelRef = useRef(null);
+    const [showFilter, setShowFilter] = useState(false);
+    const [tags, setTags] = useState([]);
+    const [categs, setCategs] = useState([]);
+    const [colors, setColors] = useState([]);
+    const [showTags, setShowTags] = useState(true)
+    const [tab, setTab] = useState('closet');
+    const qc = useQueryClient();
 
+    // set items to the correct tab
+    const closetQuery = useItems('closet');
+    const wishlistQuery = useItems('wishlist');
+    const databaseQuery = useItems('database');
+    const queries = {
+        closet: closetQuery,
+        wishlist: wishlistQuery,
+        database: databaseQuery
+    }
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading,
+        isError,
+        error
+    } = queries[tab]
+    const items = data?.pages.flatMap(page => page.items) || [];
+
+    // fetch more items
     useEffect(() => {
         if (!hasNextPage) return;
 
@@ -91,6 +111,64 @@ const Create = () => {
         return () => observer.disconnect();
     }, [hasNextPage]);
 
+    const handleSwitchTab = (selected) => {
+        if (selected === tab) return; 
+        setTab(selected);
+        if (selected === 'closet' || selected === 'wishlist') {
+            setShowTags(true);
+        } else {
+            setShowTags(false);
+        }
+    }
+
+    // filter
+    const colorMap = {
+            'Red': '#F35050',
+            'Orange': '#EEA34E',
+            'Yellow': '#F5D928',
+            'Green': '#91D58C',
+            'Blue': '#81AAEA',
+            'Purple': '#BE9FE5',
+            'Pink': '#F1AFD6',
+            'Black': '#000000',
+            'Grey': '#868585',
+            'White': '#FFFFFF',
+            'Beige': '#E9E0B6',
+            'Brown': '#A26D2C',
+            'Gold': '#D6CE85',
+            'Silver': '#E8E5E0',
+            'Rose Gold': '#D6AA90'
+        }
+    
+        const itemArray = ['Tops', 'Bottoms', 'Dresses/Rompers', 'Outerwear', 'Shoes', 'Swimwear', 'Loungewear',
+            'Sets', 'Undergarments', 'Jewelry', 'Bags', 'Accessories', 'Other'
+        ]
+    
+        const {data: dbTags=[]} = useTag();
+    
+        useEffect(() => {
+            setTags(dbTags.map(tag => ({
+                name: tag.name,
+                hex: tag.hex,
+                key: tag._id,
+                checked: false
+            })));
+            const colorCheckMap = Object.keys(colorMap)
+                .map(color => ({
+                        color,
+                        hex: colorMap[color],
+                        checked: false
+                    })
+            );
+            setColors(colorCheckMap)
+    
+            setCategs(itemArray.map(item => ({
+                categ: item,
+                checked: false
+            })))
+        }, [dbTags]) 
+
+    // canvas functionality 
     const hexCodes = ['#A36361', '#C96349', '#F7A87B', '#E9CE83', 
             '#919568', '#8FAE95', '#B4D2C0', '#F9D994',
             '#5E99A3', '#84BAC0', '#B7D2D7', '#CBBCCF', 
@@ -193,7 +271,7 @@ const Create = () => {
             link.rel = 'stylesheet';
             document.head.appendChild(link);
         }
-    }
+    };
 
     useEffect(() => {
         setTitle('');
@@ -380,7 +458,7 @@ const Create = () => {
         const listener = () => hideContextMenu();
         document.addEventListener('click', listener);
         return () => document.removeEventListener('click', listener);
-    })
+    }, [canvas])
 
     const getSelectedText = () => {
         const activeObject = canvas.getActiveObject();
@@ -486,7 +564,7 @@ const Create = () => {
 
         const { x, y } = canvas.getPointer(e.nativeEvent);
 
-        const img = await FabricImage.fromURL(data.itemRef?.imageURL.replace('/public', '/300'),
+        const img = await FabricImage.fromURL(data.itemRef?.imageURL,
             {crossOrigin: 'anonymous'});
 
         img.toObject = function(propertiesToInclude) {
@@ -512,7 +590,7 @@ const Create = () => {
     }
 
     const addImage = async (item) => {
-        const img = await FabricImage.fromURL(item.itemRef?.imageURL.replace('/public', '/300'),
+        const img = await FabricImage.fromURL(item.itemRef?.imageURL,
             {crossOrigin: 'anonymous'});
 
         img.toObject = function(propertiesToInclude) {
@@ -563,7 +641,12 @@ const Create = () => {
     const handlePost = () => {
         const json = canvas.toJSON(['itemId'], true);
         const dataURL = canvas.toDataURL({format: 'png', multiplier: 3})
-        setCanvasJSON(json);
+        setCanvasJSON({
+            objects: json.objects,
+            width: canvas.width,
+            height: canvas.height,
+            background: canvas.backgroundColor
+        });
         setPostURL(dataURL);
         setShowPost(true);
     }
@@ -756,7 +839,7 @@ const Create = () => {
                                 ref={fabricRef}
                                 onDragOver={e => e.preventDefault()}
                                 onDrop={e => handleDrop(e)}>
-                                <canvas id="canvas" ref={canvasRef}/>
+                                <canvas id="canvas" ref={canvasRef} width={400 } height={600 }/>
                         {menu.visible &&
                             <ul className="context-menu" style={{top: menu.y, left: menu.x, position: 'absolute'}}>
                                 <li onClick={() => {canvas.bringObjectToFront(menu.target)}}>
@@ -785,13 +868,16 @@ const Create = () => {
                     </div>
                     <div className="create-sidebar">
                         <div className="basic-nav sub">
-                            <p>CLOSET</p>
-                            <p>DATABASE</p>
-                            <p>UPLOAD</p>
+                            <p onClick={() => handleSwitchTab('closet')} style={{color: tab === 'closet' ? 'black' : 'grey'}}>CLOSET</p>
+                            <p onClick={() => handleSwitchTab('wishlist')} style={{color: tab === 'wishlist' ? 'black' : 'grey'}}>WISHLIST</p>
+                            <p onClick={() => handleSwitchTab('database')} style={{color: tab === 'database' ? 'black' : 'grey'}}>DATABASE</p>
                         </div>
                         <div className="search-filter">
                             <SearchBar/>
-                            {/* <Filter /> */}
+                            <div className="filter" onClick={e => setShowFilter(!showFilter)}>
+                                <p>Filter</p>
+                                <FilterIcon/>
+                            </div>
                         </div>
                         <div className="items">
                             {(isLoading || isFetchingNextPage) ? (
@@ -809,7 +895,7 @@ const Create = () => {
                                         onClick={() => addImage(item)}
                                         >
                                         <img 
-                                            src={item.itemRef?.imageURL.replace('/public', '/300')}
+                                            src={item.itemRef?.imageURL || item.imageURL}
                                             alt={item.name}
                                         />
                                     </div>
@@ -823,7 +909,18 @@ const Create = () => {
                                 <div ref={sentinelRef}/>
                             }
                         </div>
+
+                        <Filter className={`popup-container filter ${showFilter ? 'open' : ''} create`} 
+                                setShowFilter={setShowFilter}
+                                tags={tags}
+                                setTags={setTags}
+                                colors={colors}
+                                setColors={setColors}
+                                categs={categs}
+                                setCategs={setCategs}
+                        />
                     </div>
+
                 </div>
             {/* </div> */}
         </div>

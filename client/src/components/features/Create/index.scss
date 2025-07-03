@@ -5,6 +5,22 @@
     display: flex;
     flex-direction: column;
     flex: 1;
+    overflow: hidden;
+
+    .search-filter {
+        justify-content: space-between;
+
+        .search-bar {
+            width: 70%;
+        }
+
+        .filter {
+
+            p {
+                font-size: 13px;
+            }
+        }
+    }
 }
 
 .create .nav-content-wrapper {
@@ -96,7 +112,7 @@
 
 .create-board {
     // background-color: pink;
-    width: 65vw;
+    width: 60vw;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -115,25 +131,36 @@
     border-top-left-radius: 30px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     position: relative;
-    width: 35vw;
+    width: 40vw;
     height: 100%;
-    overflow-y: hidden;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     gap: 10px;
     padding-left: 15px;
+    padding-right: 15px;
     padding-top: 20px;
     box-sizing: border-box;
 
     .items {
         overflow: auto;
+        position: relative;
+    }
+
+    .popup-container.filter.create {
+        position: absolute;
+        height: 85%;
+        // width: auto;
+        width: 60%;
+        padding-left: 30px;
     }
 }
 
 .create-sidebar .basic-nav.sub {
     padding-left: 5px;
     gap: clamp(10px, 35px, 35px);
-
+    font-weight: 600;
+    color: grey;
 }
 
 .create-sidebar .search-bar input {

@@ -3,6 +3,7 @@ const router = express.Router();
 const UserItem = require("../models/UserItem");
 const Item = require('../models/Item');
 const authenticateUser = require("../middleware/authenticateUser");
+const { auth } = require("firebase-admin");
 
 router.post('/create-item', authenticateUser, async (req, res) => {
     const { mongoId } = req.user;
@@ -43,20 +44,71 @@ router.post('/create-item', authenticateUser, async (req, res) => {
     res.status(201).json({userItem: populatedItem});
 })
 
+router.post('/create-user-copy', authenticateUser, async (req, res) => {
+    const {mongoId} = req.user;
+    const {itemRefs, tab} = req.body;
+
+    const duplicates = new Set((await UserItem
+        .find({itemRef: {$in: itemRefs}, ownerId: mongoId}))
+        .map(dup => dup.itemRef.toString()));
+    const uniqueRefs = itemRefs.filter(ref => !duplicates.has(ref.toString()));
+    
+    const globalItems = await Item.find({_id: {$in: uniqueRefs}});
+
+    const itemMap = new Map(globalItems.map(item => [item._id.toString(), item]));
+
+    const userCopies = uniqueRefs.map(ref => {
+        const global = itemMap.get(ref.toString());
+        console.log('item', global)
+        return {
+            ownerId: mongoId,
+            itemRef: ref,
+            name: global.name,
+            colors: global.colors,
+            category: global.category,
+            brand: global.brand,
+            tags: [],
+            price: global.price,
+            link: global.link,
+            tab: tab
+        }
+    });
+
+    await UserItem.insertMany(userCopies, {ordered: false});
+    const addedItems = await UserItem
+        .find({itemRef: {$in: uniqueRefs}, ownerId: mongoId})
+        .select('name _id itemRef')
+        .populate('itemRef', 'imageURL _id');
+
+    res.status(200).json({addedItems});
+})
+
 router.get('/get-items', authenticateUser, async (req, res) => {
     const { mongoId } = req.user;
     const { tab, cursor } = req.query;
     const limit = Math.min(parseInt(req.query.limit) || 20, 40);
 
-    const filter = {ownerId: mongoId, tab};
-    if (cursor) filter._id.$lt = cursor;
+    let docs;
+    if (tab === 'closet' || tab === 'wishlist') {
+        const filter = {ownerId: mongoId, tab};
+        if (cursor) filter._id.$lt = cursor;
 
-    const docs = await UserItem
-        .find(filter)
-        .sort({_id: -1})
-        .limit(limit + 1)
-        .populate('itemRef', 'imageURL')
-        .select('itemRef name'); // eventually add color here for closet name
+        docs = await UserItem
+            .find(filter)
+            .sort({_id: -1})
+            .limit(limit + 1)
+            .populate('itemRef', 'imageURL')
+            .select('itemRef name'); // eventually add color here for closet name
+    } else if (tab === 'database') {
+        const filter = {public: true};
+        if (cursor) filter._id.$lt = cursor;
+
+        docs = await Item
+            .find(filter)
+            .sort({_id: -1})
+            .limit(limit + 1)
+            .select('imageURL name');
+    }
     
     const hasMore = docs.length > 20;
     const items = hasMore ? docs.slice(0, limit) : docs;

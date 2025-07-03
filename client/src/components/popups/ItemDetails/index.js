@@ -133,7 +133,7 @@ const ItemDetails = ({ mode,
         })));
     }
 
-    const handleCreateItem = async (tab) => {
+    const handleCreateItem = async () => {
         setLoading(true);
         setShowItemDetails(false);
         const itemTags = addedTags.map(tag => ({
@@ -558,8 +558,7 @@ const ItemDetails = ({ mode,
                         </div>
                         {mode === 'create' && 
                             <div className='buttons'>
-                                <button className='basic-btn blue' onClick={() => handleCreateItem('closet')}>Save to Closet</button>
-                                <button className='basic-btn' onClick={() => handleCreateItem('wishlist')}>Save to Wishlist</button>
+                                <button className='basic-btn blue' onClick={() => handleCreateItem()}>Save to {tab}</button>
                             </div>
                         }
                         {mode === 'edit' &&

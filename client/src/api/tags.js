@@ -1,7 +1,6 @@
 import { auth } from "../firebase";
 
 export const fetchTags = async () => {
-    console.log('ello')
     const token = await auth.currentUser.getIdToken();
     const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/get-tags`, {
         method: 'GET',

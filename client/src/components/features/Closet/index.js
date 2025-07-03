@@ -18,6 +18,7 @@ const Closet = () => {
     const [showAddPopup, setShowAddPopup] = useState(false);
     const [tab, setTab] = useState('closet');
     const [tags, setTags] = useState([]);
+    const [categs, setCategs] = useState([]);
     const [showFilter, setShowFilter] = useState(false);
     const [colors, setColors] = useState([]);
     const [showItemDetails, setShowItemDetails] = useState(false);
@@ -57,16 +58,12 @@ const Closet = () => {
     const {data: dbTags=[]} = useTag();
 
     useEffect(() => {
-        const populateTags = async () => {
-            setTags(dbTags.map(tag => ({
-                name: tag.name,
-                hex: tag.hex,
-                key: tag._id,
-                checked: false
-            })));
-        }
-
-        populateTags();
+        setTags(dbTags.map(tag => ({
+            name: tag.name,
+            hex: tag.hex,
+            key: tag._id,
+            checked: false
+        })));
         const colorCheckMap = Object.keys(colorMap)
             .map(color => ({
                     color,
@@ -75,11 +72,17 @@ const Closet = () => {
                 })
         );
         setColors(colorCheckMap)
-    }, []) 
+
+        setCategs(itemArray.map(item => ({
+            categ: item,
+            checked: false
+        })))
+    }, [dbTags]) 
 
     useEffect(() => {
         if(loading && filled < 100) {
-            setTimeout(() => setFilled(prev => prev += 10), 50)
+            const timeout = setTimeout(() => setFilled(prev => prev += 10), 50);
+            return () => clearTimeout(timeout);
         }
     }, [filled, loading])
 
@@ -107,6 +110,8 @@ const Closet = () => {
                                 processedUrl={processedUrl}
                                 setProcessedUrl={setProcessedUrl}
                                 tab={tab}
+                                setLoading={setLoading}
+                                handleError={handleError}
                                 />}
             <div className="nav-content-wrapper">
                 <p className="welcome-header">Welcome to your closet, {mongoUser?.name || 'Name'}</p>
@@ -145,7 +150,7 @@ const Closet = () => {
                         <div className="progress-bar" 
                             style={{width: `${filled}%`}}
                             />
-                        <p>Saving item ...</p>
+                        <p>Saving ...</p>
                     </div>
                 }
                 {error && 
@@ -160,6 +165,9 @@ const Closet = () => {
                         setTags={setTags}
                         colors={colors}
                         setColors={setColors}
+                        categs={categs}
+                        setCategs={setCategs}
+                        showTags={true}
                 />
                 {showItemDetails && <ItemDetails 
                                         mode='create' 

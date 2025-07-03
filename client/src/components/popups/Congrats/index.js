@@ -2,8 +2,11 @@ import './index.scss';
 import { useState } from "react";
 import ConfettiExplosion from 'react-confetti-explosion';
 import {ReactComponent as CloseIcon} from '../../../assets/images/icons/close.svg';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { useNavigate } from 'react-router-dom';
 
 const Congrats = ({setShowCongrats, setReload}) => {
+    const navigate = useNavigate();
     const [isExploding, setIsExploding] = useState(true);
 
     return (
@@ -15,8 +18,11 @@ const Congrats = ({setShowCongrats, setReload}) => {
                         colors={['#BBD6DB', '#E0F2F4', '#DDDD7B', '#FFE697', '#F791A9', '#FFDADF']}
                 />}
                     <div className='popup-content'>
+                        <div className='congrats-icon'>
+                            <CheckCircleIcon/>
+                        </div>
                         <div className='congrats-title'>
-                            <h1>Congrats! 💃</h1>
+                            <h1>Congrats!</h1>
                             <div className='close' 
                                 onClick={() => {
                                     setShowCongrats(false);
@@ -26,15 +32,13 @@ const Congrats = ({setShowCongrats, setReload}) => {
                             </div>
                         </div>
                         <p>Your post is now up</p>
-                        <div className='btn-wrap'>
-                            <button className='sub-btn bold'>View post</button>
-                            <button className='sub-btn' 
-                                onClick={() => {
-                                    setShowCongrats(false);
-                                    setReload(true);
-                            }}>
-                                Keep styling
-                            </button>
+                        <button className='sub-btn bold' onClick={() => navigate('/explore')}>Start exploring</button>
+                        <div className='sub-btn' 
+                            onClick={() => {
+                                setShowCongrats(false);
+                                setReload(true);
+                        }}>
+                            Keep styling
                         </div>
                     </div>
                 </div>

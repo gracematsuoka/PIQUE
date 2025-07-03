@@ -1,5 +1,11 @@
 @import '../../../variables';
 
+.add-item {
+    .popup-container.overlay {
+        overflow: hidden;
+    }
+}
+
 .popup-header {
     width: 100%;
     height: fit-content;
@@ -61,6 +67,13 @@
     display: flex;
     width: 100%;
     justify-content: space-around;
+    font-weight: 700;
+    color: grey;
+
+    .active {
+        text-decoration: none;
+        color: black
+    }
 }
 
 #image-upload {
@@ -113,5 +126,80 @@
     h1 {
       color: white;
       font-size: 2rem;
+    }
+}
+
+.database {
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+    max-height: 500px;
+    overflow: auto;
+
+    .search-filter {
+        gap: 30px;
+        padding-bottom: 10px;
+
+        .search-bar {
+
+            input {
+                font-size: 12px;
+            }
+        }
+    }
+
+    .items {
+        .item-wrapper {
+            cursor: pointer;
+        }
+    }
+
+    .popup-container.filter {
+        height: 60%;
+    }
+
+    .circle-check {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background-color: black;
+    }
+
+    .num-selected {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translate(-50%);
+        background-color: black;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 13px;
+    }
+
+    .continue {
+        position: absolute;
+        bottom: 10px;
+        right: 15px;
+        background-color: black;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        cursor: pointer;
+        transition: outline 0.2s ease-in-out;
+
+        &:hover {
+            outline: 3px solid rgb(234, 234, 234);
+        }
+
+        svg {
+            height: 15px;
+            width: 15px;
+        }
     }
 }

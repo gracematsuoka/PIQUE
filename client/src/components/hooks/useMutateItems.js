@@ -1,5 +1,5 @@
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { createItem, updateItems, deleteItem } from "../../api/items";
+import { createItem, updateItems, deleteItem, createUserCopy } from "../../api/items";
 
 export const useCreateItem = () => {
     const qc = useQueryClient();
@@ -23,6 +23,33 @@ export const useCreateItem = () => {
                     })
                 }
             )
+        }
+    })
+}
+
+export const useCreateCopy = () => {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: ({itemRefs, tab}) => {
+            return createUserCopy({itemRefs, tab});
+        },
+        onSuccess: (userItems, {tab}) => {
+            console.log('added', userItems)
+            qc.setQueryData(['items', tab], prev => 
+                prev && {
+                    ...prev,
+                    pages: prev.pages.map((page, index) => {
+                        if (index === 0) {
+                            return {
+                                ...page,
+                                items: [...userItems, ...page.items]
+                            }
+                        }
+                        return page;
+                    })
+                }
+            )
+            console.log('qc data', qc.getQueryData(['items', tab]))
         }
     })
 }

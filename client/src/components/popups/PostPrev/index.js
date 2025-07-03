@@ -83,7 +83,6 @@ const PostPrev = ({canvasJSON,
     return (
         <div className='postprev'>
         <div className="popup-overlay"></div>
-                    
                     {loading && 
                         <div className="loading overlay">
                             <div className="progress-bar" 
@@ -97,7 +96,7 @@ const PostPrev = ({canvasJSON,
                         <div className='popup-content'>
                             <div className='prev-title'>
                                 <p>Look'n good 💅</p>
-                                <h1>GET READY TO POST...</h1>
+                                <h1>Get ready to post...</h1>
                             </div>
                             <div className='prev-content'>
                                 <div className='prev-img'>

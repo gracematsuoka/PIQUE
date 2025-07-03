@@ -10,7 +10,6 @@ import { useItems } from '../../hooks/useItems';
 import { useDeleteItem } from '../../hooks/useMutateItems';
 
 const Items = ({onSelectItem, tab, handleError}) => {
-    console.log('tab', tab)
     const {
         data,
         fetchNextPage,
@@ -21,10 +20,8 @@ const Items = ({onSelectItem, tab, handleError}) => {
         error
     } = useItems(tab)
 
-    console.log('items:',data)
     const deleteItem = useDeleteItem();
     const items = data?.pages.flatMap(page => page.items) || [];
-    console.log('items', items)
     const [selectedId, setSelectedId] = useState(null);
     const [deleteId, setDeleteId] = useState(null);
     const sentinelRef = useRef(null);
@@ -63,7 +60,7 @@ const Items = ({onSelectItem, tab, handleError}) => {
                 items.map(item => 
                     <div className='item-wrapper' key={item._id}>
                         <img loading='lazy' 
-                            src={item.itemRef?.imageURL.replace('/public', '/300')}
+                            src={item.itemRef?.imageURL}
                             alt={item.name}
                             />
                         <div className='item-label'>

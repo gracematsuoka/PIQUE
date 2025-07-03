@@ -74,6 +74,22 @@ export const createItem = async ({name, colors, category, brand, price, link, ta
     return userItem;
 }
 
+export const createUserCopy = async ({itemRefs, tab}) => {
+    const token = await auth.currentUser.getIdToken();
+
+    const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/useritems/create-user-copy`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({itemRefs, tab})
+    });
+
+    const { addedItems } = await res.json();
+    return addedItems;
+}
+
 export const getImageURL = async ({processedUrl}) => {
     try {
         const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/images/get-upload-url`);

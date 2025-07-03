@@ -3,6 +3,8 @@ const router = express.Router();
 const Post = require("../models/Post");
 const Like = require('../models/Like');
 const BoardPost = require('../models/BoardPost');
+const Item = require('../models/Item');
+const UserItem = require('../models/UserItem');
 const authenticateUser = require("../middleware/authenticateUser");
 
 router.post('/create-post', authenticateUser, async (req, res) => {
@@ -13,13 +15,47 @@ router.post('/create-post', authenticateUser, async (req, res) => {
         title,
         description,
         canvasJSON,
-        userId: mongoId,
+        userRef: mongoId,
         postURL,
         likes: 0,
         visibility: 'public'
-    })
+    });
 
     await post.save();
+
+    const itemIds = canvasJSON.objects.map(obj =>
+        obj.itemId
+    )
+
+    console.log('ids', itemIds)
+
+    const items = await Item.find({_id: {$in: itemIds}});
+    const useritems = await UserItem.find({itemRef: {$in: itemIds}});
+    console.log('useritems', useritems)
+    if (!items.length) return res.status(404).json({message: 'Items not found'});
+
+    const userItemMap = new Map(useritems.map(item => [item.itemRef.toString(), item]));
+
+    const newItems = []
+    items.forEach(item => { 
+        if (!item.public) {
+            const useritem = userItemMap.get(item._id.toString());
+            if (useritem) {
+                item.public = true;
+                item.name = useritem.name;
+                item.colors = useritem.colors;
+                item.category = useritem.category;
+                item.brand = useritem.brand;
+                item.link = useritem.link;
+                newItems.push(item);
+            }
+        };
+    });
+    console.log('new items', newItems)
+
+    await Promise.all(newItems.map(item => item.save()));
+    console.log('saved items', items)
+
     res.status(200).json({message: 'Post created', post})
 })
 
@@ -77,7 +113,6 @@ router.post('/saved', authenticateUser, async (req, res) => {
 
     const fetchedPosts = boardId ? await model.find({boardRef: boardId}).select('postRef -_id')
                             : await model.find({userRef: mongoId}).select('postRef -_id');
-    console.log('fetchedos', fetchedPosts)
 
     const postIds = fetchedPosts.map(bp => bp.postRef);
     if (postIds.length === 0) {
@@ -162,7 +197,7 @@ router.get('/:postId', authenticateUser, async (req, res) => {
 
     const post = await Post.findById(postId).populate('userRef', 'username profileURL');
     if (!post) return res.status(404).json({error: 'Post not found'});
-    
+    console.log('back post', post)
     res.status(200).json(post);
 })
 

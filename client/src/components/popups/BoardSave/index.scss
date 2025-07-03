@@ -24,7 +24,8 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            font-family: 'Publica Play Bold';
+            // font-family: 'Publica Play Bold';
+            font-weight: 600;
             font-size: 12px;
             display: flex;
             justify-content: flex-start;
@@ -39,6 +40,7 @@
         display: flex;
         justify-content: center;
         align-self: center;
+        cursor: pointer;
 
         &:hover {
             outline: 2px solid #EBEBEBEB

@@ -5,9 +5,9 @@
     padding: 20px 25px;
 }
 .prev-title h1{
-    font-family: 'Publica Play Bold';
+    // font-family: 'Publica Play Bold';
     font-size: 23px;
-    font-weight: 500;
+    font-weight: 700;
 }
 
 .prev-title p {
@@ -55,7 +55,7 @@
 }
 
 .sub-btn button {
-    font-family: 'Publica Play Bold';
+    // font-family: 'Publica Play Bold';
     display: flex;
 }
 
@@ -83,6 +83,8 @@
 }
 
 .postprev .progress-bar {
-    height: 8px
+    height: 4px;
+    background-color: white;
+    border-radius: 50px;
 }
 

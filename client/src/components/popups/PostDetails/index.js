@@ -56,6 +56,7 @@ const PostDetails = ({
             })
 
             const postData = await res.json();
+            console.log('post data', postData)
             setPost(postData);
             setUsername(postData.userRef?.username);
             setProfileURL(postData.userRef?.profileURL);
@@ -253,7 +254,7 @@ const PostDetails = ({
                                             {selectedPost.likedByUser && <FavoriteIcon style={{fill: '#c23b0e'}}/>}
                                             <p>{selectedPost.likes}</p>
                                     </div>
-                                    <Tooltip title='Save to board'>
+                                    <Tooltip title='Save to board' >
                                     <div className='save-btn' onClick={() => setShowSave(prev => !prev)}>
                                         {showSave ? 
                                             <RemoveIcon/> :

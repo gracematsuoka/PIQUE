@@ -2,6 +2,7 @@
     position: fixed;
     right: 0;
     bottom: 0;
+    border-radius: 15px;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -11,7 +12,7 @@
     height: 65%;
     width: 30%;
     transform: translateX(110%);
-    overflow: hidden;
+    overflow: auto;
     transition: transform 0.3s ease;
 
     &.open {
@@ -19,17 +20,59 @@
     }
 }
 
-.popup-container.filter .close {
-    width: 100%;
+.filter-header {
     position: relative;
+    width: 100%;
+    padding-left: 10px;
+    box-sizing: border-box;
+    font-weight: 700;
+    color: grey;
+    padding-bottom: 15px;
+
+    p {
+        font-size: 15px;
+    }
+
+    svg {
+        fill: grey;
+    }
+}
+
+.popup-container.filter hr {
+    width: 100%;
+    padding-bottom: 10px;
 }
 
 .filter-choices {
     display: flex;
     width: 100%;
     flex-wrap: wrap;
-    gap: 8px
+    gap: 10px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    font-size: 13px;
+
+    .circle {
+        width: 12px;
+        height: 12px;
+    }
 }
+
+.circle-check {
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1px;
+    width: 10px;
+    aspect-ratio: 1/1;
+    outline: 1px solid black;
+
+    svg {
+        fill: white;
+    }
+}
+
 
 .circle {
     border-radius: 50%;
@@ -47,19 +90,20 @@
     cursor: pointer;
 }
 
-.color-filter:hover {
-    background-color: rgba(128, 128, 128, 0.2);;
-}
-
 .filter-title {
-    font-family: 'Publica Play Bold';
     padding-left: 10px;
     padding-bottom: 8px;
     padding-top: 13px;
-}
+    padding-right: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 90%;
+    cursor: pointer;
 
-.popup-container.filter .tag p{
-    font-size: 15px;
+    p {
+        font-family: 'Publica Play Bold';
+    }
 }
 
 .popup-container.filter .tag {
@@ -67,12 +111,6 @@
     border-radius: 50px;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 7px;
     cursor: pointer;
-}
-
-.check {
-    fill: black;
-    width: 15px;
-    height: 15px;
 }
