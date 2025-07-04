@@ -1,16 +1,26 @@
 import { auth } from "../firebase";
 
-export const fetchItems = async ({tab, cursor}) => {
+export const fetchItems = async ({tab, cursor, query, filters}) => {
+    const params = new URLSearchParams();
+
+    if (query) params.append('q', query);
+    if (filters.colors?.length) filters.colors.forEach(color => params.append('color', color));
+    if (filters.categories?.length) filters.categories.forEach(category => params.append('category', category));
+    if (filters.tags?.length) filters.tags.forEach(tag => params.append('tag', tag));
+    if (filters.styles?.length) filters.styles.forEach(style => params.append('style', style));
+
     try {
         const token = await auth.currentUser.getIdToken();
-        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/useritems/get-items?tab=${tab}&limit=20&${cursor ? `cursor=${cursor}` : ''}`, {
+        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/useritems/get-items?${params.toString()}&tab=${tab}&limit=20&${cursor ? `cursor=${cursor}` : ''}`, {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${token}`
             }
         });
 
+        if (!res.ok) console.log('error', res.status, res.text())
         const data = await res.json();
+        console.log('data', data)
         return data;
     } catch (err) {
         console.log('Failed to fetch closet:', err);

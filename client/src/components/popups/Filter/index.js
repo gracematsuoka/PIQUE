@@ -5,12 +5,26 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { useState } from 'react';
 
-const Filter = ({className, setShowFilter, colors, setColors, tags, setTags, categs, setCategs, showTags}) => {
+const Filter = ({
+    className, 
+    setShowFilter, 
+    colors, 
+    setColors, 
+    tags, 
+    setTags, 
+    categs, 
+    setCategs, 
+    showTags,
+    style,
+    setStyle,
+    onApply
+    }) => {
 
     const [optionOpen, setOptionOpen] = useState({
         colors: false,
         tags: false,
-        categories: false
+        categories: false,
+        styles: false
     })
 
     const toggleTagChecked = (key) => {
@@ -32,6 +46,12 @@ const Filter = ({className, setShowFilter, colors, setColors, tags, setTags, cat
         ))
     }
 
+    const toggleStyleChecked = (key) => {
+        setStyle(prev => prev.map(style => 
+            style.style === key ? {...style, checked: !style.checked} : style
+        ))
+    }
+
     return (
         <div className={className}>
             <div className='filter-header'>
@@ -47,7 +67,7 @@ const Filter = ({className, setShowFilter, colors, setColors, tags, setTags, cat
                         ...prev,
                         colors: !prev.colors
                     }))}>
-                <p>COLORS</p>
+                <p>COLOR</p>
                 {optionOpen.colors ? <RemoveIcon/> : <AddIcon/> }
             </div>
             {optionOpen.colors &&
@@ -71,7 +91,7 @@ const Filter = ({className, setShowFilter, colors, setColors, tags, setTags, cat
                             ...prev,
                             tags: !prev.tags
                         }))}>
-                    <p>TAGS</p>
+                    <p>TAG</p>
                     {optionOpen.tags ? <RemoveIcon/> : <AddIcon/> }
                 </div>
                 {optionOpen.tags && 
@@ -100,7 +120,7 @@ const Filter = ({className, setShowFilter, colors, setColors, tags, setTags, cat
                         ...prev,
                         categories: !prev.categories
                     }))}>
-                <p>CATEGORIES</p>
+                <p>CATEGORY</p>
                 {optionOpen.categories ? <RemoveIcon/> : <AddIcon/> }
             </div>
             {optionOpen.categories && 
@@ -121,7 +141,43 @@ const Filter = ({className, setShowFilter, colors, setColors, tags, setTags, cat
                     )}
                 </div>
             }
-            <button className='basic-btn'>Apply</button>
+            <div className='filter-title'
+                onClick={() => 
+                    setOptionOpen(prev => ({
+                        ...prev,
+                        styles: !prev.styles
+                    }))}>
+                <p>STYLE</p>
+                {optionOpen.styles ? <RemoveIcon/> : <AddIcon/> }
+            </div>
+            {optionOpen.styles && 
+                <div className='filter-choices'>
+                    {style.map(style => 
+                    <>
+                        <div className='tag' 
+                            key={style.style} 
+                            style={{backgroundColor: 'rgba(128, 128, 128, 0.114)', outline: style.checked ? '1px solid black' : ''}} 
+                            onClick={e => toggleStyleChecked(style.style)}
+                        > 
+                            <div className='circle-check' style={{backgroundColor: style.checked ? 'black' : ''}}>
+                                {style.checked ? <Check/> : null}
+                            </div> 
+                            <p>{style.style}</p>
+                        </div>
+                    </>
+                    )}
+                </div>
+            }
+            <div className='basic-btn-wrapper'>
+                <button className='basic-btn'
+                    onClick={() => {
+                        setShowFilter(false);
+                        onApply();
+                    }}
+                >
+                    Apply
+                </button>
+            </div>
         </div>
     )
 }

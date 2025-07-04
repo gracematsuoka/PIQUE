@@ -1,8 +1,7 @@
 import './index.scss';
-import {ReactComponent as ShirtIcon} from '../../../assets/images/icons/shirt.svg';
 import SearchBar from "../../reusable/SearchBar";
 import Filter from "../../popups/Filter";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import Select, {components} from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 import {Canvas, FabricImage, Textbox, FabricObject, Point, FabricText} from "fabric";
@@ -64,19 +63,15 @@ const Create = () => {
     const [tags, setTags] = useState([]);
     const [categs, setCategs] = useState([]);
     const [colors, setColors] = useState([]);
+    const [style, setStyle] = useState([])
     const [showTags, setShowTags] = useState(true)
     const [tab, setTab] = useState('closet');
     const qc = useQueryClient();
+    const [query, setQuery] = useState('');
+    const [filters, setFilters] = useState([]);
+    const [input, setInput] = useState('');
 
     // set items to the correct tab
-    const closetQuery = useItems('closet');
-    const wishlistQuery = useItems('wishlist');
-    const databaseQuery = useItems('database');
-    const queries = {
-        closet: closetQuery,
-        wishlist: wishlistQuery,
-        database: databaseQuery
-    }
     const {
         data,
         fetchNextPage,
@@ -85,8 +80,12 @@ const Create = () => {
         isLoading,
         isError,
         error
-    } = queries[tab]
+    } = useItems({tab, query, filters})
     const items = data?.pages.flatMap(page => page.items) || [];
+
+    const onSearch = (input) => {
+        setQuery(input);
+    }
 
     // fetch more items
     useEffect(() => {
@@ -123,50 +122,74 @@ const Create = () => {
 
     // filter
     const colorMap = {
-            'Red': '#F35050',
-            'Orange': '#EEA34E',
-            'Yellow': '#F5D928',
-            'Green': '#91D58C',
-            'Blue': '#81AAEA',
-            'Purple': '#BE9FE5',
-            'Pink': '#F1AFD6',
-            'Black': '#000000',
-            'Grey': '#868585',
-            'White': '#FFFFFF',
-            'Beige': '#E9E0B6',
-            'Brown': '#A26D2C',
-            'Gold': '#D6CE85',
-            'Silver': '#E8E5E0',
-            'Rose Gold': '#D6AA90'
-        }
-    
-        const itemArray = ['Tops', 'Bottoms', 'Dresses/Rompers', 'Outerwear', 'Shoes', 'Swimwear', 'Loungewear',
-            'Sets', 'Undergarments', 'Jewelry', 'Bags', 'Accessories', 'Other'
-        ]
-    
-        const {data: dbTags=[]} = useTag();
-    
-        useEffect(() => {
-            setTags(dbTags.map(tag => ({
-                name: tag.name,
-                hex: tag.hex,
-                key: tag._id,
-                checked: false
-            })));
-            const colorCheckMap = Object.keys(colorMap)
-                .map(color => ({
-                        color,
-                        hex: colorMap[color],
-                        checked: false
-                    })
-            );
-            setColors(colorCheckMap)
-    
-            setCategs(itemArray.map(item => ({
-                categ: item,
-                checked: false
-            })))
-        }, [dbTags]) 
+        'Red': '#F35050',
+        'Orange': '#EEA34E',
+        'Yellow': '#F5D928',
+        'Green': '#91D58C',
+        'Blue': '#81AAEA',
+        'Purple': '#BE9FE5',
+        'Pink': '#F1AFD6',
+        'Black': '#000000',
+        'Grey': '#868585',
+        'White': '#FFFFFF',
+        'Beige': '#E9E0B6',
+        'Brown': '#A26D2C',
+        'Gold': '#D6CE85',
+        'Silver': '#E8E5E0',
+        'Rose Gold': '#D6AA90'
+    }
+
+    const itemArray = ['Tops', 'Bottoms', 'Dresses/Rompers', 'Outerwear', 'Shoes', 'Swimwear', 'Loungewear',
+        'Sets', 'Undergarments', 'Jewelry', 'Bags', 'Accessories', 'Other'
+    ]
+
+    const styleArray = ['Women', 'Men', 'Unisex']
+
+    const {data: dbTags=[]} = useTag();
+
+    useEffect(() => {
+        setTags(dbTags.map(tag => ({
+            name: tag.name,
+            hex: tag.hex,
+            key: tag._id,
+            checked: false
+        })));
+        const colorCheckMap = Object.keys(colorMap)
+            .map(color => ({
+                    color,
+                    hex: colorMap[color],
+                    checked: false
+                })
+        );
+        setColors(colorCheckMap)
+
+        setCategs(itemArray.map(item => ({
+            categ: item,
+            checked: false
+        })));
+
+        setStyle(styleArray.map(style => ({
+            style,
+            checked: false
+        })))
+    }, [dbTags]);
+
+    const filterObj = useMemo(() => ({
+        colors: colors.filter(color => color.checked).map(color => color.color),
+        categories: categs.filter(categ => categ.checked).map(categ => categ.categ),
+        tags: tags.filter(tag => tag.checked).map(tag => tag.name),
+        styles: style.filter(style => style.checked).map(style => style.style)
+    }), [colors, categs, tags, style]);
+
+    const onApply = () => {
+        setFilters(filterObj);
+    }
+
+    useEffect(() => {
+        setQuery('');
+        setFilters({});
+        setInput('');
+    }, [tab])
 
     // canvas functionality 
     const hexCodes = ['#A36361', '#C96349', '#F7A87B', '#E9CE83', 
@@ -873,7 +896,11 @@ const Create = () => {
                             <p onClick={() => handleSwitchTab('database')} style={{color: tab === 'database' ? 'black' : 'grey'}}>DATABASE</p>
                         </div>
                         <div className="search-filter">
-                            <SearchBar/>
+                            <SearchBar 
+                                onSearch={onSearch}
+                                input={input}
+                                setInput={setInput}
+                            />
                             <div className="filter" onClick={e => setShowFilter(!showFilter)}>
                                 <p>Filter</p>
                                 <FilterIcon/>
@@ -902,7 +929,7 @@ const Create = () => {
                                 )
                             ) : (
                                 <div className="empty-closet">
-                                    <p>You have no items in your closet, navigate to 'closet' to start adding items</p>
+                                    <p>No items found :/ ...</p>
                                 </div>
                             )}
                             {hasNextPage && 
@@ -914,10 +941,14 @@ const Create = () => {
                                 setShowFilter={setShowFilter}
                                 tags={tags}
                                 setTags={setTags}
+                                showTags={tab === 'database' ? false : true}
                                 colors={colors}
                                 setColors={setColors}
                                 categs={categs}
                                 setCategs={setCategs}
+                                style={style}
+                                setStyle={setStyle}
+                                onApply={onApply}
                         />
                     </div>
 

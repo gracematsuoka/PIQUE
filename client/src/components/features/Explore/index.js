@@ -17,9 +17,19 @@ import { usePost } from "../../hooks/usePost";
 import { useBoard } from "../../hooks/useBoard";
 import { useToggleLike } from "../../hooks/useToggleLike";
 import { useQueryClient } from "@tanstack/react-query";
+import { useSearchParams } from 'react-router-dom';
 
 const Explore = () => {
+    const { mutate } = useToggleLike();
+    const [selectedPost, setSelectedPost] = useState(null);
+    const sentinelRef = useRef(null);
+    const [showAddBoard, setShowAddBoard] = useState(false);
+    const [activePostId, setActivePostId] = useState(null);
+    const queryClient = useQueryClient();
+    const [searchInput, setSearchInput] = useSearchParams();
+    const searchTerm = searchInput.get('q') || '';
     const { data: boards = [] } = useBoard();
+    const [input, setInput] = useState(searchTerm);
 
     const {
         data,
@@ -29,15 +39,17 @@ const Explore = () => {
         isLoading,
         isError,
         error
-    } = usePost();
+    } = usePost({query: searchTerm});
 
-    const { mutate } = useToggleLike();
     const posts = data?.pages.flatMap(page => page.postData) || [];
-    const [selectedPost, setSelectedPost] = useState(null);
-    const sentinelRef = useRef(null);
-    const [showAddBoard, setShowAddBoard] = useState(false);
-    const [activePostId, setActivePostId] = useState(null);
-    const queryClient = useQueryClient();
+
+    useEffect(() => {
+        setInput(searchInput.get('q') || '')
+    }, [searchInput])
+
+    const onSearch = (input) => {
+        setSearchInput({q: input});
+    }
 
     useEffect(() => {
         if (!hasNextPage) return;
@@ -80,7 +92,7 @@ const Explore = () => {
     }
 
     return (
-        <div className="posts-wrap">
+        <div className="explore">
             {showAddBoard &&
                 <AddBoard
                     mode='add'
@@ -102,51 +114,73 @@ const Explore = () => {
             />}
             <div className="nav-content-wrapper">
                 <div className="search-bar-wrapper">
-                    <SearchBar/>
+                    <SearchBar 
+                        onSearch={onSearch}
+                        input={input}
+                        setInput={setInput}
+                    />
                 </div>
                 <div className="posts">
-                    {posts.map(post =>
-                        <div className="post" key={post._id}>
-                            <img src={post.postURL} onClick={() => {
-                                setSelectedPost(post);
-                            }}/>
-                            <div className={`post-save-bar ${activePostId === post._id ? 'active' : ''}`}>
-                                <div className="like-btn" 
-                                    onClick={() => mutate({postId: post._id, liked: post.likedByUser})}>
-                                    {!post.likedByUser && <FavoriteBorderIcon/>}
-                                    {post.likedByUser && <FavoriteIcon style={{fill: '#c23b0e'}}/>}
-                                    <p>{post.likes}</p>
+                    {(isLoading || isFetchingNextPage ) ? (
+                        <Bouncy
+                            size="45"
+                            speed="1.75"
+                            color="#6B799F"
+                        /> 
+                    ) : (
+                    posts.length > 0 ? (
+                        posts.map(post =>
+                            <div className="post" key={post._id}>
+                                <img src={post.postURL} onClick={() => {
+                                    setSelectedPost(post);
+                                }}/>
+                                <div className={`post-save-bar ${activePostId === post._id ? 'active' : ''}`}>
+                                    <div className="like-btn" 
+                                        onClick={() => 
+                                            mutate({
+                                                postId: post._id, 
+                                                liked: post.likedByUser,
+                                                queryKeys: [['posts', searchTerm], ['savedPosts', {liked: true}]]
+                                            })}>
+                                        {!post.likedByUser && <FavoriteBorderIcon/>}
+                                        {post.likedByUser && <FavoriteIcon style={{fill: '#c23b0e'}}/>}
+                                        <p>{post.likes}</p>
+                                    </div>
+                                    <div className="save-btn" 
+                                        onClick={() =>  {
+                                            handleOpen(post._id);
+                                        }}>
+                                        {activePostId === post._id ?
+                                            <RemoveIcon/> :
+                                            <AddIcon/> 
+                                        }
+                                        <p>SAVE</p>
+                                    </div>
                                 </div>
-                                <div className="save-btn" 
-                                    onClick={() =>  {
-                                        handleOpen(post._id);
-                                    }}>
-                                    {activePostId === post._id ?
-                                        <RemoveIcon/> :
-                                        <AddIcon/> 
-                                    }
-                                    <p>SAVE</p>
-                                </div>
+                                {activePostId === post._id && 
+                                    <BoardSave 
+                                        className='board-save'
+                                        postId={activePostId}
+                                        boards={boards}
+                                        savedBoards={posts.find(post => post._id === activePostId)?.savedBoards || []}
+                                        setShowAddBoard={setShowAddBoard}
+                                        queryKeys={[['posts', searchTerm]]}
+                                    />
+                                }
                             </div>
-                            {activePostId === post._id && 
-                                <BoardSave 
-                                    className='board-save'
-                                    postId={activePostId}
-                                    boards={boards}
-                                    savedBoards={posts.find(post => post._id === activePostId)?.savedBoards || []}
-                                    setShowAddBoard={setShowAddBoard}
-                                />
-                            }
+                            )
+                        ) : (
+                        <div className='empty'>
+                            <p>No search results match '{searchTerm}'...</p>
+                            <div className='empty-h1'>
+                                <h1>Try a different search input</h1>
+                            </div>
                         </div>
-                    )}
+                        ))
+                    }
                     {hasNextPage && 
                         <div ref={sentinelRef}/>
                     }
-                    {isFetchingNextPage && <Bouncy
-                    size="45"
-                    speed="1.75"
-                    color="#6B799F"
-                    />}
                 </div>
             </div>
         </div>

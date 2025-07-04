@@ -3,6 +3,13 @@
 .add-item {
     .popup-container.overlay {
         overflow: hidden;
+        min-height: 400px;
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    .empty {
+        height: 100px;
     }
 }
 
@@ -141,6 +148,17 @@
         padding-bottom: 10px;
 
         .search-bar {
+            margin-top: 5px;
+
+            hr {
+                border-left: 1px solid rgba(0, 0, 0, 0.3);
+                height: 14px;
+                width: 0px;
+                position: absolute;
+                right: 40px;
+                top: 50%;
+                transform: translateY((-50%));
+            }
 
             input {
                 font-size: 12px;

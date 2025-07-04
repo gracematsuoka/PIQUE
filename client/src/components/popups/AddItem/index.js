@@ -3,7 +3,7 @@ import {ReactComponent as BackIcon} from '../../../assets/images/icons/back.svg'
 import {ReactComponent as ShirtIcon} from '../../../assets/images/icons/shirt.svg';
 import {ReactComponent as UploadIcon} from '../../../assets/images/icons/upload.svg';
 import SearchBar from '../../reusable/SearchBar';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useDropzone } from 'react-dropzone';
 import {ReactComponent as FilterIcon} from '../../../assets/images/icons/filter.svg';
 import { useItems } from '../../hooks/useItems';
@@ -11,6 +11,7 @@ import { useCreateCopy } from '../../hooks/useMutateItems';
 import Filter from '../Filter';
 import {ReactComponent as Check} from '../../../assets/images/icons/check.svg';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import { Bouncy } from 'ldrs/react';
 
 const AddItem = ({onClose, 
                     setShowAddPopup, 
@@ -27,8 +28,27 @@ const AddItem = ({onClose,
     const [showFilter, setShowFilter] = useState(false);
     const [categs, setCategs] = useState([]);
     const [colors, setColors] = useState([]);
+    const maxSize = 10 * 1024 * 1024;
     const [selectedItems, setSelectedItems] = useState([]);
+    const [style, setStyle] = useState([]);
     const createCopy = useCreateCopy();
+    const [query, setQuery] = useState('');
+    const [filters, setFilters] = useState([]);
+    const [input, setInput] = useState();
+
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading: itemsLoading,
+        isError,
+        error: itemsError
+    } = useItems({tab: 'database', query, filters})
+
+    const onSearch = (input) => {
+        setQuery(input);
+    }
 
     // filter
     const colorMap = {
@@ -52,6 +72,8 @@ const AddItem = ({onClose,
         const itemArray = ['Tops', 'Bottoms', 'Dresses/Rompers', 'Outerwear', 'Shoes', 'Swimwear', 'Loungewear',
             'Sets', 'Undergarments', 'Jewelry', 'Bags', 'Accessories', 'Other'
         ]
+
+        const styleArray = ['Women', 'Men', 'Unisex']
     
         useEffect(() => {
             const colorCheckMap = Object.keys(colorMap)
@@ -67,16 +89,13 @@ const AddItem = ({onClose,
                 categ: item,
                 checked: false
             })))
+
+            setStyle(styleArray.map(style => ({
+                style,
+                checked: false
+            })))
         }, []) 
 
-    const maxSize = 10 * 1024 * 1024;
-    const {
-            data,
-            fetchNextPage,
-            hasNextPage,
-            isFetchingNextPage,
-            isLoading: itemsLoading
-        } = useItems('database');
     const items = data?.pages.flatMap(page => page.items) || [];
 
     const sentinelRef = useRef(null);
@@ -103,9 +122,20 @@ const AddItem = ({onClose,
         return () => observer.disconnect();
     }, [hasNextPage]);
 
+    const filterObj = useMemo(() => ({
+        colors: colors.filter(color => color.checked).map(color => color.color),
+        categories: categs.filter(categ => categ.checked).map(categ => categ.categ),
+        styles: style.filter(style => style.checked).map(style => style.style)
+    }), [colors, categs, style]);
+
+    const onApply = () => {
+        setFilters(filterObj);
+    }
+
     useEffect(() => {
         if(isLoading && filled < 100) {
-            setTimeout(() => setFilled(prev => prev += 2), 50)
+            const timeout = setTimeout(() => setFilled(prev => prev += 2), 50);
+            return () => clearTimeout(timeout);
         }
     }, [filled, isLoading])
 
@@ -232,43 +262,64 @@ const AddItem = ({onClose,
                         {addTab === 'database' && 
                         <div className='database'>
                             <div className='search-filter'>
-                                <SearchBar/>
+                                <SearchBar 
+                                    onSearch={onSearch}
+                                    input={input}
+                                    setInput={setInput}
+                                />
                                 <div className="filter" onClick={e => setShowFilter(!showFilter)}>
                                     <p>Filter</p>
                                     <FilterIcon/>
                                 </div>
                             </div>
                             <div className='items'>
-                                {items.map(item => 
-                                    <div className='item-wrapper' 
-                                        key={item._id}
-                                        onClick={() => handleSelected(item._id)}
-                                        style={{backgroundColor: selectedItems.includes(item._id) ? '#f2f2f2' : ''}}
-                                    >
-                                        <img loading='lazy' 
-                                            src={item.imageURL}
-                                            alt={item.name}
-                                        />
-                                        {selectedItems.includes(item._id) &&
-                                            <div className='circle-check'>
-                                                <Check/>
-                                            </div> 
-                                        }
-                                    </div>
-                                )}
+                                {(itemsLoading || isFetchingNextPage) ? (
+                                    <Bouncy
+                                        size="45"
+                                        speed="1.75"
+                                        color="#6B799F"
+                                    />
+                                ) : items.length > 0 ? ( 
+                                    items.map(item => 
+                                        <div className='item-wrapper' 
+                                            key={item._id}
+                                            onClick={() => handleSelected(item._id)}
+                                            style={{backgroundColor: selectedItems.includes(item._id) ? '#f2f2f2' : ''}}>
+                                            <img loading='lazy' 
+                                                src={item.imageURL}
+                                                alt={item.name}
+                                            />
+                                            {selectedItems.includes(item._id) &&
+                                                <div className='circle-check'>
+                                                    <Check/>
+                                                </div> 
+                                            }
+                                        </div>
+                                    )) : (
+                                        <div className='empty'>
+                                            <p>No items found ...</p>
+                                            <div className='empty-h1'>
+                                                <p style={{fontSize: '20px'}}><b>Click <i>upload</i> to add items</b></p>
+                                            </div>
+                                        </div>
+                                    )
+                            }
+                                
                                 {hasNextPage && 
                                     <div ref={sentinelRef}/>
                                 }
                             </div>
                             {(selectedItems.length > 0) && 
+                            <>
                                 <div className='num-selected'>
                                     <p>{selectedItems.length} selected</p>
                                 </div>
+                                <div className='continue' onClick={handleAdd}>
+                                    <p>Add to {tab}</p>
+                                    <NavigateNextIcon/>
+                                </div>
+                            </>
                             }
-                            <div className='continue' onClick={handleAdd}>
-                                <p>Add to {tab}</p>
-                                <NavigateNextIcon/>
-                            </div>
                             <Filter className={`popup-container filter ${showFilter ? 'open' : ''}`} 
                                     setShowFilter={setShowFilter}
                                     colors={colors}
@@ -276,6 +327,9 @@ const AddItem = ({onClose,
                                     categs={categs}
                                     setCategs={setCategs}
                                     showTags={false}
+                                    style={style}
+                                    setStyle={setStyle}
+                                    onApply={onApply}
                             />
                         </div>
                         }

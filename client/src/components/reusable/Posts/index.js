@@ -77,7 +77,6 @@ const Posts = ({
         }
     }
 
-
     return (
         <div className='posts'>
             {showAddBoard &&

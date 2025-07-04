@@ -20,7 +20,7 @@ const Saved = () => {
                             <hr/>
                         </NavLink>
                     </div>
-                    <SearchBar/>
+                    {/* <SearchBar/> */}
                 </div>
             <Outlet/>
         </div>

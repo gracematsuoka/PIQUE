@@ -13,10 +13,11 @@ export const fetchBoards = async () => {
     return boards;
 }
 
-export const fetchPosts = async ({cursor, boardIds}) => {
+export const fetchPosts = async ({cursor, boardIds, query}) => {
     const token = await auth.currentUser.getIdToken();
+    console.log('query fetch', query)
 
-    const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/posts/get-posts?limit=20&${cursor ? `cursor=${cursor}` : ''}`, {
+    const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/posts/get-posts?${query ? `q=${query}&` : ''}limit=20&${cursor ? `cursor=${cursor}` : ''}`, {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,

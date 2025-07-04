@@ -20,6 +20,9 @@ import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 import BoardSave from '../BoardSave';
 import AddBoard from '../AddBoard';
 import { useQueryClient } from '@tanstack/react-query';
+import { useCreateCopy } from '../../hooks/useMutateItems';
+import { useDeleteItem } from '../../hooks/useMutateItems';
+import CheckIcon from '@mui/icons-material/Check';
 
 const PostDetails = ({
     selectedPost,
@@ -44,6 +47,10 @@ const PostDetails = ({
     const [showSave, setShowSave] = useState(false);
     const [liked, setLiked] = useState(false);
     const [likes, setLikes] = useState(0);
+    const createCopy = useCreateCopy();
+    const deleteItem = useDeleteItem();
+    const [addW, setAddW] = useState([]);
+    const [addC, setAddC] = useState([]);
 
     useEffect(() => {
         setLiked(selectedPost.likedByUser);
@@ -100,7 +107,7 @@ const PostDetails = ({
                 
                 canvas.enableRetinaScaling = true;
                 canvas.getObjects().forEach(obj => obj.selectable = false);
-
+                
                 canvas.renderAll();
                 function tick() {
                     canvas.requestRenderAll();
@@ -161,7 +168,7 @@ const PostDetails = ({
         const mouseDown = e => {
             if (e.target?.itemId) {
                 setSelectedItem(items.find(item => item._id === e.target.itemId));
-                console.log(items.find(item => item._id === e.target.itemId))
+                console.log((items.find(item => item._id === e.target.itemId)))
             }
         }
 
@@ -171,57 +178,34 @@ const PostDetails = ({
             if (e.target?.itemId) {
                 setHoverItemId(e.target.itemId);
                 e.target.hovered = true;
-
-                if (!e.target._originalScaleX) {
-                    e.target._originalScaleX = e.target.scaleX;
-                    e.target._originalScaleY = e.target.scaleY;
-                }
-                console.log("Target scaleX:", e.target.scaleX)
-                e.target.animate('scaleX', e.target._originalScaleX * 1.1, {
-                    duration: 150,
-                    easing: easeOutCubic,
-                    onChange: () => {
-                        e.target.setCoords();
-                        canvas.requestRenderAll();
-                        console.log('scaled')
-                    }
-                });
-                e.target.animate('scaleY', e.target._originalScaleY * 1.1, {
-                    duration: 150,
-                    easing: easeOutCubic,
-                    onChange: () => {
-                        e.target.setCoords();
-                        canvas.requestRenderAll();
-                    }
-                });
             }
         }
 
-        const mouseOut = e => {
-            setHoverItemId(null);
-            const target = e.target;
-            if (!target || !target.hovered) return;
+        // const mouseOut = e => {
+        //     setHoverItemId(null);
+        //     const target = e.target;
+        //     if (!target || !target.hovered) return;
 
-            target.hovered = false;
-            target.animate('scaleX', target._originalScaleX, {
-                duration: 150,
-                onChange: canvas.renderAll.bind(canvas),
-                easing: easeOutCubic
-            });
-            target.animate('scaleY', target._originalScaleY, {
-                duration: 150,
-                onChange: canvas.renderAll.bind(canvas),
-                easing: easeOutCubic
-            });
-        };
+        //     target.hovered = false;
+        //     target.animate('scaleX', target._originalScaleX, {
+        //         duration: 150,
+        //         onChange: canvas.renderAll.bind(canvas),
+        //         easing: easeOutCubic
+        //     });
+        //     target.animate('scaleY', target._originalScaleY, {
+        //         duration: 150,
+        //         onChange: canvas.renderAll.bind(canvas),
+        //         easing: easeOutCubic
+        //     });
+        // };
 
         canvas.on('mouse:over', hover);
-        canvas.on('mouse:out', mouseOut);
+        // canvas.on('mouse:out', mouseOut);
         canvas.on('mouse:down', mouseDown);
 
         return () => {
             canvas.off('mouse:down', mouseDown);
-            canvas.off('mouse:out', mouseOut);
+            // canvas.off('mouse:out', mouseOut);
             canvas.off('mouse:down', mouseDown);
         }
     }, [items])
@@ -236,6 +220,32 @@ const PostDetails = ({
             document.head.appendChild(link);
         }
     }
+
+    const handleAdd = (tab, itemId) => {
+        let add;
+        if (tab === 'wishlist') {
+            if (addW.includes(itemId)) {
+                add = false;
+                setAddW(prev => prev.filter(id => id !== itemId))
+            } else {
+                add = true;
+                setAddW(prev => [...prev, itemId])
+            }
+        } else {
+            if (addC.includes(itemId)) {
+                add = false;
+                setAddC(prev => prev.filter(id => id !== itemId))
+            } else {
+                add = true;
+                setAddC(prev => [...prev, itemId])
+            }
+        }
+        add ? createCopy.mutate({itemRefs: [itemId], tab}) : deleteItem.mutate({itemId, tab});
+    }
+
+    useEffect(() => {
+        console.log('addW', addW)
+    }, [addW])
 
     return (
         <div className='post-details'>
@@ -309,15 +319,19 @@ const PostDetails = ({
                                                     <KeyboardArrowRightIcon/>
                                                 </div>
                                             </div>
-                                            <div className='quick-add'>
+                                            <div className='quick-add mini'>
                                                 <Tooltip title='Add to wishlist'>
-                                                <div className='toolbar-icon'>
+                                                <div className={`toolbar-icon ${addW.includes(item._id) ? 'active' : ''}`}
+                                                    onClick={() => handleAdd('wishlist', item._id)}>
                                                     <ShoppingBagIcon/>
+                                                    {addW.includes(item._id) && <CheckIcon/>}
                                                 </div>
                                                 </Tooltip>
                                                 <Tooltip title='Add to closet'>
-                                                <div className='toolbar-icon'>
+                                                <div className={`toolbar-icon ${addC.includes(item._id) ? 'active' : ''}`}
+                                                    onClick={() => handleAdd('closet', item._id)}>
                                                     <img src={BlackShirt}/>
+                                                    {addC.includes(item._id) && <CheckIcon/>}
                                                 </div>
                                                 </Tooltip>
                                                 {/* <Tooltip title='Add to rack'>
@@ -328,64 +342,66 @@ const PostDetails = ({
                                             </div>
                                             <hr/>
                                         </div>
-                                        )}
-                                        <div className={`post-item-det ${selectedItem ? 'show' : ''}`}>
-                                            <div className='item-arrow' onClick={() => setSelectedItem(null)}>
-                                                <KeyboardArrowLeftIcon/>
-                                            </div>
-                                            <div className='item-header'>
-                                                <h1>{selectedItem?.name}</h1>
-                                                <div className='circle' style={{backgroundColor: selectedItem?.colors[0].hex}}/>
-                                                <p id='brand' style={{color: selectedItem?.brand ? 'black' : '#BBBBBB'}}>
-                                                    {selectedItem?.brand || '---'}
-                                                </p>
-                                                <div className='item-link'>
-                                                    <a href={selectedItem?.link.startsWith('http') ? selectedItem?.link : `https://${selectedItem?.link}`}
-                                                        id='link'
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        onClick={(e) => {
-                                                            if (!selectedItem?.link) e.preventDefault(); 
-                                                        }}
-                                                        style={{color: selectedItem?.link ? 'white' : '#BBBBBB'}}
-                                                        >
-                                                        {selectedItem?.link.replace('https://', '').replace('www.', '') || '---'}
-                                                    </a>
-                                                    <ArrowOutwardIcon/>
-                                                </div>
-                                            </div>
-                                            <hr/>
-                                            <div className='item-mid'>
-                                                <div className='item-field-disp'>
-                                                    <label htmlFor='price'>PRICE</label>
-                                                    <p id='price' style={{color: selectedItem?.price ? 'black' : '#BBBBBB'}}>
-                                                        ${selectedItem?.price || ' ---'}
-                                                    </p>
-                                                </div>
-                                                <div className='item-field-disp'>
-                                                    <label htmlFor='category'>CATEGORY</label>
-                                                    <p id='category' style={{color: selectedItem?.category ? 'black' : '#BBBBBB'}}>
-                                                        {selectedItem?.category || '---'}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <hr/>
-                                            <div className='quick-add'>
-                                                <div className='toolbar-icon'>
-                                                    <ShoppingBagIcon/>
-                                                    <p>Add to wishlist</p>
-                                                </div>
-                                                <div className='toolbar-icon'>
-                                                    <img src={BlackShirt}/>
-                                                    <p>Add to closet</p>
-                                                </div>
-                                                {/* <div className='toolbar-icon'>
-                                                    <AddIcon/>
-                                                    <p>Add to rack</p>
-                                                </div> */}
+                                    )}
+                                    <div className={`post-item-det ${selectedItem ? 'show' : ''}`}>
+                                        <div className='item-arrow' onClick={() => setSelectedItem(null)}>
+                                            <KeyboardArrowLeftIcon/>
+                                        </div>
+                                        <div className='item-header'>
+                                            <h1>{selectedItem?.name}</h1>
+                                            {/* <div className='circle' style={{backgroundColor: selectedItem?.colors[0].hex}}/> */}
+                                            <p id='brand' style={{color: selectedItem?.brand ? 'black' : '#BBBBBB'}}>
+                                                {selectedItem?.brand || '---'}
+                                            </p>
+                                            <div className='item-link'>
+                                                <a href={selectedItem?.link.startsWith('http') ? selectedItem?.link : `https://${selectedItem?.link}`}
+                                                    id='link'
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    onClick={(e) => {
+                                                        if (!selectedItem?.link) e.preventDefault(); 
+                                                    }}
+                                                    style={{color: selectedItem?.link ? 'white' : '#BBBBBB'}}
+                                                    >
+                                                    {selectedItem?.link.replace('https://', '').replace('www.', '') || '---'}
+                                                </a>
+                                                <ArrowOutwardIcon/>
                                             </div>
                                         </div>
+                                        <hr/>
+                                        <div className='item-mid'>
+                                            <div className='item-field-disp'>
+                                                <label htmlFor='price'>PRICE</label>
+                                                <p id='price' style={{color: selectedItem?.price ? 'black' : '#BBBBBB'}}>
+                                                    ${selectedItem?.price || ' ---'}
+                                                </p>
+                                            </div>
+                                            <div className='item-field-disp'>
+                                                <label htmlFor='category'>CATEGORY</label>
+                                                <p id='category' style={{color: selectedItem?.category ? 'black' : '#BBBBBB'}}>
+                                                    {selectedItem?.category || '---'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <hr/>
+                                        <div className='quick-add'>
+                                            <div className={`toolbar-icon ${addW.includes(selectedItem?._id) ? 'active' : ''}`}
+                                                onClick={() => handleAdd('wishlist', selectedItem?._id)}>
+                                                <ShoppingBagIcon/>
+                                                <p>Add{addW.includes(selectedItem?._id) ? 'ed' : ''} to wishlist {addW.includes(selectedItem?._id) ? '✓' : ''}</p>
+                                            </div>
+                                            <div className={`toolbar-icon ${addC.includes(selectedItem?._id) ? 'active' : ''}`}
+                                                onClick={() => handleAdd('closet', selectedItem?._id)}>
+                                                <img src={BlackShirt}/>
+                                                <p>Add{addC.includes(selectedItem?._id) ? 'ed' : ''} to closet {addC.includes(selectedItem?._id) ? '✓' : ''}</p>
+                                            </div>
+                                            {/* <div className='toolbar-icon'>
+                                                <AddIcon/>
+                                                <p>Add to rack</p>
+                                            </div> */}
+                                        </div>
                                     </div>
+                                </div>
                             </div>
                         </div>
                     </div>

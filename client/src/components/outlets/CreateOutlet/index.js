@@ -13,9 +13,9 @@ const CreateOutlet = () => {
                                 }>
                             CREATE
                         </NavLink>
-                        <NavLink to='/create/drafts' className={({ isActive }) => `nav ${isActive ? 'active' : ''}`}>
+                        {/* <NavLink to='/create/drafts' className={({ isActive }) => `nav ${isActive ? 'active' : ''}`}>
                             DRAFTS
-                        </NavLink>
+                        </NavLink> */}
                     </div>
                     <Outlet/>
                 </div>

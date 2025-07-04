@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import './index.scss';
 import {ReactComponent as More} from '../../../assets/images/icons/more.svg';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -8,8 +8,16 @@ import { Bouncy } from 'ldrs/react';
 import {ReactComponent as CloseIcon} from '../../../assets/images/icons/close.svg';
 import { useItems } from '../../hooks/useItems';
 import { useDeleteItem } from '../../hooks/useMutateItems';
+import SearchBar from '../../reusable/SearchBar';
+import {ReactComponent as FilterIcon} from '../../../assets/images/icons/filter.svg';
+import { useTag } from '../../hooks/useTag';
+import Filter from '../../popups/Filter';
 
-const Items = ({onSelectItem, tab, handleError}) => {
+const Items = ({onSelectItem, tab, handleError, colorMap, itemArray}) => {
+    const [query, setQuery] = useState('');
+    const [filters, setFilters] = useState([]);
+    const [input, setInput] = useState();
+
     const {
         data,
         fetchNextPage,
@@ -18,13 +26,59 @@ const Items = ({onSelectItem, tab, handleError}) => {
         isLoading,
         isError,
         error
-    } = useItems(tab)
+    } = useItems({tab, query, filters})
+
+    const onSearch = (input) => {
+        setQuery(input);
+    }
+
+    useEffect(() => {
+        setQuery('');
+        setFilters({});
+        setInput('');
+    }, [tab])
 
     const deleteItem = useDeleteItem();
     const items = data?.pages.flatMap(page => page.items) || [];
     const [selectedId, setSelectedId] = useState(null);
     const [deleteId, setDeleteId] = useState(null);
     const sentinelRef = useRef(null);
+    const [showFilter, setShowFilter] = useState(false);
+    const [tags, setTags] = useState([]);
+    const [categs, setCategs] = useState([]);
+    const [colors, setColors] = useState([]);
+    const [style, setStyle] = useState([]);
+
+    const styleArray = ['Women', 'Men', 'Unisex']
+
+    const {data: dbTags=[]} = useTag();
+
+    useEffect(() => {
+        setTags(dbTags.map(tag => ({
+            name: tag.name,
+            hex: tag.hex,
+            key: tag._id,
+            checked: false
+        })));
+        const colorCheckMap = Object.keys(colorMap)
+            .map(color => ({
+                    color,
+                    hex: colorMap[color],
+                    checked: false
+                })
+        );
+        setColors(colorCheckMap)
+
+        setCategs(itemArray.map(item => ({
+            categ: item,
+            checked: false
+        })));
+
+        setStyle(styleArray.map(style => ({
+            style,
+            checked: false
+        })))
+    }, [dbTags]) 
 
     useEffect(() => {
         if (!hasNextPage) return;
@@ -48,7 +102,43 @@ const Items = ({onSelectItem, tab, handleError}) => {
         return () => observer.disconnect();
     }, [hasNextPage]);
 
+    const filterObj = useMemo(() => ({
+        colors: colors.filter(color => color.checked).map(color => color.color),
+        categories: categs.filter(categ => categ.checked).map(categ => categ.categ),
+        tags: tags.filter(tag => tag.checked).map(tag => tag.name),
+        styles: style.filter(style => style.checked).map(style => style.style)
+    }), [colors, categs, tags, style]);
+
+    const onApply = () => {
+        setFilters(filterObj);
+    }
+
     return (
+        <div className='items-wrap'>
+        <Filter className={`popup-container filter ${showFilter ? 'open' : ''}`} 
+                setShowFilter={setShowFilter}
+                tags={tags}
+                setTags={setTags}
+                colors={colors}
+                setColors={setColors}
+                categs={categs}
+                setCategs={setCategs}
+                showTags={true}
+                style={style}
+                setStyle={setStyle}
+                onApply={onApply}
+        />
+        <div className="search-filter">
+            <SearchBar
+                onSearch={onSearch}
+                input={input}
+                setInput={setInput}
+            />
+            <div className="filter" onClick={e => setShowFilter(!showFilter)}>
+                <p>Filter</p>
+                <FilterIcon/>
+            </div>
+        </div>
         <div className='items'>
             {(isLoading || isFetchingNextPage) ? (
                 <Bouncy
@@ -113,13 +203,13 @@ const Items = ({onSelectItem, tab, handleError}) => {
                 )
             ) : (
                 <div className='empty'>
-                    <p>You have no items in your {tab} yet...</p>
+                    <p>No items found...</p>
                     <div className='empty-h1'>
                         <h1>Click </h1>
                         <div className='add-icon'>
                             <img src={addClothes}/>
                         </div>
-                        <h1> to get started</h1>
+                        <h1> to add items</h1>
                     </div>
                     <h1>↪</h1>
                 </div>
@@ -127,6 +217,7 @@ const Items = ({onSelectItem, tab, handleError}) => {
             {hasNextPage && 
                 <div ref={sentinelRef}/>
             }
+        </div>
         </div>
     )
 }

@@ -3,7 +3,8 @@ const router = express.Router();
 const UserItem = require("../models/UserItem");
 const Item = require('../models/Item');
 const authenticateUser = require("../middleware/authenticateUser");
-const { auth } = require("firebase-admin");
+
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 router.post('/create-item', authenticateUser, async (req, res) => {
     const { mongoId } = req.user;
@@ -47,11 +48,12 @@ router.post('/create-item', authenticateUser, async (req, res) => {
 router.post('/create-user-copy', authenticateUser, async (req, res) => {
     const {mongoId} = req.user;
     const {itemRefs, tab} = req.body;
-
+    console.log('itemref', itemRefs)
     const duplicates = new Set((await UserItem
         .find({itemRef: {$in: itemRefs}, ownerId: mongoId}))
         .map(dup => dup.itemRef.toString()));
     const uniqueRefs = itemRefs.filter(ref => !duplicates.has(ref.toString()));
+    if (!uniqueRefs.length) return res.status(404).json({message: 'Items not found or are already saved'});
     
     const globalItems = await Item.find({_id: {$in: uniqueRefs}});
 
@@ -85,13 +87,22 @@ router.post('/create-user-copy', authenticateUser, async (req, res) => {
 
 router.get('/get-items', authenticateUser, async (req, res) => {
     const { mongoId } = req.user;
-    const { tab, cursor } = req.query;
+    const { tab, cursor, q, color, category, tag, style } = req.query;
     const limit = Math.min(parseInt(req.query.limit) || 20, 40);
 
     let docs;
+    let filter = {};
+    if (q) filter.name = {$regex: q, $options: 'i'};
+    if (color) filter.colors = {$in: Array.isArray(color) ? color : [color]};
+    if (category) filter.category = {$in: Array.isArray(category) ? category : [category]};
+    if (tag) filter.tags = {$elemMatch: {name: {$in: Array.isArray(tag) ? tag : [tag]}}};
+    if (style) filter.style = {$in: Array.isArray(style) ? style : [style]};
+    if (cursor) filter._id.$lt = cursor;
+
     if (tab === 'closet' || tab === 'wishlist') {
-        const filter = {ownerId: mongoId, tab};
-        if (cursor) filter._id.$lt = cursor;
+        filter.ownerId = mongoId;
+        filter.tab = tab;
+        console.log('filter', filter)
 
         docs = await UserItem
             .find(filter)
@@ -100,8 +111,7 @@ router.get('/get-items', authenticateUser, async (req, res) => {
             .populate('itemRef', 'imageURL')
             .select('itemRef name'); // eventually add color here for closet name
     } else if (tab === 'database') {
-        const filter = {public: true};
-        if (cursor) filter._id.$lt = cursor;
+        filter.public = true;
 
         docs = await Item
             .find(filter)
@@ -114,6 +124,7 @@ router.get('/get-items', authenticateUser, async (req, res) => {
     const items = hasMore ? docs.slice(0, limit) : docs;
 
     const nextCursor = hasMore ? items[limit - 1]._id : null;
+    console.log('items', items)
     
     res.status(200).json({items, nextCursor, hasMore});
 })

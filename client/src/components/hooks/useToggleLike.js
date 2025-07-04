@@ -25,8 +25,6 @@ export const useToggleLike = () => {
                     }
                 )
             )
-            console.log('qdsac', queryKeys)
-            console.log('likedqc', queryClient.getQueryData(['posts']))
         }
     })
 }

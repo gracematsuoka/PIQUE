@@ -1,15 +1,11 @@
 import "./index.scss"
 import { useAuth } from "../../../contexts/AuthContext"
 import addClothes from "../../../assets/images/icons/addclothes.png"
-import SearchBar from "../../reusable/SearchBar"
 import AddItem from "../../popups/AddItem"
 import ItemDetails from "../../popups/ItemDetails"
-import Filter from "../../popups/Filter"
 import Items from "../Items"
 import { useState, useEffect } from "react"
-import {ReactComponent as FilterIcon} from '../../../assets/images/icons/filter.svg'
 import Tooltip from "@mui/material/Tooltip";
-import { useTag } from "../../hooks/useTag"
 import ErrorIcon from '@mui/icons-material/Error';
 import { NavLink, useLocation } from "react-router-dom"
 
@@ -17,10 +13,6 @@ const Closet = () => {
     const {mongoUser} = useAuth();
     const [showAddPopup, setShowAddPopup] = useState(false);
     const [tab, setTab] = useState('closet');
-    const [tags, setTags] = useState([]);
-    const [categs, setCategs] = useState([]);
-    const [showFilter, setShowFilter] = useState(false);
-    const [colors, setColors] = useState([]);
     const [showItemDetails, setShowItemDetails] = useState(false);
     const [processedUrl, setProcessedUrl] = useState('');
     const [selectedItemId, setSelectedItemId] = useState(null);
@@ -28,10 +20,6 @@ const Closet = () => {
     const [error, setError] = useState('');
     const [filled, setFilled] = useState(0);
     const location = useLocation();
-
-    useEffect(() => {
-        location.pathname === '/closet' ? setTab('closet') : setTab('wishlist');
-    }, [location])
 
     const colorMap = {
         'Red': '#F35050',
@@ -55,29 +43,10 @@ const Closet = () => {
         'Sets', 'Undergarments', 'Jewelry', 'Bags', 'Accessories', 'Other'
     ]
 
-    const {data: dbTags=[]} = useTag();
-
     useEffect(() => {
-        setTags(dbTags.map(tag => ({
-            name: tag.name,
-            hex: tag.hex,
-            key: tag._id,
-            checked: false
-        })));
-        const colorCheckMap = Object.keys(colorMap)
-            .map(color => ({
-                    color,
-                    hex: colorMap[color],
-                    checked: false
-                })
-        );
-        setColors(colorCheckMap)
+        location.pathname === '/closet' ? setTab('closet') : setTab('wishlist');
+    }, [location])
 
-        setCategs(itemArray.map(item => ({
-            categ: item,
-            checked: false
-        })))
-    }, [dbTags]) 
 
     useEffect(() => {
         if(loading && filled < 100) {
@@ -89,9 +58,10 @@ const Closet = () => {
     const handleError = (err) => {
         setError(err);
 
-        setTimeout(() => {
+        const timeout = setTimeout(() => {
             setError(null);
         }, 30000);
+        return () => clearTimeout(timeout);
     }
 
     const toggleAddPopup = () => {
@@ -123,13 +93,6 @@ const Closet = () => {
                         MY WISHLIST
                     </NavLink>
                 </div>
-                <div className="search-filter">
-                    <SearchBar/>
-                    <div className="filter" onClick={e => setShowFilter(!showFilter)}>
-                        <p>Filter</p>
-                        <FilterIcon/>
-                    </div>
-                </div>
                 <Tooltip title='New item'>
                 <div className="add" onClick={toggleAddPopup}>
                     <img src={addClothes}/>
@@ -143,6 +106,8 @@ const Closet = () => {
                             setShowItemDetails(true);
                         }}
                         handleError={handleError}
+                        itemArray={itemArray}
+                        colorMap={colorMap}
                         />
                 </div>
                 {loading && 
@@ -159,16 +124,6 @@ const Closet = () => {
                         <p>Error: {error.message}</p>
                     </div>
                 }
-                <Filter className={`popup-container filter ${showFilter ? 'open' : ''}`} 
-                        setShowFilter={setShowFilter}
-                        tags={tags}
-                        setTags={setTags}
-                        colors={colors}
-                        setColors={setColors}
-                        categs={categs}
-                        setCategs={setCategs}
-                        showTags={true}
-                />
                 {showItemDetails && <ItemDetails 
                                         mode='create' 
                                         setShowItemDetails={setShowItemDetails}

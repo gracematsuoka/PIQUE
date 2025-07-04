@@ -16,7 +16,8 @@ const PostPrev = ({canvasJSON,
 
     useEffect(() => {
             if(loading && filled < 100) {
-                setTimeout(() => setFilled(prev => prev += 5), 50)
+                const timeout = setTimeout(() => setFilled(prev => prev += 5), 50);
+                return () => clearTimeout(timeout);
             }
         }, [filled, loading])
 
@@ -95,7 +96,7 @@ const PostPrev = ({canvasJSON,
                     <div className="popup-container overlay">
                         <div className='popup-content'>
                             <div className='prev-title'>
-                                <p>Look'n good 💅</p>
+                                <p>Looking good 💅</p>
                                 <h1>Get ready to post...</h1>
                             </div>
                             <div className='prev-content'>
@@ -107,6 +108,7 @@ const PostPrev = ({canvasJSON,
                                         {error && <div className='error'>{error}</div>}
                                         <input type='text' placeholder='Title' value={title} onChange={e => setTitle(e.target.value)}/>
                                         <textarea className='description' rows='8' placeholder='Description' value={description} onChange={e => setDescription(e.target.value)}/>
+                                        <p style={{fontSize: '9px', textAlign: 'center'}}>* Note: any uploaded items will become part of the public database once posted</p>
                                     </div>
                                     <div className='prev-btns'>
                                         <button className='sub-btn bold' onClick={handlePost}>Post</button>

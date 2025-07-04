@@ -12,6 +12,26 @@
 
         .search-bar {
             width: 70%;
+
+            hr {
+                border-left: 1px solid rgba(0, 0, 0, 0.3);
+                height: 14px;
+                width: 0px;
+                position: absolute;
+                right: 25px;
+                top: 50%;
+                transform: translateY((-50%));
+            }
+
+            .search-close svg {
+                opacity: 0.4;
+                width: 12px;
+                position: absolute;
+                right: 30px;
+                top: 50%;
+                transform: translateY((-50%));
+                cursor: pointer;
+            }
         }
 
         .filter {
@@ -360,4 +380,5 @@
     text-align: center;
     color: rgba(128, 128, 128, 0.773);
     padding: 50px 10px; 
+    width: 100%;
 }

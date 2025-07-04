@@ -203,6 +203,15 @@
     svg, img {
         width: 16px
     }
+
+    &.mini {
+        gap: 2px;
+        .toolbar-icon {
+            flex-direction: row;
+            gap: 2px;
+            
+        }
+    }
 }
 
 .post-item-det {

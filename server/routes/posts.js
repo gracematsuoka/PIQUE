@@ -57,18 +57,30 @@ router.post('/create-post', authenticateUser, async (req, res) => {
     res.status(200).json({message: 'Post created', post})
 })
 
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 router.post('/get-posts', authenticateUser, async (req, res) => {
     const { mongoId } = req.user;
     const { boardIds } = req.body;
+    const { q, cursor } = req.query;
     const limit = Math.min(parseInt(req.query.limit) || 20, 40);
-    const cursor = req.query.cursor;
+    console.log('q', q)
 
-    const docs = await Post.find(cursor ? {_id: {$lt: cursor}} : {})
+    let filter = {};
+    if (q) {
+        const regex = new RegExp(escapeRegex(q), 'i');
+        filter.$or = [
+            {title: regex},
+            {description: regex}
+        ]
+    }
+    if (cursor) filter._id.$lt = cursor;
+
+    const docs = await Post.find(filter)
                             .sort({_id: -1})
                             .limit(limit + 1)
                             .select('likes _id postURL userId')
                             .lean();
-    
     const hasMore = docs.length > limit;
     const posts = hasMore ? docs.slice(0, limit) : docs;
 
@@ -94,7 +106,9 @@ router.post('/get-posts', authenticateUser, async (req, res) => {
         ...post,
         likedByUser: likedIdsSet.has(post._id.toString()),
         savedBoards: postToBoard[post._id.toString()] || []
-    }))
+    }));
+
+    console.log('data', postData)
 
     const nextCursor = hasMore ? posts[limit - 1]._id : null;
 
@@ -257,7 +271,6 @@ router.get('/:postId', authenticateUser, async (req, res) => {
 
     const post = await Post.findById(postId).populate('userRef', 'username profileURL');
     if (!post) return res.status(404).json({error: 'Post not found'});
-    console.log('back post', post)
     res.status(200).json(post);
 })
 

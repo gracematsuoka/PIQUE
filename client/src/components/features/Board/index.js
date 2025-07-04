@@ -43,9 +43,9 @@ const Board = () => {
                     </div>
                     <p className='board-desc'>{board?.description}</p>
                 </div>
-                <div className="search-bar-wrapper">
+                {/* <div className="search-bar-wrapper">
                     <SearchBar/>
-                </div>
+                </div> */}
                 <Posts
                     mode='board'
                     boardId={boardId}

@@ -18,6 +18,19 @@
     &.open {
         transform: translateX(0)
     }
+
+    .basic-btn-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        padding-top: 10px;
+    }
+
+    .basic-btn {
+        background-color: black;
+        color: white;
+        font-weight: 600;
+    }
 }
 
 .filter-header {
