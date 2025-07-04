@@ -1,5 +1,7 @@
 .profile {
     height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .nav-content {
@@ -23,6 +25,11 @@
     box-sizing: border-box;
 }
 
+.profile .nav-content-wrapper {
+    overflow-y: hidden;
+    flex: 1;
+}
+
 .profile-header {
     display: flex;
     align-items: center;
@@ -43,6 +50,7 @@
 
 .profile hr {
     width: 100%;
+    flex-shrink: 0;
 }
 
 .basic-nav {
@@ -71,4 +79,17 @@
     font-weight: 600;
     padding: 5px 10px;
     font-size: 15px;
+}
+
+.post-drafts {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+
+    .basic-nav p{
+        padding-bottom: 10px;
+        padding-left: 10px;
+        cursor:default;
+    }
 }

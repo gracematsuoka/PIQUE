@@ -51,10 +51,8 @@ router.post('/create-post', authenticateUser, async (req, res) => {
             }
         };
     });
-    console.log('new items', newItems)
 
     await Promise.all(newItems.map(item => item.save()));
-    console.log('saved items', items)
 
     res.status(200).json({message: 'Post created', post})
 })
@@ -137,6 +135,67 @@ router.post('/saved', authenticateUser, async (req, res) => {
 
     const hasMore = docs.length > limit;
     const posts = hasMore ? docs.slice(0, limit) : docs;
+    console.log('posts', posts)
+
+    const likedPostIds = await Like.distinct('postRef', 
+        {userRef: mongoId, postRef: {$in: posts.map(post => post._id)}});
+    const likedIdsSet = new Set(likedPostIds.map(id => id.toString()));
+    
+    const boardPosts = await BoardPost.find({
+        'postRef': { $in: posts.map(post => post._id)}, 
+        'boardRef': { $in: boardIds }
+    });
+
+    const postToBoard = {};
+    for (const el of boardPosts) {
+        const postId = el.postRef.toString();
+        if (!postToBoard[postId]) {
+            postToBoard[postId] = [];
+        }
+        postToBoard[postId].push(el.boardRef.toString());
+    }
+
+    const postData = posts.map(post => ({
+        ...post,
+        likedByUser: likedIdsSet.has(post._id.toString()),
+        savedBoards: postToBoard[post._id.toString()] || []
+    }))
+    console.log('postdata', postData)
+
+    const nextCursor = hasMore ? posts[limit - 1]._id : null;
+
+    res.json({postData, nextCursor, hasMore});
+})
+
+router.post('/profile-posts', authenticateUser, async (req, res) => {
+    const {mongoId} = req.user;
+    const {userId} = req.query;
+    const {boardIds} = req.body;
+    console.log('id', userId)
+
+    const fetchedPosts = await Post.find({userRef: userId});
+
+    const postIds = fetchedPosts.map(fp => fp._id);
+    if (postIds.length === 0) {
+        return res.json({postData: [], nextCursor: null, hasMore: false});
+    }
+
+    const limit = Math.min(parseInt(req.query.limit) || 20, 40);
+    const cursor = req.query.cursor;
+
+    const filter = {_id: {$in: postIds}};
+    if (cursor) filter._id.$lt = cursor;
+
+    const docs = await Post
+        .find(filter)
+        .sort({_id: -1})
+        .limit(limit + 1)
+        .select('_id likes _id postURL userId')
+        .lean();
+
+    const hasMore = docs.length > limit;
+    const posts = hasMore ? docs.slice(0, limit) : docs;
+    console.log('posts', posts)
 
     const likedPostIds = await Like.distinct('postRef', 
         {userRef: mongoId, postRef: {$in: posts.map(post => post._id)}});
@@ -163,6 +222,7 @@ router.post('/saved', authenticateUser, async (req, res) => {
     }))
 
     const nextCursor = hasMore ? posts[limit - 1]._id : null;
+    console.log('postdata', postData)
 
     res.json({postData, nextCursor, hasMore});
 })

@@ -18,7 +18,7 @@ const Follows = ({mode,
 
     useEffect(() => {
         const fetchUserData = async () => {
-            const token = auth.currentUser.getIdToken();
+            const token = await auth.currentUser.getIdToken();
 
             const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/follows/${userId}/${mode}`, {
                 method: 'GET',

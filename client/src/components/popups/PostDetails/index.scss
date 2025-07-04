@@ -227,25 +227,37 @@
 }
 
 .post-item-det .quick-add{
-    gap: 5px;
-    padding-right: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding-right: 70px;
     box-sizing: border-box;
 
     .toolbar-icon {
-        gap: 5px
+        display: flex;
+        gap: 5px;
+        width: 65px;
+
+        p {
+            text-align: center;
+        }
     }
 
     svg {
-        width: 35px;
-        height: 35px
+        width: 30px;
+        height: 30px
     }
 
     img {
-        width: 34px
+        width: 30px;
+        // height: 35px;
     }
 
     p {
-        font-size: 12px;
+        font-size: 11px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 }
 

@@ -42,8 +42,12 @@ const PostDetails = ({
     const [profileURL, setProfileURL] = useState('');
     const [showAddBoard, setShowAddBoard] = useState(false);
     const [showSave, setShowSave] = useState(false);
+    const [liked, setLiked] = useState(false);
+    const [likes, setLikes] = useState(0);
 
     useEffect(() => {
+        setLiked(selectedPost.likedByUser);
+        setLikes(selectedPost.likes);
         const fetchPostDetails = async () => {
             const token = await auth.currentUser.getIdToken();
             setToken(token);
@@ -66,7 +70,9 @@ const PostDetails = ({
     }, [selectedPost])
 
     useEffect(() => {
+        let isCancelled = false;
         if (!post) return;
+        if (!canvasRef.current) return;
     
         const canvas = new Canvas(canvasRef.current, {
             selection: false,
@@ -77,41 +83,49 @@ const PostDetails = ({
         canvas.setViewportTransform([zoom, 0, 0, zoom, 0, 0]);
         canvas.calcOffset();
 
-        (async () => {
-            await canvas.loadFromJSON(
-                post.canvasJSON,
-                () => canvas.requestRenderAll(),
-                {
-                    Image: FabricImage,
-                    Text: FabricText
+        const handleInitCanvas = async () => {
+            try {
+                await canvas.loadFromJSON (
+                    post.canvasJSON,
+                    () => {
+                        if (!isCancelled) {
+                            canvas.requestRenderAll();
+                        }
+                    },
+                    {
+                        Image: FabricImage,
+                        Text: FabricText
+                    }
+                );            
+                
+                canvas.enableRetinaScaling = true;
+                canvas.getObjects().forEach(obj => obj.selectable = false);
+
+                canvas.renderAll();
+                function tick() {
+                    canvas.requestRenderAll();
+                    requestAnimationFrame(tick);
                 }
-            );            
-            
-            canvas.enableRetinaScaling = true;
-            canvas.getObjects().forEach(obj => obj.selectable = false);
+                tick();
 
-            canvas.renderAll();
-            function tick() {
-                canvas.requestRenderAll();
-                requestAnimationFrame(tick);
-              }
-              tick();
+                const fonts = new Set();
+                const itemIds = [];
 
-            const fonts = new Set();
-            const itemIds = [];
+                canvas.getObjects().forEach(obj => {
+                    if (obj.type === 'textbox') {
+                        if (obj.fontFamily) fonts.add(obj.fontFamily);
+                    }
+                    itemIds.push(obj.itemId);
+                })
 
-            canvas.getObjects().forEach(obj => {
-                if (obj.type === 'textbox') {
-                    if (obj.fontFamily) fonts.add(obj.fontFamily);
-                }
-                itemIds.push(obj.itemId);
-            })
+                fonts.forEach(font => loadGoogleFont(font))
+                fetchItemDetails(itemIds);
 
-            fonts.forEach(font => loadGoogleFont(font))
-            fetchItemDetails(itemIds);
-
-            document.fonts.ready.then(() => canvas.requestRenderAll());
-        })();
+                document.fonts.ready.then(() => canvas.requestRenderAll());
+            } catch (err) {
+                console.log('Error:', err);
+            }
+        }
 
         const fetchItemDetails = async (itemIds) => {
             try {
@@ -128,6 +142,26 @@ const PostDetails = ({
                 setItems(data.items);
             } catch (err) {
                 console.log('Failed to fetch items:', err);
+            }
+        }
+
+        handleInitCanvas();
+
+        return () => {
+            isCancelled = true;
+            canvas.dispose();
+            fabricCanvasRef.current = null;
+        }
+    }, [post, token])
+
+    useEffect(() => {
+        const canvas = fabricCanvasRef.current;
+        if (!items?.length || !canvas) return;
+
+        const mouseDown = e => {
+            if (e.target?.itemId) {
+                setSelectedItem(items.find(item => item._id === e.target.itemId));
+                console.log(items.find(item => item._id === e.target.itemId))
             }
         }
 
@@ -183,27 +217,13 @@ const PostDetails = ({
 
         canvas.on('mouse:over', hover);
         canvas.on('mouse:out', mouseOut);
-
-        return () => {
-            canvas.dispose();
-            fabricCanvasRef.current = null;
-        }
-    }, [post, token])
-
-    useEffect(() => {
-        const canvas = fabricCanvasRef.current;
-        if (!items?.length || !canvas) return;
-
-        const mouseDown = e => {
-            if (e.target?.itemId) {
-                setSelectedItem(items.find(item => item._id === e.target.itemId));
-                console.log(items.find(item => item._id === e.target.itemId))
-            }
-        }
-
         canvas.on('mouse:down', mouseDown);
 
-        return () => canvas.off('mouse:down', mouseDown)
+        return () => {
+            canvas.off('mouse:down', mouseDown);
+            canvas.off('mouse:out', mouseOut);
+            canvas.off('mouse:down', mouseDown);
+        }
     }, [items])
 
     const loadGoogleFont = (font) => {
@@ -249,10 +269,14 @@ const PostDetails = ({
                             <div className='post-details'>
                                 <div className='save-bar'>
                                     <div className='toolbar-icon like' 
-                                        onClick={() => mutate({postId: post._id, liked: post.likedByUser})}>
-                                            {!selectedPost.likedByUser && <FavoriteBorderIcon/>}
-                                            {selectedPost.likedByUser && <FavoriteIcon style={{fill: '#c23b0e'}}/>}
-                                            <p>{selectedPost.likes}</p>
+                                        onClick={() => {
+                                            setLiked(prev => !prev);
+                                            setLikes(prev => liked ? prev - 1 : prev + 1);
+                                            mutate({postId: selectedPost._id, liked});
+                                        }}>
+                                            {!liked && <FavoriteBorderIcon/>}
+                                            {liked && <FavoriteIcon style={{fill: '#c23b0e'}}/>}
+                                            <p>{likes}</p>
                                     </div>
                                     <Tooltip title='Save to board' >
                                     <div className='save-btn' onClick={() => setShowSave(prev => !prev)}>
@@ -296,11 +320,11 @@ const PostDetails = ({
                                                     <img src={BlackShirt}/>
                                                 </div>
                                                 </Tooltip>
-                                                <Tooltip title='Add to rack'>
+                                                {/* <Tooltip title='Add to rack'>
                                                 <div className='toolbar-icon'>
                                                     <AddIcon/>
                                                 </div>
-                                                </Tooltip>
+                                                </Tooltip> */}
                                             </div>
                                             <hr/>
                                         </div>
@@ -355,10 +379,10 @@ const PostDetails = ({
                                                     <img src={BlackShirt}/>
                                                     <p>Add to closet</p>
                                                 </div>
-                                                <div className='toolbar-icon'>
+                                                {/* <div className='toolbar-icon'>
                                                     <AddIcon/>
                                                     <p>Add to rack</p>
-                                                </div>
+                                                </div> */}
                                             </div>
                                         </div>
                                     </div>

@@ -8,7 +8,7 @@ const BoardSave = ({
     savedBoards,
     boards,
     setShowAddBoard,
-    queryKey
+    queryKeys
     }) => {
 
     const { mutate } = useToggleBoard();
@@ -26,7 +26,7 @@ const BoardSave = ({
                                     boardId: board._id, 
                                     postId, 
                                     remove: true,
-                                    queryKey
+                                    queryKeys
                                 })}>
                             <RemoveIcon/>
                         </div> :
@@ -37,7 +37,7 @@ const BoardSave = ({
                                     boardId: board._id, 
                                     postId, 
                                     remove: false,
-                                    queryKey
+                                    queryKeys
                                 })}>
                             <AddIcon/>
                         </div>

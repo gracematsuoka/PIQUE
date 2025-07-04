@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "../../../contexts/AuthContext"
 import { useNavigate, useParams } from "react-router-dom";
-import TopBar from "../TopBar";
-import NavBar from "../NavBar";
 import './index.scss';
 import { auth } from '../../../firebase';
 import Follows from "../../popups/Follows";
-import { Bouncy } from 'ldrs/react';
-import defaultProfilePic from '../../../assets/images/icons/default-profile-pic.png'
+import defaultProfilePic from '../../../assets/images/icons/default-profile-pic.png';
+import Posts from "../../reusable/Posts";
 
 const Profile = () => {
     const {mongoUser} = useAuth();
@@ -86,7 +84,7 @@ const Profile = () => {
         }
     }
 
-    if (!userData) return 'Unable to fetch user data'
+    if (!loading && !userData) return 'Unable to fetch user data'
 
     return (
         <div className="profile">
@@ -96,8 +94,8 @@ const Profile = () => {
                         <img className='profile-pic' src={userData?.profileURL || defaultProfilePic}/>
                     </div>
                     <div className="profile-text">
-                        <p className='popup-name'>{userData.name}</p>
-                        <p className='popup-username'>@{userData.username}</p>
+                        <p className='popup-name'>{userData?.name}</p>
+                        <p className='popup-username'>@{userData?.username}</p>
                         <div className='follow'>
                             <div className="sub-btn" onClick={() => setShowFollowers(true)}>
                                 <p><b>{followers}</b> followers</p>
@@ -118,6 +116,10 @@ const Profile = () => {
                     <div className="basic-nav">
                         <p>POSTS</p>
                     </div>
+                    <Posts
+                        mode='profile'
+                        userId={userData?._id}
+                    />
                 </div>
 
                 {showFollowers && 
@@ -125,14 +127,14 @@ const Profile = () => {
                             setShowFollowers={setShowFollowers}
                             setFollowers={setFollowers}
                             isSelf={isSelf}
-                            userId={userData._id}
+                            userId={userData?._id}
                     />}
                 {showFollowing && 
                     <Follows mode='following'
                             setShowFollowing={setShowFollowing}
                             setFollowing={setFollowing}
                             isSelf={isSelf}
-                            userId={userData._id}
+                            userId={userData?._id}
                     />}
             </div>
         </div>

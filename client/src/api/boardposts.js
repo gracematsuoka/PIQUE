@@ -28,22 +28,36 @@ export const fetchPosts = async ({cursor, boardIds}) => {
     return { postData, hasMore, nextCursor };
 }
 
-export const fetchBoardPosts = async ({boardId, liked, cursor, boardIds}) => {
+export const fetchBoardPosts = async ({boardId, liked, userId, cursor, boardIds}) => {
     const token = await auth.currentUser.getIdToken();
+    
+    if (userId) {
+        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/posts/profile-posts?userId=${userId}&limit=20&${cursor ? `cursor=${cursor}` : ''}`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({boardIds})
+        });
+        const data = await res.json();
+        return data;
+    } else {
+        let query;
+        if (boardId) query = `boardId=${boardId}&`;
+        else if (liked) query = 'liked=true&';
 
-    let query;
-    if (boardId) query = `boardId=${boardId}&`;
-    else if (liked) query = 'liked=true&';
-    const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/posts/saved?${query}limit=20&${cursor ? `cursor=${cursor}` : ''}`, {
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({boardIds})
-    })
-    const data = await res.json();
-    return data;
+        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/posts/saved?${query}limit=20&${cursor ? `cursor=${cursor}` : ''}`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({boardIds})
+        });
+        const data = await res.json();
+        return data;
+    }
 }
 
 export const removePost = async (boardId, postId) => {
