@@ -1,5 +1,6 @@
 .home {
     height: 100vh;
+    overflow: hidden;
 }
 
 .home-container {
@@ -11,6 +12,7 @@
     gap: 30px;
     box-sizing: border-box;
     padding: 0 50px;
+    overflow: auto;
     // background-color: pink;
 }
 
