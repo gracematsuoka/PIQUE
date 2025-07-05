@@ -20,6 +20,10 @@ router.post('/upload', upload.single('image'), async (req, res) => {
         });
         res.setHeader('Content-Type', 'image/png');
         response.data.pipe(res);
+
+        response.data.on('end', async () => {
+            await fs.unlink(req.file.path);
+        })
     } catch (err) {
         console.error('Error sending image to Python service:', err.message);
         res.status(500).json({ error: 'Failed to process image' });

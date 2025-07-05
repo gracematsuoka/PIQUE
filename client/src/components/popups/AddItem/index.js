@@ -67,34 +67,34 @@ const AddItem = ({onClose,
             'Gold': '#D6CE85',
             'Silver': '#E8E5E0',
             'Rose Gold': '#D6AA90'
-        }
-    
-        const itemArray = ['Tops', 'Bottoms', 'Dresses/Rompers', 'Outerwear', 'Shoes', 'Swimwear', 'Loungewear',
-            'Sets', 'Undergarments', 'Jewelry', 'Bags', 'Accessories', 'Other'
-        ]
+    }
 
-        const styleArray = ['Women', 'Men', 'Unisex']
-    
-        useEffect(() => {
-            const colorCheckMap = Object.keys(colorMap)
-                .map(color => ({
-                        color,
-                        hex: colorMap[color],
-                        checked: false
-                    })
-            );
-            setColors(colorCheckMap)
-    
-            setCategs(itemArray.map(item => ({
-                categ: item,
-                checked: false
-            })))
+    const itemArray = ['Tops', 'Bottoms', 'Dresses/Rompers', 'Outerwear', 'Shoes', 'Swimwear', 'Loungewear',
+        'Sets', 'Undergarments', 'Jewelry', 'Bags', 'Accessories', 'Other'
+    ]
 
-            setStyle(styleArray.map(style => ({
-                style,
-                checked: false
-            })))
-        }, []) 
+    const styleArray = ['Women', 'Men', 'Unisex']
+
+    useEffect(() => {
+        const colorCheckMap = Object.keys(colorMap)
+            .map(color => ({
+                    color,
+                    hex: colorMap[color],
+                    checked: false
+                })
+        );
+        setColors(colorCheckMap)
+
+        setCategs(itemArray.map(item => ({
+            categ: item,
+            checked: false
+        })))
+
+        setStyle(styleArray.map(style => ({
+            style,
+            checked: false
+        })))
+    }, []) 
 
     const items = data?.pages.flatMap(page => page.items) || [];
 

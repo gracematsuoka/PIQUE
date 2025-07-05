@@ -5,11 +5,15 @@ import io
 
 app = Flask(__name__)
 
-session = new_session()
-print("✅ Rembg session initialized.")
+rembg_session = None
 
 @app.route('/remove-bg', methods=['POST'])
 def remove_background():
+    global rembg_session
+    if rembg_session is None:
+        rembg_session = new_session()
+        print("✅ Rembg session initialized.")
+
     file = request.files['image']
     input_image = Image.open(file.stream).convert("RGBA")
     output_image = remove(input_image, session=session)
@@ -21,4 +25,4 @@ def remove_background():
     return send_file(byte_io, mimetype='image/png')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
