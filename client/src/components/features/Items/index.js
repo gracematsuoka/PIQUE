@@ -27,6 +27,7 @@ const Items = ({onSelectItem, tab, handleError, colorMap, itemArray}) => {
         isError,
         error
     } = useItems({tab, query, filters})
+    console.log('data', data)
 
     const onSearch = (input) => {
         setQuery(input);

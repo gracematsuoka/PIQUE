@@ -7,7 +7,8 @@ export const useCreateItem = () => {
         mutationFn: ({name, colors, category, brand, price, link, tags, tab, processedUrl}) => {
             return createItem({name, colors, category, brand, price, link, tags, tab, processedUrl})
         },
-        onSuccess: (userItem, {tab}) => {
+        onSuccess: (userItem, vars) => {
+            const {tab} = vars;
             console.log('created', userItem)
             qc.setQueryData(['items', tab], prev => 
                 prev && {
@@ -33,8 +34,8 @@ export const useCreateCopy = () => {
         mutationFn: ({itemRefs, tab}) => {
             return createUserCopy({itemRefs, tab});
         },
-        onSuccess: (userItems, {tab}) => {
-            console.log('added', userItems)
+        onSuccess: (userItems, vars) => {
+            const {tab} = vars;
             qc.setQueryData(['items', tab], prev => 
                 prev && {
                     ...prev,
@@ -49,7 +50,6 @@ export const useCreateCopy = () => {
                     })
                 }
             )
-            console.log('qc data', qc.getQueryData(['items', tab]))
         }
     })
 }

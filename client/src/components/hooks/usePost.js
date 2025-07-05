@@ -9,7 +9,6 @@ export const usePost = ({query}) => {
     return useInfiniteQuery({
         queryKey: ['posts', query],
         queryFn: ({ pageParam = null }) => fetchPosts({cursor: pageParam, boardIds, query}),
-        getNextPageParam: last => last.nextCursor ?? undefined,
-        enabled: boardIds.length > 0,
+        getNextPageParam: last => last.nextCursor ?? undefined
     })
 }

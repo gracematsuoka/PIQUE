@@ -47,6 +47,7 @@ export const fetchBoardPosts = async ({boardId, liked, userId, cursor, boardIds}
         let query;
         if (boardId) query = `boardId=${boardId}&`;
         else if (liked) query = 'liked=true&';
+        console.log('query', query)
 
         const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/posts/saved?${query}limit=20&${cursor ? `cursor=${cursor}` : ''}`, {
             method: 'POST',

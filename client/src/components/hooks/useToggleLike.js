@@ -3,11 +3,12 @@ import { unlikePost, likePost } from "../../api/boardposts";
 
 export const useToggleLike = () => {
     const queryClient = useQueryClient();
+    const query = '';
     return useMutation({
         mutationFn: ({postId, liked}) => {
             liked ? unlikePost(postId) : likePost(postId);
         },
-        onSuccess: (_res, {postId, liked, queryKeys = [['posts']]}) => {
+        onSuccess: (_res, {postId, liked, queryKeys = [['posts', query], ['savedPosts', {liked: true}]]}) => {
             queryKeys.forEach(key => 
                 queryClient.setQueryData(key, prev => 
                     prev && {

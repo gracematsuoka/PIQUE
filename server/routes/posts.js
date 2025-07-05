@@ -117,14 +117,12 @@ router.post('/saved', authenticateUser, async (req, res) => {
     const {mongoId} = req.user;
     const {boardId, liked} = req.query;
     const {boardIds} = req.body;
-    console.log('reached')
 
     const model = boardId ? BoardPost : Like;
 
-    const fetchedPosts = boardId ? await model.find({boardRef: boardId}).select('postRef -_id')
-                            : await model.find({userRef: mongoId}).select('postRef -_id');
-
-    const postIds = fetchedPosts.map(bp => bp.postRef);
+    const fetchedPosts = boardId ? await BoardPost.find({boardRef: boardId}).select('postRef -_id')
+                            : await Like.find({userRef: mongoId}).select('postRef -_id');
+    const postIds = fetchedPosts.map(p => p.postRef);
     if (postIds.length === 0) {
         return res.json({postData: [], nextCursor: null, hasMore: false});
     }
@@ -132,7 +130,7 @@ router.post('/saved', authenticateUser, async (req, res) => {
     const limit = Math.min(parseInt(req.query.limit) || 20, 40);
     const cursor = req.query.cursor;
 
-    const filter = {postRef: {$in: postIds}};
+    const filter = {postRef: {$in: postIds}, userRef: mongoId};
     if (cursor) filter._id.$lt = cursor;
 
     const allData = await model

@@ -29,7 +29,9 @@ const PostDetails = ({
     setSelectedPost,
     mutate,
     boards,
-    savedBoards
+    savedBoards,
+    searchTerm,
+    query
     }) => {
     const queryClient = useQueryClient();
     const [post, setPost] = useState(null);
@@ -51,6 +53,14 @@ const PostDetails = ({
     const deleteItem = useDeleteItem();
     const [addW, setAddW] = useState([]);
     const [addC, setAddC] = useState([]);
+    let queryKeys = [['posts', '']];
+    if (query) {
+        queryKeys.push(['savedPosts', query]);
+    }
+    if (searchTerm) {
+        queryKeys.push(['posts', searchTerm]);
+    }
+    console.log('keys keys',queryKeys)
 
     useEffect(() => {
         setLiked(selectedPost.likedByUser);
@@ -282,7 +292,11 @@ const PostDetails = ({
                                         onClick={() => {
                                             setLiked(prev => !prev);
                                             setLikes(prev => liked ? prev - 1 : prev + 1);
-                                            mutate({postId: selectedPost._id, liked});
+                                            mutate({
+                                                postId: selectedPost._id, 
+                                                liked,
+                                                queryKeys
+                                            });
                                         }}>
                                             {!liked && <FavoriteBorderIcon/>}
                                             {liked && <FavoriteIcon style={{fill: '#c23b0e'}}/>}

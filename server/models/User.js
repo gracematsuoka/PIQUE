@@ -13,7 +13,8 @@ const UserSchema = new mongoose.Schema({
     profileURL: String,
     tags: [TagSchema],
     followers: Number,
-    following: Number
+    following: Number,
+    preference: String
 }, { timestamps: true })
 
 module.exports = mongoose.model("User", UserSchema);

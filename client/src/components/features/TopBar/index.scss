@@ -15,15 +15,13 @@
 .top-bar .profile-pic {
     width: 40px;
     height: 40px;
-    // outline: 1px black solid;
-    outline: 0px;
     cursor: pointer;
     position: relative;
     right: 50px
 }
 
 .top-bar .profile-pic:hover {
-    box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.1);
 }
 
 .profile-wrapper {

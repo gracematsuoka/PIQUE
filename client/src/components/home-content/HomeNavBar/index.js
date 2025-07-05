@@ -6,9 +6,9 @@ const HomeNavBar = () => {
     return (
         <div className="home-nav-bar">
             <div className="left-nav">
-                <p>BROWSE</p>
+                {/* <p>BROWSE</p>
                 <p>ABOUT</p>
-                <p>PRICING</p>
+                <p>PRICING</p> */}
             </div>
             <h1>PIQUE</h1>
             <div className="right-nav">

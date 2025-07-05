@@ -30,6 +30,7 @@ router.post("/google-signin", authenticateUser, async (req, res) => {
 router.post('/create-user', authenticateUser, async(req, res) => {
     try {
         const { firebaseUid, email } = req.user;
+        console.log('email', email)
 
         let user = await User.findOne({firebaseUid});
         if(user) {
@@ -38,7 +39,9 @@ router.post('/create-user', authenticateUser, async(req, res) => {
 
         user = new User({
             firebaseUid,
-            email
+            email,
+            followers: 0,
+            following: 0
         });
         await user.save();
 
@@ -49,8 +52,19 @@ router.post('/create-user', authenticateUser, async(req, res) => {
     }
 })
 
+
+router.get('/me', authenticateUser, async (req, res) => {
+    res.json({
+        name: req.user.name,
+        username: req.user.username,
+        profileURL: req.user.profileURL,
+        email: req.user.email
+    });
+})
+
 router.post("/check-username", authenticateUser, async (req, res) => {
     try {
+        console.log('hit')
         const { username } = req.body;
         const lowerUser = username.toLowerCase();
 
@@ -102,15 +116,6 @@ router.delete('/delete-account', authenticateUser, async (req, res) => {
         console.error('Failed to delete account:', err);
         res.status(500).json({message: 'Failed to delete account'});
     }
-})
-
-router.get('/me', authenticateUser, async (req, res) => {
-    res.json({
-        name: req.user.name,
-        username: req.user.username,
-        profileURL: req.user.profileURL,
-        email: req.user.email
-    });
 })
 
 router.get('/:username/get-user', async (req, res) => {

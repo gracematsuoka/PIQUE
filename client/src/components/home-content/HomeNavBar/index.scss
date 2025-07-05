@@ -4,7 +4,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     padding: 0 20px;
     max-width: 100vw;
     height: 7vh
@@ -32,11 +32,14 @@
 .right-nav {
     display: flex;
     flex-direction: row;
-    gap: 20px;
-    font-size: 18px;
+    gap: 15px;
+    font-size: 15px;
     font-weight: 700;
     text-align: left;
     line-height: 28px;
+    position: absolute;
+    right: 10px;
+    top: 10px;
 }
 
 .home-nav-bar a {
@@ -49,10 +52,18 @@
 
 #log-in {
     color: white; 
-    background-color: $light-blue;
+    background-color: #6B799F;
+
+    &:hover {
+        background-color: #5b6c9a;
+    }
 }
 
 .home-nav-bar #sign-up {
     color: black;
     background-color: $light-grey;
+
+    &:hover {
+        background-color: rgb(220, 220, 220);
+    }
 }

@@ -110,7 +110,7 @@ const Explore = () => {
                     mutate={mutate}
                     boards={boards}
                     savedBoards={posts.find(post => post._id === selectedPost._id)?.savedBoards || []}
-
+                    searchTerm={searchTerm}
             />}
             <div className="nav-content-wrapper">
                 <div className="search-bar-wrapper">

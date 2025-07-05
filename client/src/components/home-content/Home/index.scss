@@ -5,12 +5,13 @@
 .home-container {
     display: flex;
     align-items: center;
-    justify-content: spac;
+    justify-content: space-around;
     width: 100vw;
     height: 100vh;
-    gap: 50px;
-    padding: 20px;
-    box-sizing: border-box
+    gap: 30px;
+    box-sizing: border-box;
+    padding: 0 50px;
+    // background-color: pink;
 }
 
 .home hr {
@@ -36,36 +37,55 @@
     max-width: 620px;
     word-break: break-all;
     position: absolute;
-    line-height: clamp(150px, 20vw, 320px);
+    line-height: clamp(150px, 20vw, 230px);
     z-index: 0;
-    left: 0;
+    left: 40px;
+    white-space: nowrap;
+    height: fit-content;
 }
 
 .front-text {
     position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
-.main-text {
-    color: rgb(0, 0, 0);
-    font-size: clamp(40px, 5vw, 60px);
+.main-text{
+    font-size: clamp(30px, 10vw, 55px);
     font-weight: 700;
-    line-height: 85px;
-    max-width: 570px;
-    line-height: normal;
 }
 
-.sub-text a{
-    font-size: clamp(10px, 2vw, 20px);
-    font-weight: 500;
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 10px;
-    color: black;
+.sub-text {
+    a {
+        color: black;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 7px;
+        transform: translateX(0);
+        transition: transform 0.5s ease-in-out ;
+        font-size: 18px;
+        text-decoration: underline;
+        text-underline-offset: 10px;
+        text-decoration-thickness: 1px;
+
+        &:hover svg{
+            transform: translateX(10px);
+            transition: transform 0.5s ease-in-out ;
+        }
+    }
 }
 
 .right-home {
     flex: 1;
-    overflow: hidden;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: clamp(10px, 20vw, 20px)
 }
 
 .tops {
@@ -81,6 +101,53 @@
 }
 
 .home img {
-    width: 200px;
     filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.2)); 
+}
+
+.sample-fit {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sample-fit > img {
+    align-self: center;
+}
+
+// * {
+//     outline: 1px solid green;
+// }
+
+#knit, #sweats, #skirt, #tank{
+    opacity: 0.5;
+}
+
+#knit {
+    height: 190px;
+    width: auto;
+}
+
+#tank {
+    height: 160px;
+    width: auto;
+}
+
+#skirt {
+    height: 300px;
+    width: auto;
+}
+
+#sweats {
+    height: 290px;
+    width: auto;
+}
+
+#blouse {
+    height: 210px;
+    width: auto;
+}
+
+#jeans {
+    height: 330px;
+    width: auto;
 }

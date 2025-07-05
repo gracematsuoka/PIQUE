@@ -1,3 +1,4 @@
+import './index.scss'
 import { useSavedPosts } from "../../hooks/useSavedPosts";
 import PostDetails from '../../popups/PostDetails';
 import BoardSave from '../../popups/BoardSave';
@@ -96,6 +97,7 @@ const Posts = ({
                     mutate={mutate}
                     boards={boards}
                     savedBoards={posts.find(post => post._id === selectedPost._id)?.savedBoards || []}
+                    query={query}
                 />}
             {(isLoading || isFetchingNextPage || boardIsLoading) ? (
                 <Bouncy
@@ -115,7 +117,7 @@ const Posts = ({
                                     onClick={() => 
                                         mutate({postId: post._id, 
                                                 liked: post.likedByUser,
-                                                queryKeys: [['posts'], ['savedPosts', query]]
+                                                queryKeys: [['posts', ''], ['savedPosts', query]]
                                                 })}>
                                     {!post.likedByUser && <FavoriteBorderIcon/>}
                                     {post.likedByUser && <FavoriteIcon style={{fill: '#c23b0e'}}/>}
