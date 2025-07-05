@@ -33,8 +33,10 @@ app.use('/api/follows', FollowRoutes);
 const boardPostRoutes = require('./routes/boardposts');
 app.use('/api/boardposts', boardPostRoutes);
 
+const PORT = process.env.PORT || 8000;
+
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB connected");
-    app.listen(8000, () => console.log("Server running on port 8000"));
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   })
