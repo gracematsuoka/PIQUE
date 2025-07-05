@@ -16,7 +16,7 @@ import Filter from '../../popups/Filter';
 const Items = ({onSelectItem, tab, handleError, colorMap, itemArray}) => {
     const [query, setQuery] = useState('');
     const [filters, setFilters] = useState([]);
-    const [input, setInput] = useState();
+    const [input, setInput] = useState('');
 
     const {
         data,

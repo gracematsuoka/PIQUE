@@ -65,7 +65,7 @@ const ItemDetails = ({ mode,
             setColors(selectedItem.colors);
             setOriginalField(selectedItem);
             setAddedTags(selectedItem.tags.map(tag => ({
-                id: tag.id,
+                id: tag._id,
                 content: tag.name,
                 color: tag.hex,
                 showDetails: false,
@@ -190,7 +190,7 @@ const ItemDetails = ({ mode,
         console.log('save tagdivs', tagDivs)
         tagDivs.map(div => {
             if (div.mongoId && div.updated) {
-                tagsUpdate.push({name: div.content, hex: div.color});
+                tagsUpdate.push({name: div.content, hex: div.color, mongoId: div.mongoId});
             } else if (!div.mongoId) {
                 tagsCreate.push({name: div.content, hex: div.color});
             }

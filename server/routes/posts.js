@@ -108,8 +108,6 @@ router.post('/get-posts', authenticateUser, async (req, res) => {
         savedBoards: postToBoard[post._id.toString()] || []
     }));
 
-    console.log('data', postData)
-
     const nextCursor = hasMore ? posts[limit - 1]._id : null;
 
     res.json({postData, nextCursor, hasMore});

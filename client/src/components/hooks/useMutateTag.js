@@ -33,7 +33,7 @@ export const useDeleteTag = () => {
         onSuccess: (_res, {tagId}) => {
             qc.setQueryData(['tags'], prev => {
                 if (!prev) return [];
-                return prev.filter(tag => tag._id === tagId);
+                return prev.filter(tag => tag._id !== tagId);
             })
         }
     })

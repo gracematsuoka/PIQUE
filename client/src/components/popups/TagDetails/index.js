@@ -31,8 +31,9 @@ const TagDetails = forwardRef(({name,
     }, [])
     const handleEditTagDiv = (e) => {
         if (e.key === 'Enter') {
+            console.log('adding...')
             setTagDivs(prev => prev.map(div => 
-                div.id === id ? {...div, content: e.target.value, showDetails: false} : div
+                div.id === id ? {...div, content: e.target.value, showDetails: false, updated: true} : div
             ));
             setAddedTags(prev => prev.map(div => 
                 div.id === id ? {...div, content: e.target.value, showDetails: false} : div
@@ -50,7 +51,6 @@ const TagDetails = forwardRef(({name,
     }
 
     const handleDeleteTag = async () => {
-        console.log('handle del')
         setTagDivs(prev => prev
                                 .map(div => 
                                         div.id === id ? {...div, showDetails: false} : div

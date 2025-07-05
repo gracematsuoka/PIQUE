@@ -20,7 +20,6 @@ export const fetchItems = async ({tab, cursor, query, filters}) => {
 
         if (!res.ok) console.log('error', res.status, res.text())
         const data = await res.json();
-        console.log('data', data)
         return data;
     } catch (err) {
         console.log('Failed to fetch closet:', err);

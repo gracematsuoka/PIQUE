@@ -1,7 +1,6 @@
 import './index.scss';
 import {ReactComponent as More} from '../../../assets/images/icons/more.svg'
 import {ReactComponent as Add} from '../../../assets/images/icons/add.svg'
-import TagDetails from '../TagDetails';
 import { forwardRef, useState, useEffect, useRef } from 'react';
 
 const AddTag = forwardRef(({tagDivs, 
@@ -10,12 +9,17 @@ const AddTag = forwardRef(({tagDivs,
                             setAddedTags, 
                             showAddTag, 
                             setShowAddTag, 
-                            handleArrayChange,
                             detailsRefs,
                             setTagDetailsPos
                         },ref) => {
     const [tagName, setTagName] = useState('');
     const moreRefs = useRef({});
+
+
+    useEffect(() => {
+        console.log('divs', tagDivs)
+        console.log('tags', addedTags)
+    }, [addedTags, tagDivs])
 
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -72,9 +76,6 @@ const AddTag = forwardRef(({tagDivs,
             return { ...div, showDetails: false };
         }))
     }
-    useEffect(() => {
-        console.log('effect tagdivs', tagDivs)
-    }, [tagDivs])
 
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') {

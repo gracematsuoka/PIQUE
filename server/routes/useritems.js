@@ -124,7 +124,6 @@ router.get('/get-items', authenticateUser, async (req, res) => {
     const items = hasMore ? docs.slice(0, limit) : docs;
 
     const nextCursor = hasMore ? items[limit - 1]._id : null;
-    console.log('items', items)
     
     res.status(200).json({items, nextCursor, hasMore});
 })

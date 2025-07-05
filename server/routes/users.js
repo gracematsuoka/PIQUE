@@ -246,15 +246,16 @@ router.delete('/delete-tag', authenticateUser, async (req, res) => {
 router.put('/update-tags', authenticateUser, async (req, res) => {
     const { tags } = req.body;
     const { mongoId } = req.user;
-
+    console.log('tags', tags)
     const user = await User.findById(mongoId);
     const updatedTags = [];
     
     tags.forEach(updatedTag => {
         const tag = user.tags.id(updatedTag.mongoId);
+        console.log('tag', tag)
         if (tag) {
-            tag.name = updatedTag.content;
-            tag.hex = updatedTag.color;
+            tag.name = updatedTag.name;
+            tag.hex = updatedTag.hex;
             updatedTags.push(tag);
         }
     })

@@ -34,7 +34,7 @@ const AddItem = ({onClose,
     const createCopy = useCreateCopy();
     const [query, setQuery] = useState('');
     const [filters, setFilters] = useState([]);
-    const [input, setInput] = useState();
+    const [input, setInput] = useState('');
 
     const {
         data,

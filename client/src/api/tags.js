@@ -30,7 +30,7 @@ export const addTags = async ({tags}) => {
 
 export const updateTags = async ({tags}) => {
     const token = await auth.currentUser.getIdToken();
-    const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/update-tag`, {
+    const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/update-tags`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
