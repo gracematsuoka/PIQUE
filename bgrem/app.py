@@ -6,15 +6,10 @@ import os
 
 app = Flask(__name__)
 
-rembg_session = None
+rembg_session = new_session()
 
 @app.route('/remove-bg', methods=['POST'])
 def remove_background():
-    global rembg_session
-    if rembg_session is None:
-        rembg_session = new_session()
-        print("✅ Rembg session initialized.")
-
     if 'image' not in request.files:
         print("No image file found in request")
         return "No file", 400
