@@ -17,4 +17,4 @@ COPY . .
 
 ENV PORT=5001
 
-CMD ["sh", "-c", "gunicorn app:app --bind 0.0.0.0:$$PORT"]
+ENTRYPOINT ["sh", "-c", "gunicorn app:app --bind 0.0.0.0:$PORT"]
