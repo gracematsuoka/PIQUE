@@ -6,7 +6,7 @@ import os
 
 app = Flask(__name__)
 
-rembg_session = new_session()
+rembg_session = new_session(model_name="u2netp")
 
 @app.route('/remove-bg', methods=['POST'])
 def remove_background():
