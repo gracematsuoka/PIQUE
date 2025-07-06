@@ -6,7 +6,7 @@ import os
 
 app = Flask(__name__)
 
-rembg_session = new_session()
+rembg_session = new_session(model_name="u2netp")
 
 @app.route('/remove-bg', methods=['POST'])
 def remove_background():
@@ -17,6 +17,7 @@ def remove_background():
     file = request.files['image']
     print(f"Received file: {file.filename}")
     input_image = Image.open(file.stream).convert("RGBA")
+    input_image.thumbnail((512, 512))
     output_image = remove(input_image, session=rembg_session)
 
     byte_io = io.BytesIO()
