@@ -15,6 +15,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-EXPOSE 5001
+ENV PORT=5001
 
-CMD ["gunicorn", "-b", "0.0.0.0:5001", "app:app"]
+CMD ["sh", "-c", "gunicorn app:app --bind 0.0.0.0:${PORT}"]
