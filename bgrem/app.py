@@ -15,7 +15,12 @@ def remove_background():
         rembg_session = new_session()
         print("✅ Rembg session initialized.")
 
+    if 'image' not in request.files:
+        print("No image file found in request")
+        return "No file", 400
+
     file = request.files['image']
+    print(f"Received file: {file.filename}")
     input_image = Image.open(file.stream).convert("RGBA")
     output_image = remove(input_image, session=rembg_session)
 

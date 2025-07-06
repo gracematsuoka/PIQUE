@@ -223,7 +223,6 @@ const ItemDetails = ({ mode,
                 linkInputRef.current &&
                 !linkInputRef.current.contains(e.target)
             ) {
-                console.log('link',link)
                 setEditLink(false);
             }
         }

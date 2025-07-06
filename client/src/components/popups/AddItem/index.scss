@@ -6,6 +6,7 @@
         min-height: 400px;
         display: flex;
         justify-content: flex-start;
+        // background-color: pink;
     }
 
     .empty {
@@ -87,7 +88,7 @@
     display: none
 }
 
-.loading.overlay {
+.loading.closet {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -111,7 +112,7 @@
 }
 
 .add-item .loading .progress-bar {
-    height: 10px;
+    height: 7px;
     border-radius: 10px;
     transition: width 0.5s ease;
     background-color: white;
