@@ -7,7 +7,11 @@
         display: flex;
         justify-content: flex-start;
         // background-color: pink;
+        &.loading-active {
+            display: none;
+        }
     }
+
 
     .empty {
         height: 100px;
@@ -112,7 +116,7 @@
 }
 
 .add-item .loading .progress-bar {
-    height: 7px;
+    height: 5px;
     border-radius: 10px;
     transition: width 0.5s ease;
     background-color: white;

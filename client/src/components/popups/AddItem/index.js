@@ -21,7 +21,7 @@ const AddItem = ({onClose,
                     setLoading,
                     handleError
                     }) => {
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [filled, setFilled] = useState(0);
     const [addTab, setAddTab] = useState('upload');
     const [error, setError] = useState('');
@@ -245,7 +245,7 @@ const AddItem = ({onClose,
             <div className='add-item'>
             <div className="popup-overlay"></div>
             <div {...getRootProps()} style={{ width: '100%', height: '100%' }}>
-                <div className="popup-container overlay">
+                <div className={`popup-container overlay ${isLoading ? 'loading-active' : ''}`}>
                 {!isLoading &&  
                     <div className='popup-content'>
                         <div className='popup-header'>
