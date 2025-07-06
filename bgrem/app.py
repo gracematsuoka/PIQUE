@@ -17,7 +17,7 @@ def remove_background():
 
     file = request.files['image']
     input_image = Image.open(file.stream).convert("RGBA")
-    output_image = remove(input_image, session=session)
+    output_image = remove(input_image, session=rembg_session)
 
     byte_io = io.BytesIO()
     output_image.save(byte_io, 'PNG')
