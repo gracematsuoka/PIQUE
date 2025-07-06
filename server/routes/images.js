@@ -11,7 +11,7 @@ const upload = multer({ dest: 'uploads/' });
 router.post('/upload', upload.single('image'), async (req, res) => {
     const formData = new FormData();
     formData.append('image', fs.createReadStream(req.file.path));
-
+    console.log('url:', `${process.env.PYTHON_SERVICE_API}/remove-bg`)
     try {
         const response = await axios.post(`${process.env.PYTHON_SERVICE_API}/remove-bg`, formData,
         {

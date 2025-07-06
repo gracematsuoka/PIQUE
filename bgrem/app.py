@@ -36,3 +36,8 @@ if __name__ == '__main__':
 @app.route('/')
 def home():
     return 'App is running ✅'
+
+@app.errorhandler(404)
+def not_found(e):
+    print(f"404 Not Found: {request.path}")
+    return "Route not found", 404
