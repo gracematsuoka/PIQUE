@@ -141,7 +141,10 @@
     padding: 0 20px;
     box-sizing: border-box;
     max-height: 500px;
-    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    // overflow: hidden;
 
     .search-filter {
         gap: 30px;
@@ -167,6 +170,9 @@
     }
 
     .items {
+        overflow: auto;
+        flex: 1;
+
         .item-wrapper {
             cursor: pointer;
         }
