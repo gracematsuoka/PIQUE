@@ -6,7 +6,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const app = express();
 
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+app.use(cors({ origin: ['http://localhost:3000','https://pique-ten.vercel.app'], credentials: true }));
 app.use(express.json());
 
 const userRoutes = require("./routes/users");
