@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { auth } from '../../../firebase';
 import {getAuth} from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
+import { fetchWithError } from '../../../utils/fetchWithError'
 
 const Auth = ({ mode }) => {
     const isLogin = mode === 'login';
@@ -41,14 +42,15 @@ const Auth = ({ mode }) => {
                 
                 const token = await auth.currentUser.getIdToken();
 
-                await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/create-user`, {
+                await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/users/create-user`, {
                     method: 'POST',
                     headers: {
                         Authorization: `Bearer ${token}`
                     },
                 })
             }
-        } catch {
+        } catch (err) {
+            console.error('Error:', err.message)
             setError('Failed to create an account');
         }
 
@@ -73,22 +75,25 @@ const Auth = ({ mode }) => {
         const currentUser = getAuth().currentUser;
 
         if (!currentUser) return;
+        try {
+            const token = await currentUser.getIdToken();
 
-        const token = await currentUser.getIdToken();
+            const data = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/users/me`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
 
-        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/me`, {
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${token}`
+            if (data.username) {
+                navigate('/explore');
+            } else {
+                navigate('/account-setup');
             }
-        });
-
-        const data = await res.json();
-        if (data.username) {
-            navigate('/explore');
-        } else {
-            navigate('/account-setup');
+        } catch (err) {
+            console.error('Failed to fetch:', err.message);
         }
+
     }
 
     return (

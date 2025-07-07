@@ -4,7 +4,7 @@ import Filter from "../../popups/Filter";
 import { useRef, useState, useEffect, useMemo } from "react";
 import Select, {components} from 'react-select';
 import CreatableSelect from 'react-select/creatable';
-import {Canvas, FabricImage, Textbox, FabricObject, Point, FabricText} from "fabric";
+import {Canvas, FabricImage, Textbox} from "fabric";
 import CanvasHistory from "../../../utils/CanvasHistory";
 import Tooltip from "@mui/material/Tooltip";
 import Congrats from "../../popups/Congrats";
@@ -12,8 +12,6 @@ import { useItems } from "../../hooks/useItems";
 import {ReactComponent as FilterIcon} from '../../../assets/images/icons/filter.svg'
 import { useTag } from '../../hooks/useTag';
 // toolbar
-import CropRoundedIcon from '@mui/icons-material/CropRounded';
-import TextFieldsRoundedIcon from '@mui/icons-material/TextFieldsOutlined';
 import UndoRoundedIcon from '@mui/icons-material/UndoOutlined';
 import RedoRoundedIcon from '@mui/icons-material/RedoOutlined';
 import ColorLensRoundedIcon from '@mui/icons-material/ColorLensOutlined';
@@ -30,9 +28,10 @@ import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrow
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import PostPrev from "../../popups/PostPrev";
 import { Bouncy } from 'ldrs/react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '../../../contexts/AuthContext';
 
 const Create = () => {
+    const {mongoUser} = useAuth();
     const canvasRef = useRef(null);
     const fabricRef = useRef(null);
     const [canvas, setCanvas] = useState(null);
@@ -66,7 +65,6 @@ const Create = () => {
     const [style, setStyle] = useState([])
     const [showTags, setShowTags] = useState(true)
     const [tab, setTab] = useState('closet');
-    const qc = useQueryClient();
     const [query, setQuery] = useState('');
     const [filters, setFilters] = useState([]);
     const [input, setInput] = useState('');
@@ -167,10 +165,11 @@ const Create = () => {
             categ: item,
             checked: false
         })));
+        console.log('pref',mongoUser)
 
         setStyle(styleArray.map(style => ({
             style,
-            checked: false
+            checked: style === mongoUser?.pref ? true : false
         })))
     }, [dbTags]);
 
@@ -347,7 +346,7 @@ const Create = () => {
                 if (activeObject.fontWeight === 700) {
                     setIsBold(true);
                 }
-                if (activeObject.underline == true) {
+                if (activeObject.underline === true) {
                     setIsUnderline(true);
                 }
                 if (activeObject.fontStyle === 'italic') {
@@ -396,10 +395,7 @@ const Create = () => {
                     clipboardRef.current = clone;
                 }
                 if (e.key === 'v') {
-                    console.log('v')
-                    console.log(clipboardRef.current)
                     if(clipboardRef.current) {
-                        console.log('clip')
                         const clone = await clipboardRef.current.clone();
                         clone.set({
                             left: clipboardRef.current.left + 10,

@@ -147,7 +147,7 @@ const Filter = ({
                         ...prev,
                         styles: !prev.styles
                     }))}>
-                <p>TYPE</p>
+                <p>CLOTHING TYPE</p>
                 {optionOpen.styles ? <RemoveIcon/> : <AddIcon/> }
             </div>
             {optionOpen.styles && 

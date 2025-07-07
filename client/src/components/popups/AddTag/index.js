@@ -15,12 +15,6 @@ const AddTag = forwardRef(({tagDivs,
     const [tagName, setTagName] = useState('');
     const moreRefs = useRef({});
 
-
-    useEffect(() => {
-        console.log('divs', tagDivs)
-        console.log('tags', addedTags)
-    }, [addedTags, tagDivs])
-
     useEffect(() => {
         const handleClickOutside = (e) => {
             setTagDivs(prev => prev.map(div => {
@@ -54,11 +48,9 @@ const AddTag = forwardRef(({tagDivs,
     }
 
     const toggleDetails = (id) => {
-        console.log('details toggling')
         const moreEl = moreRefs.current[id];
         if (moreEl) {
             const rect = moreEl.getBoundingClientRect();
-            console.log('top', rect.top)
             setTagDetailsPos({
                 id,
                 top: rect.bottom + window.scrollY,
@@ -69,7 +61,6 @@ const AddTag = forwardRef(({tagDivs,
 
         setTagDivs(prev => prev.map(div => {
             if (div.id === id) {
-                console.log(div.showDetails)
                 return { ...div, showDetails: !div.showDetails };
 
             }
@@ -83,18 +74,15 @@ const AddTag = forwardRef(({tagDivs,
             addDiv(tagDiv);
             addTag(tagDiv);
             setShowAddTag(!showAddTag);
-            console.log('tagdivs', tagDivs)
         }
     }
 
     const addDiv = (tagDiv) => {
         setTagDivs(prev => [...prev, tagDiv]);
-        console.log('tagdiv added', tagDiv)
     }
 
     const addTag = (tagDiv) => {
         setAddedTags(prev => [...prev, tagDiv]);
-        console.log('tag added', tagDiv)
     }
 
     const tagAdded = (id) => {

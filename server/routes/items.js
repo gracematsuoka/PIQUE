@@ -4,12 +4,18 @@ const Item = require("../models/Item");
 const authenticateUser = require("../middleware/authenticateUser");
 
 router.post('/get-items', authenticateUser, async (req, res) => {
-    const {itemIds} = req.body;
+    try {
+        const {itemIds} = req.body;
 
-    const items = await Item.find({_id: {$in: itemIds}})
-                            .select('_id name category brand link colors');
+        const items = await Item
+            .find({_id: {$in: itemIds}})
+            .select('_id name category brand link colors');
 
-    res.json({items});
+        res.status(200).json({items});
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error: 'Server error'});
+    }
 })
 
 module.exports = router;

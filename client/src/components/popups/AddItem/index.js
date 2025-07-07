@@ -12,6 +12,7 @@ import Filter from '../Filter';
 import {ReactComponent as Check} from '../../../assets/images/icons/check.svg';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { Bouncy } from 'ldrs/react';
+import { useAuth } from '../../../contexts/AuthContext';
 
 const AddItem = ({onClose, 
                     setShowAddPopup, 
@@ -21,6 +22,7 @@ const AddItem = ({onClose,
                     setLoading,
                     handleError
                     }) => {
+    const {mongoUser} = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [filled, setFilled] = useState(0);
     const [addTab, setAddTab] = useState('upload');
@@ -92,7 +94,7 @@ const AddItem = ({onClose,
 
         setStyle(styleArray.map(style => ({
             style,
-            checked: false
+            checked: style === mongoUser?.pref ? true : false
         })))
     }, []) 
 
@@ -148,7 +150,9 @@ const AddItem = ({onClose,
             const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/images/upload`, {
                 method: 'POST',
                 body: formData
-            })
+            });
+
+            if (!res.ok) throw new Error('Failed to fetch');
 
             const blob = await res.blob();
             const url = URL.createObjectURL(blob);
@@ -229,7 +233,6 @@ const AddItem = ({onClose,
     }
 
     const handleAdd = async () => {
-        console.log('selected:',selectedItems)
         setShowAddPopup(false);
         setLoading(true);
         try {

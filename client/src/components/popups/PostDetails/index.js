@@ -23,6 +23,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useCreateCopy } from '../../hooks/useMutateItems';
 import { useDeleteItem } from '../../hooks/useMutateItems';
 import CheckIcon from '@mui/icons-material/Check';
+import { fetchWithError } from '../../../utils/fetchWithError';
 
 const PostDetails = ({
     selectedPost,
@@ -60,27 +61,28 @@ const PostDetails = ({
     if (searchTerm) {
         queryKeys.push(['posts', searchTerm]);
     }
-    console.log('keys keys',queryKeys)
 
     useEffect(() => {
         setLiked(selectedPost.likedByUser);
         setLikes(selectedPost.likes);
         const fetchPostDetails = async () => {
-            const token = await auth.currentUser.getIdToken();
-            setToken(token);
-    
-            const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/posts/${selectedPost._id}`, {
-                method: 'GET',
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
+            try {
+                const token = await auth.currentUser.getIdToken();
+                setToken(token);
+        
+                const postData = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/posts/${selectedPost._id}`, {
+                    method: 'GET',
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
 
-            const postData = await res.json();
-            console.log('post data', postData)
-            setPost(postData);
-            setUsername(postData.userRef?.username);
-            setProfileURL(postData.userRef?.profileURL);
+                setPost(postData);
+                setUsername(postData.userRef?.username);
+                setProfileURL(postData.userRef?.profileURL);
+            } catch (err) {
+                console.error('Failed to fetch:', err.message);
+            }
         }
 
         fetchPostDetails();
@@ -146,7 +148,7 @@ const PostDetails = ({
 
         const fetchItemDetails = async (itemIds) => {
             try {
-                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/items/get-items`, {
+                const data = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/items/get-items`, {
                     method: 'POST',
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -155,7 +157,6 @@ const PostDetails = ({
                     body: JSON.stringify({itemIds})
                 })
 
-                const data = await res.json();
                 setItems(data.items);
             } catch (err) {
                 console.log('Failed to fetch items:', err);
@@ -178,7 +179,6 @@ const PostDetails = ({
         const mouseDown = e => {
             if (e.target?.itemId) {
                 setSelectedItem(items.find(item => item._id === e.target.itemId));
-                console.log((items.find(item => item._id === e.target.itemId)))
             }
         }
 
@@ -252,10 +252,6 @@ const PostDetails = ({
         }
         add ? createCopy.mutate({itemRefs: [itemId], tab}) : deleteItem.mutate({itemId, tab});
     }
-
-    useEffect(() => {
-        console.log('addW', addW)
-    }, [addW])
 
     return (
         <div className='post-details'>

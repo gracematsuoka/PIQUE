@@ -5,6 +5,8 @@ import { auth } from '../../../firebase';
 import { useAuth } from '../../../contexts/AuthContext';
 import UploadProfilePic from '../../reusable/UploadProfilePic';
 import WarningPopup from '../../popups/WarningPopup';
+import { fetchWithError } from '../../../utils/fetchWithError';
+import {ReactComponent as Check} from '../../../assets/images/icons/check.svg';
 
 const AccountSetup = ({ mode }) => {
     const isSetup = mode === 'setup';
@@ -19,8 +21,9 @@ const AccountSetup = ({ mode }) => {
     const [usernameValid, setUsernameValid] = useState('');
     const [name, setName] = useState(mongoUser?.name || '');
     const [username, setUsername] = useState(mongoUser?.username || '');
+    const [pref, setPref] = useState(mongoUser?.pref || '')
     const [isWarningVisible, setIsWarningVisible] = useState(false);
-    
+    const styleArray = ['Women', 'Men', 'Unisex']
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -35,15 +38,19 @@ const AccountSetup = ({ mode }) => {
             setError('Please choose another username');
             return;
         }
-
-        await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/update-user`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${await auth.currentUser.getIdToken(true)}`
-            },
-            body: JSON.stringify({name, username})
-        })
+        try {
+            const token = await auth.currentUser.getIdToken();
+            await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/users/update-user`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({name, username, pref})
+            })
+        } catch (err) {
+            console.error('Failed to fetch:', err.message);
+        }
 
         if (isSetup) {
             navigate('/'); 
@@ -58,16 +65,14 @@ const AccountSetup = ({ mode }) => {
         try {
             const token = await auth.currentUser.getIdToken();
 
-            const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/check-username`, {
+            const data = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/users/check-username`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify({username}),
-            })
-
-            const data = await res.json();
+            });
 
             if (!data.exists || username == mongoUser.username) {
                 setUsernameValid('✓ Username is available');
@@ -148,6 +153,22 @@ const AccountSetup = ({ mode }) => {
                                 {usernameValid}
                             </p>
                             }
+                        </div>
+                        <div className='auth-field'>
+                            <p className='pref'>Clothing Preference <i>(Optional)</i></p>
+                            <div className='filter-choices'>
+                                {styleArray.map(style => 
+                                    <div className='tag' 
+                                        key={style} 
+                                        style={{backgroundColor: 'rgba(128, 128, 128, 0.114)', outline: pref === style ? '1px solid black' : ''}} 
+                                        onClick={e => setPref(prev => prev !== style ? style : '')}> 
+                                        <div className='circle-check' style={{backgroundColor: pref === style ? 'black' : ''}}>
+                                            {pref === style ? <Check/> : null}
+                                        </div> 
+                                        <p>{style}</p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         <button className='submit' type='submit'>{isSetup ? 'Continue' : 'Save'}</button>
                         {successMessage && <p className='success'>{successMessage}</p>}

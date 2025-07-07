@@ -140,9 +140,7 @@ const ItemDetails = ({ mode,
             name: tag.content,
             hex: tag.color
         }))
-        console.log('item tags', itemTags)
 
-        console.log('tab to update:', tab)
         try {
             await createItem.mutateAsync(
                 {processedUrl, name, colors, category, brand, price, link, tags: itemTags, tab},
@@ -162,9 +160,6 @@ const ItemDetails = ({ mode,
         const itemId = selectedItemId;
         const changes = {...changedField}
 
-        console.log('mutating')
-        console.log('changed:', changedField)
-        console.log('will run', Object.keys(changedField).length > 0)
         setSelectedItemId(null);
         setShowItemDetails(false);
         await handleSaveTags();
@@ -184,10 +179,8 @@ const ItemDetails = ({ mode,
 
     // save tags to mongo (for user)
     const handleSaveTags = async () => {
-        console.log('running tags')
         const tagsCreate = [];
         const tagsUpdate = [];
-        console.log('save tagdivs', tagDivs)
         tagDivs.map(div => {
             if (div.mongoId && div.updated) {
                 tagsUpdate.push({name: div.content, hex: div.color, mongoId: div.mongoId});
@@ -197,8 +190,6 @@ const ItemDetails = ({ mode,
         })
 
         const promises = [];
-        console.log('create', tagsCreate)
-        console.log('update', tagsUpdate)
 
         if (tagsCreate.length > 0) {
             promises.push(addTag.mutateAsync({tags: tagsCreate}));
@@ -562,9 +553,9 @@ const ItemDetails = ({ mode,
                         }
                         {mode === 'edit' &&
                             <>
-                                <button type='button' className='basic-btn' id='edit' onClick={() => 
-                                    {console.log('clicked')
-                                        handleSaveChanges()}}>Save Changes</button>
+                                <button type='button' className='basic-btn' id='edit' onClick={() => handleSaveChanges()}>
+                                    Save Changes
+                                </button>
                             </>
                         }
                 </div>

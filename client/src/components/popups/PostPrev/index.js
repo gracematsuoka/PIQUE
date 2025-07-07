@@ -1,6 +1,7 @@
 import './index.scss';
 import { useState, useEffect } from 'react';
 import { auth } from '../../../firebase';
+import { fetchWithError } from '../../../utils/fetchWithError';
 
 const PostPrev = ({canvasJSON,
                     postURL,
@@ -38,7 +39,7 @@ const PostPrev = ({canvasJSON,
         try {
             const token = await auth.currentUser.getIdToken();
 
-            await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/posts/create-post`, {
+            await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/posts/create-post`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -60,19 +61,20 @@ const PostPrev = ({canvasJSON,
 
     const handleSaveImage = async () => {
         try {
-            const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/images/get-upload-url`);
-            const {uploadURL} = await res.json();
+            const {uploadURL} = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/images/get-upload-url`);
+            
             const blob = await fetch(postURL).then(res => res.blob());
+
+            if (!blob.ok) throw new Error('Failed to fetch blob');
 
             const formData = new FormData();
             formData.append('file', blob);
 
-            const uploadRes = await fetch(uploadURL, {
+            const data = await fetchWithError(uploadURL, {
                 method: 'POST',
                 body: formData
             });
 
-            const data = await uploadRes.json();
             const imageId = data.result?.id;
             const publicURL = `https://imagedelivery.net/${process.env.REACT_APP_CF_HASH}/${imageId}/public`;
             return publicURL;

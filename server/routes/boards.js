@@ -7,6 +7,7 @@ router.post('/create-board', authenticateUser, async (req, res) => {
     const {mongoId} = req.user;
     const {title, description} = req.body;
 
+    try {
     const board = new Board({
         title,
         description,
@@ -16,38 +17,57 @@ router.post('/create-board', authenticateUser, async (req, res) => {
 
     await board.save();
     res.status(200).json({board})
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error: 'Server error'});
+    }
 })
 
 router.get('/get-boards', authenticateUser, async (req, res) => {
     const {mongoId} = req.user;
 
-    const boards = await Board.find({userId: mongoId}).populate('coverRef');
-    res.status(200).json({boards});
+    try {
+        const boards = await Board.find({userId: mongoId}).populate('coverRef');
+        res.status(200).json({boards});
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error: 'Server error'});
+    }
 })
 
 router.patch('/edit-board/:boardId', authenticateUser, async (req, res) => {
     const {boardId} = req.params;
     const {title, description, coverURL} = req.body;
 
-    const board = await Board.findById(boardId);
+    try {
+        const board = await Board.findById(boardId);
 
-    if (!board) return res.status(404).json({error: 'Board not found'});
+        if (!board) return res.status(404).json({error: 'Board not found'});
 
-    board.title = title;
-    board.description = description;
-    board.coverURL = coverURL;
+        board.title = title;
+        board.description = description;
+        board.coverURL = coverURL;
 
-    await board.save();
-    res.status(200).json({board});
+        await board.save();
+        res.status(200).json({board});
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error: 'Server error'});
+    }
 })
 
 router.get('/:boardId/board', authenticateUser, async (req, res) => {
     const {boardId} = req.params;
 
-    const board = await Board.findById(boardId);
-    if (!board) return res.status(404).json({error: 'Board not found'});
+    try {
+        const board = await Board.findById(boardId);
+        if (!board) return res.status(404).json({error: 'Board not found'});
 
-    res.json(board);
+        res.status(200).json(board);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error: 'Server error'});
+    }
 })
 
 module.exports = router;

@@ -26,12 +26,8 @@ const TagDetails = forwardRef(({name,
         Beige: '#f5ede1'
     }
 
-    useEffect(() => {
-        console.log('opened')
-    }, [])
     const handleEditTagDiv = (e) => {
         if (e.key === 'Enter') {
-            console.log('adding...')
             setTagDivs(prev => prev.map(div => 
                 div.id === id ? {...div, content: e.target.value, showDetails: false, updated: true} : div
             ));
@@ -80,7 +76,6 @@ const TagDetails = forwardRef(({name,
             <div className='sub-btn td-delete' 
                 onClick={(e) => {
                     e.stopPropagation();
-                    console.log('hedla')
                     handleDeleteTag();
                     }}>
                 <p>Delete</p>

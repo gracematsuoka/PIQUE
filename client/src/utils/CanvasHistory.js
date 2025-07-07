@@ -47,7 +47,7 @@ class CanvasHistory {
 
   async redo() {
     if (this.historyRedo.length === 0) return; // Prevent undoing beyond the initial state
-    console.log(this.historyRedo)
+    
     this._clearCanvas();
     const lastState = this.historyRedo.pop();
     this.history.push(lastState)

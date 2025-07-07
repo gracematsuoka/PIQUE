@@ -23,7 +23,7 @@ export const useToggleBoard = () => {
                                 post._id === postId ? {
                                     ...post,
                                     savedBoards: remove ? 
-                                        post.savedBoards.filter(id => id != boardId) :
+                                        post.savedBoards.filter(id => id !== boardId) :
                                         [...post.savedBoards, boardId]
                                 } : post
                             )

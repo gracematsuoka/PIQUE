@@ -18,6 +18,7 @@ import { useBoard } from "../../hooks/useBoard";
 import { useToggleLike } from "../../hooks/useToggleLike";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from 'react-router-dom';
+import Masonry from 'react-masonry-css';
 
 const Explore = () => {
     const { mutate } = useToggleLike();
@@ -129,7 +130,17 @@ const Explore = () => {
                         /> 
                     ) : (
                     posts.length > 0 ? (
-                        posts.map(post =>
+                        <Masonry 
+                            breakpointCols={{
+                                default: 5,
+                                1100: 4,
+                                900: 3,
+                                700: 2,
+                                400: 1
+                            }}
+                            className='masonry-posts'
+                            columnClassName='masonry-posts_col'>
+                            {posts.map(post =>
                             <div className="post" key={post._id}>
                                 <img src={post.postURL} onClick={() => {
                                     setSelectedPost(post);
@@ -168,7 +179,8 @@ const Explore = () => {
                                     />
                                 }
                             </div>
-                            )
+                            )}
+                            </Masonry>
                         ) : (
                         <div className='empty'>
                             <p>No search results match '{searchTerm}'...</p>

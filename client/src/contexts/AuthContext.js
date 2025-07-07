@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from 'react'
 import {auth, googleProvider} from '../firebase'
 import {getIdToken, setPersistence, browserLocalPersistence, getAuth} from 'firebase/auth'
 import { createUserWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword, signOut, signInWithPopup } from 'firebase/auth';
+import { fetchWithError } from '../utils/fetchWithError';
 
 const AuthContext = React.createContext();
 
@@ -10,9 +11,9 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }) {
-    const [firebaseUser, setFirebaseUser] = useState();
+    const [firebaseUser, setFirebaseUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [mongoUser, setMongoUser] = useState();
+    const [mongoUser, setMongoUser] = useState(null);
 
     const signup = async (email, password) => {
         return await createUserWithEmailAndPassword(auth, email, password);
@@ -31,36 +32,38 @@ export function AuthProvider({ children }) {
     }
 
     const googleLogin = async () => {
-        await setPersistence(auth, browserLocalPersistence);
-        const res = await signInWithPopup(auth, googleProvider);
-        const user = res.user;
-        const token = await getAuth().currentUser.getIdToken();
-        
-        const backendRes = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/google-signin`, {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`
-            },
-        });
+        try {
+            await setPersistence(auth, browserLocalPersistence);
+            const res = await signInWithPopup(auth, googleProvider);
+            const user = res.user;
+            const token = await getAuth().currentUser.getIdToken();
+            
+            const backendUser = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/users/google-signin`, {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+            });
 
-        const backendUser = await backendRes.json();
-        return { firebaseUser: user, mongoUser: backendUser };
+            return { firebaseUser: user, mongoUser: backendUser };
+        } catch (err) {
+            console.error('Failed to fetch:', err.message);
+        }
     }
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             setFirebaseUser(user);
             if (user) {
-                const token = await getIdToken(user, true);
 
                 try {
-                    const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/me`, {
+                    const token = await getIdToken(user, true);
+                    const data = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/users/me`, {
                         headers: {
                             Authorization: `Bearer ${token}`
                         }
                     });
-                    const data = await res.json();
                     setMongoUser(data);
                 } catch (err) {
                     console.error('Failed to fetch user from backend:', err);

@@ -20,7 +20,7 @@ router.post('/:postId/post-exists', authenticateUser, async (req, res) => {
             exists: containedBoardIds.has(boardId.toString())
         }));
 
-        res.json(exists);
+        res.status(200).json(exists);
     } catch (err) {
         console.error('Error checking if post exists in boards:', err);
         res.status(500).json({error: 'Server error'});
@@ -30,44 +30,54 @@ router.post('/:postId/post-exists', authenticateUser, async (req, res) => {
 router.delete('/:postId/remove-post/:boardId', authenticateUser, async(req, res) => {
     const {postId, boardId} = req.params;
 
-    await BoardPost.findOneAndDelete({postRef: postId, boardRef: boardId});
-    await Board.findByIdAndUpdate(boardId, {$inc: {numSaved: -1}});
+    try {
+        await BoardPost.findOneAndDelete({postRef: postId, boardRef: boardId});
+        await Board.findByIdAndUpdate(boardId, {$inc: {numSaved: -1}});
 
-    const board = await Board.findById(boardId);
-    let newCoverRef;
-    if (board?.coverRef.toString() === postId.toString()) {
-        if (board.numSaved === 0) {
-            await Board.findByIdAndUpdate(boardId, {coverRef: null});
-            newCoverRef = null;
-        } else {
-            const boardPost = await BoardPost
-                                    .findOne({boardRef: boardId})
-                                    .sort({createdAt: 1})
-                                    .populate('postRef');
-            const newPostId = boardPost.postRef._id;
-            await Board.findByIdAndUpdate(boardId, {coverRef: newPostId});
-            newCoverRef = newPostId;
+        const board = await Board.findById(boardId);
+        let newCoverRef;
+        if (board?.coverRef.toString() === postId.toString()) {
+            if (board.numSaved === 0) {
+                await Board.findByIdAndUpdate(boardId, {coverRef: null});
+                newCoverRef = null;
+            } else {
+                const boardPost = await BoardPost
+                                        .findOne({boardRef: boardId})
+                                        .sort({createdAt: 1})
+                                        .populate('postRef');
+                const newPostId = boardPost.postRef._id;
+                await Board.findByIdAndUpdate(boardId, {coverRef: newPostId});
+                newCoverRef = newPostId;
+            }
         }
-    }
 
-    res.json({newCoverRef})
+        res.status(200).json({newCoverRef})
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error: 'Server error'});
+    }
 });
 
 router.post('/:postId/add-post/:boardId', authenticateUser, async(req, res) => {
     const {postId, boardId} = req.params;
     const {mongoId} = req.user;
 
-    await BoardPost.create({postRef: postId, boardRef: boardId, userRef: mongoId});
-    await Board.findByIdAndUpdate(boardId, {$inc: {numSaved: 1}});
+    try {
+        await BoardPost.create({postRef: postId, boardRef: boardId, userRef: mongoId});
+        await Board.findByIdAndUpdate(boardId, {$inc: {numSaved: 1}});
 
-    const board = await Board.findById(boardId);
-    let newCoverRef;
-    if (!board?.coverRef) {
-        await Board.findByIdAndUpdate(boardId, {coverRef: postId});
-        newCoverRef = postId;
+        const board = await Board.findById(boardId);
+        let newCoverRef;
+        if (!board?.coverRef) {
+            await Board.findByIdAndUpdate(boardId, {coverRef: postId});
+            newCoverRef = postId;
+        }
+
+        res.status(200).json({newCoverRef})
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error: 'Server error'});
     }
-
-    res.json({newCoverRef})
 });
 
 module.exports = router;

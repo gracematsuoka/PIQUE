@@ -12,6 +12,7 @@ import { useToggleLike } from '../../hooks/useToggleLike';
 import { useEffect, useState, useRef } from 'react';
 import { useQueryClient } from "@tanstack/react-query";
 import AddBoard from '../../popups/AddBoard';
+import Masonry from 'react-masonry-css';
 
 const Posts = ({
     mode,
@@ -107,7 +108,17 @@ const Posts = ({
                 /> 
             ) : (
                 posts.length > 0 ? (
-                    posts.map(post => 
+                    <Masonry 
+                        breakpointCols={{
+                            default: 5,
+                            1100: 4,
+                            900: 3,
+                            700: 2,
+                            400: 1
+                        }}
+                        className='masonry-posts'
+                        columnClassName='masonry-posts_col'>
+                        {posts.map(post => 
                         <div className='post' key={post._id}>
                             <img src={post.postURL} onClick={() => {
                                 setSelectedPost(post);
@@ -145,7 +156,8 @@ const Posts = ({
                                 />
                             }
                         </div>
-                    )
+                    )}
+                </Masonry>
                 ) : (
                     <div className='empty'>
                         <p>You have no saved posts yet...</p>

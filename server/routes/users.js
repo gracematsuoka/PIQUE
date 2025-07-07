@@ -15,14 +15,16 @@ router.post("/google-signin", authenticateUser, async (req, res) => {
                 firebaseUid,
                 name, 
                 email, 
-                profileURL
+                profileURL,
+                followers: 0,
+                following: 0
             });
             await user.save().catch(err => console.error("Mongo save error:", err));
         }
 
         res.status(200).json(user);
-    } catch (e) {
-        console.log('Error in Google Sign-In:', e);
+    } catch (err) {
+        console.log('Error in Google Sign-In:', err);
         res.status(500).json({error: 'Server error'});
     }
 });
@@ -30,7 +32,6 @@ router.post("/google-signin", authenticateUser, async (req, res) => {
 router.post('/create-user', authenticateUser, async(req, res) => {
     try {
         const { firebaseUid, email } = req.user;
-        console.log('email', email)
 
         let user = await User.findOne({firebaseUid});
         if(user) {
@@ -58,13 +59,13 @@ router.get('/me', authenticateUser, async (req, res) => {
         name: req.user.name,
         username: req.user.username,
         profileURL: req.user.profileURL,
-        email: req.user.email
+        email: req.user.email,
+        pref: req.user.pref
     });
 })
 
 router.post("/check-username", authenticateUser, async (req, res) => {
     try {
-        console.log('hit')
         const { username } = req.body;
         const lowerUser = username.toLowerCase();
 
@@ -89,11 +90,12 @@ router.post('/update-user', authenticateUser, async (req, res) => {
             return res.status(404).json({message: 'update: User not found'});
         }
 
-        const { name, username, profileURL } = req.body;
+        const { name, username, profileURL, pref } = req.body;
 
         if (name !== undefined) user.name = name;
         if (username !== undefined) user.username = username.toLowerCase();
         if (profileURL !== undefined) user.profileURL = profileURL;
+        if (pref !== undefined) user.preference = pref;
 
         await user.save();
 
@@ -158,18 +160,14 @@ router.get('/:username/is-following', authenticateUser, async (req, res) => {
 router.post('/:username/add-follow', authenticateUser, async (req, res) => {
     const {username} = req.params;
     const viewerId = req.user.mongoId;
-    console.log('adding')
 
     try {
         const user = await User.findOne({username}).select('_id');
         if (!user) return res.status(404).json({message: 'user not found'});
 
-        console.log('viewerId:', viewerId)
         await User.findByIdAndUpdate(viewerId, {
             $addToSet: { following: user._id }
         });
-        console.log('user:', user)
-        console.log('userid:', user._id)
         await User.findByIdAndUpdate(user._id, {
             $addToSet: { followers: viewerId }
         })
@@ -206,24 +204,34 @@ router.post('/:username/remove-follow', authenticateUser, async (req, res) => {
 
 router.post('/get-users', async (req, res) => {
     const { userIds } = req.body;
-    const users = await User.find({_id: {$in: userIds}})
-                            .select('_id name username profileURL');
-    res.json({users});
+    try {
+        const users = await User.find({_id: {$in: userIds}})
+                                .select('_id name username profileURL');
+        res.status(200).json({users});
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error: 'Server error'});
+    }
 })
 
 router.post('/create-tag', authenticateUser, async (req, res) => {
     const { tags } = req.body;
     const { mongoId } = req.user;
 
-    const user = await User.findById(mongoId);
-    const prevNumTags = user.tags.length;
+    try {
+        const user = await User.findById(mongoId);
+        const prevNumTags = user.tags.length;
 
-    user.tags.push(...tags);
-    await user.save();
+        user.tags.push(...tags);
+        await user.save();
 
-    const addedTags = user.tags.slice(prevNumTags);
+        const addedTags = user.tags.slice(prevNumTags);
 
-    res.status(200).json({addedTags});
+        res.status(200).json({addedTags});
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error: 'Server error'});
+    }
 })
 
 router.get('/get-tags', authenticateUser, async (req, res) => {
@@ -232,7 +240,7 @@ router.get('/get-tags', authenticateUser, async (req, res) => {
 
     const user = await User.findById(mongoId).lean().select('tags');
     if (!user) return res.status(404).json({error: 'User not found'});
-    res.json({tags: user.tags});
+    res.status(200).json({tags: user.tags});
     } catch (err) {
         res.status(500).json({error: 'Server failed to get tags:', err})
     }
@@ -242,31 +250,39 @@ router.delete('/delete-tag', authenticateUser, async (req, res) => {
     const { mongoId } = req.user;
     const { tagId } = req.query;
 
-    const user = await User.findById(mongoId);
-    user.tags = user.tags.filter(tag => tag._id.toString() !== tagId);
-    await user.save();
-    res.status(200).json({tagId});
+    try {
+        const user = await User.findById(mongoId);
+        user.tags = user.tags.filter(tag => tag._id.toString() !== tagId);
+        await user.save();
+        res.status(200).json({tagId});
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error: 'Server error'});
+    }
 })
 
 router.put('/update-tags', authenticateUser, async (req, res) => {
     const { tags } = req.body;
     const { mongoId } = req.user;
-    console.log('tags', tags)
-    const user = await User.findById(mongoId);
-    const updatedTags = [];
-    
-    tags.forEach(updatedTag => {
-        const tag = user.tags.id(updatedTag.mongoId);
-        console.log('tag', tag)
-        if (tag) {
-            tag.name = updatedTag.name;
-            tag.hex = updatedTag.hex;
-            updatedTags.push(tag);
-        }
-    })
+    try {
+        const user = await User.findById(mongoId);
+        const updatedTags = [];
+        
+        tags.forEach(updatedTag => {
+            const tag = user.tags.id(updatedTag.mongoId);
+            if (tag) {
+                tag.name = updatedTag.name;
+                tag.hex = updatedTag.hex;
+                updatedTags.push(tag);
+            }
+        })
 
-    await user.save();
-    res.status(200).json({updatedTags});
+        await user.save();
+        res.status(200).json({updatedTags});
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error: 'Server error'});
+    }
 })
 
 module.exports = router;

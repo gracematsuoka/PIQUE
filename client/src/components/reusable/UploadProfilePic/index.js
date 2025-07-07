@@ -4,6 +4,7 @@ import { auth } from '../../../firebase';
 import { useAuth } from '../../../contexts/AuthContext';
 import {useState} from 'react';
 import defaultProfilePic from '../../../assets/images/icons/default-profile-pic.png'
+import { fetchWithError } from '../../../utils/fetchWithError';
 
 const UploadProfilePic = () => {
     const {mongoUser} = useAuth();
@@ -11,29 +12,32 @@ const UploadProfilePic = () => {
 
     const handleFileChange = async (e) => {
         const image = e.target.files[0];
+        try {
+            const compressed = await imageCompression(image, {
+                maxSizeMB: 0.2,
+                maxWidthOrHeight: 500,
+                useWebWorker: true
+            });
 
-        const compressed = await imageCompression(image, {
-            maxSizeMB: 0.2,
-            maxWidthOrHeight: 500,
-            useWebWorker: true
-        });
+            const storage = getStorage();
+            const storageRef = ref(storage, `profilePics/${auth.currentUser.uid}`);
 
-        const storage = getStorage();
-        const storageRef = ref(storage, `profilePics/${auth.currentUser.uid}`);
+            await uploadBytes(storageRef, compressed);
+            const downloadURL = await getDownloadURL(storageRef);
 
-        await uploadBytes(storageRef, compressed);
-        const downloadURL = await getDownloadURL(storageRef);
+            await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/users/update-user`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${await auth.currentUser.getIdToken(true)}`
+                },
+                body: JSON.stringify({ profileURL: downloadURL })
+            });
 
-        await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/update-user`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${await auth.currentUser.getIdToken(true)}`
-            },
-            body: JSON.stringify({ profileURL: downloadURL })
-        });
-
-        setFile(downloadURL);
+            setFile(downloadURL);
+        } catch (err) {
+            console.error('Failed to fetch:', err.message);
+        }
     }
 
     return (

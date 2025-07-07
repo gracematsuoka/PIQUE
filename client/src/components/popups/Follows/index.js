@@ -4,6 +4,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../../../firebase';
+import { fetchWithError } from '../../../utils/fetchWithError';
 
 const Follows = ({mode, 
                 setShowFollowers,
@@ -18,68 +19,74 @@ const Follows = ({mode,
 
     useEffect(() => {
         const fetchUserData = async () => {
-            const token = await auth.currentUser.getIdToken();
+            try {
+                const token = await auth.currentUser.getIdToken();
 
-            const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/follows/${userId}/${mode}`, {
-                method: 'GET',
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
+                const data = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/follows/${userId}/${mode}`, {
+                    method: 'GET',
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
 
-            const data = await res.json();
-            setUserData(data.map(userData => ({
-                user: mode === 'followers' ? userData.followerRef : userData.followingRef,
-                follow: true
-            })));
-        
+                setUserData(data.map(userData => ({
+                    user: mode === 'followers' ? userData.followerRef : userData.followingRef,
+                    follow: true
+                })));
+            } catch (err) {
+                console.error('Failed to fetch:', err.message);
+            }
         }
 
         fetchUserData();
     },[])
     
     const handleChange = async (follow, otherUserId) => {
-        if (mode === 'followers') {
-            if (!follow) return;
-            setUserData(userData.map(data => 
-                data.user._id === userId ? {...data, follow: !data.follow} : data
-            ))
+        try {
+            if (mode === 'followers') {
+                if (!follow) return;
+                setUserData(userData.map(data => 
+                    data.user._id === userId ? {...data, follow: !data.follow} : data
+                ))
 
-            const token = await auth.currentUser.getIdToken();
-            await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/follows/${userId}/remove-follower/${otherUserId}`, {
-                method: 'DELETE',
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            setFollowers(prev => prev -= 1);
-            return;
-        }
-        if (mode === 'following') {
-            setUserData(userData.map(data => 
-                data.user._id === otherUserId ? {...data, follow: !data.follow} : data
-            ));
-            const token = await auth.currentUser.getIdToken();
-
-            if (!follow) {
-                await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/follows/${otherUserId}/create-follow`, {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-                setFollowing(prev => prev += 1);
-                return;
-            } else {
-                await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/follows/${otherUserId}/remove-follow`, {
+                const token = await auth.currentUser.getIdToken();
+                await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/follows/${userId}/remove-follower/${otherUserId}`, {
                     method: 'DELETE',
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
                 });
-                setFollowing(prev => prev -= 1);
-            return;
-        }}
+                setFollowers(prev => prev -= 1);
+                return;
+            }
+            if (mode === 'following') {
+                setUserData(userData.map(data => 
+                    data.user._id === otherUserId ? {...data, follow: !data.follow} : data
+                ));
+                const token = await auth.currentUser.getIdToken();
+
+                if (!follow) {
+                    await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/follows/${otherUserId}/create-follow`, {
+                        method: 'POST',
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    });
+                    setFollowing(prev => prev += 1);
+                    return;
+                } else {
+                    await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/follows/${otherUserId}/remove-follow`, {
+                        method: 'DELETE',
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    });
+                    setFollowing(prev => prev -= 1);
+                return;
+            }}
+        } catch (err) {
+            console.error('Failed to fetch:', err.message);
+        }
     }
 
     return (

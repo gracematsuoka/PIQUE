@@ -3,6 +3,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useState, useEffect } from 'react';
 import { auth } from '../../../firebase';
 import { useMutation } from '@tanstack/react-query';
+import { fetchWithError } from '../../../utils/fetchWithError';
 
 const AddBoard = ({
                     mode,
@@ -19,7 +20,7 @@ const AddBoard = ({
         mutationFn: async (newTitle, newDescription) => {
             try {
                 const token = await auth.currentUser.getIdToken();
-                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/boards/create-board`, {
+                const { board: newBoard } = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/boards/create-board`, {
                     method: 'POST',
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -28,7 +29,6 @@ const AddBoard = ({
                     body: JSON.stringify({title: newTitle, description: newDescription})
                 })
 
-                const { board: newBoard } = await res.json();
                 return newBoard;
             } catch (err) {
                 console.log('Failed to create board:', err);
@@ -41,7 +41,7 @@ const AddBoard = ({
         mutationFn: async (newTitle, newDescription, newCoverURL) => {
             try {
                 const token = await auth.currentUser.getIdToken();
-                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/boards/edit-board/${board._id}`, {
+                const { board: newBoard } = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/boards/edit-board/${board._id}`, {
                     method: 'PATCH',
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -50,7 +50,6 @@ const AddBoard = ({
                     body: JSON.stringify({title: newTitle, description: newDescription, coverURL: newCoverURL})
                 })
 
-                const { board: newBoard } = await res.json();
                 return newBoard;
             } catch (err) {
                 console.log('Failed to update board:', err);

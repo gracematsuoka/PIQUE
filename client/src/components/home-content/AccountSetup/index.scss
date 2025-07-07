@@ -1,5 +1,5 @@
 .account-setup .auth-content {
-    gap: 35px
+    gap: 35px;
 }
 
 .account-setup .sub-btn {
@@ -51,4 +51,16 @@
 }
 .live-validate.invalid {
     background-color: rgba(151, 23, 0, 0.3);
+}
+
+.auth-field {
+    .filter-choices {
+        padding-top: 5px;
+    }
+    .tag {
+        padding: 5px 15px;
+        gap: 7px;
+        border-radius: 50px;
+        cursor: pointer;
+    }
 }

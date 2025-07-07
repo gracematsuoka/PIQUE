@@ -12,11 +12,13 @@ import SearchBar from '../../reusable/SearchBar';
 import {ReactComponent as FilterIcon} from '../../../assets/images/icons/filter.svg';
 import { useTag } from '../../hooks/useTag';
 import Filter from '../../popups/Filter';
+import { useAuth } from '../../../contexts/AuthContext';
 
 const Items = ({onSelectItem, tab, handleError, colorMap, itemArray}) => {
     const [query, setQuery] = useState('');
     const [filters, setFilters] = useState([]);
     const [input, setInput] = useState('');
+    const {mongoUser} = useAuth();
 
     const {
         data,
@@ -76,7 +78,7 @@ const Items = ({onSelectItem, tab, handleError, colorMap, itemArray}) => {
 
         setStyle(styleArray.map(style => ({
             style,
-            checked: false
+            checked: style === mongoUser?.pref ? true : false
         })))
     }, [dbTags]) 
 

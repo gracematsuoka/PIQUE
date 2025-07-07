@@ -2,13 +2,14 @@ import './index.scss'
 import {ReactComponent as CloseIcon} from '../../../assets/images/icons/close.svg'
 import { auth } from '../../../firebase';
 import {useNavigate} from 'react-router-dom'
+import { fetchWithError } from '../../../utils/fetchWithError';
 
 const WarningPopup = ({ onClose }) => {
     const navigate = useNavigate();
 
     const handleDeleteUser = async () => {
         try {
-            await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/delete-account`, {
+            await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/users/delete-account`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

@@ -1,109 +1,133 @@
 import { auth } from "../firebase";
+import { fetchWithError } from "../utils/fetchWithError";
 
 export const fetchBoards = async () => {
-    const token = await auth.currentUser.getIdToken();
-    const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/boards/get-boards`, {
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    });
+    try {
+        const token = await auth.currentUser.getIdToken();
+        const { boards } = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/boards/get-boards`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
 
-    const { boards } = await res.json();
-    return boards;
+        return boards;
+    } catch (err) {
+        console.error('Failed to fetch:', err.message);
+    }
 }
 
 export const fetchPosts = async ({cursor, boardIds, query}) => {
-    const token = await auth.currentUser.getIdToken();
-    console.log('query fetch', query)
+    try {
+        const token = await auth.currentUser.getIdToken();
 
-    const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/posts/get-posts?${query ? `q=${query}&` : ''}limit=20&${cursor ? `cursor=${cursor}` : ''}`, {
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({boardIds})
-    })
-    const { postData, hasMore, nextCursor } = await res.json();
-    return { postData, hasMore, nextCursor };
+        const { postData, hasMore, nextCursor } = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/posts/get-posts?${query ? `q=${query}&` : ''}limit=20&${cursor ? `cursor=${cursor}` : ''}`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({boardIds})
+        })
+
+        return { postData, hasMore, nextCursor };
+    } catch (err) {
+        console.error('Failed to fetch:', err.message);
+    }
 }
 
 export const fetchBoardPosts = async ({boardId, liked, userId, cursor, boardIds}) => {
-    const token = await auth.currentUser.getIdToken();
-    
-    if (userId) {
-        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/posts/profile-posts?userId=${userId}&limit=20&${cursor ? `cursor=${cursor}` : ''}`, {
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({boardIds})
-        });
-        const data = await res.json();
-        return data;
-    } else {
-        let query;
-        if (boardId) query = `boardId=${boardId}&`;
-        else if (liked) query = 'liked=true&';
-        console.log('query', query)
+    try {
+        const token = await auth.currentUser.getIdToken();
+        
+        if (userId) {
+            const data = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/posts/profile-posts?userId=${userId}&limit=20&${cursor ? `cursor=${cursor}` : ''}`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({boardIds})
+            });
 
-        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/posts/saved?${query}limit=20&${cursor ? `cursor=${cursor}` : ''}`, {
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({boardIds})
-        });
-        const data = await res.json();
-        return data;
+            return data;
+        } else {
+            let query;
+            if (boardId) query = `boardId=${boardId}&`;
+            else if (liked) query = 'liked=true&';
+
+            const data = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/posts/saved?${query}limit=20&${cursor ? `cursor=${cursor}` : ''}`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({boardIds})
+            });
+
+            return data;
+        };
+    } catch (err) {
+        console.error('Failed to fetch:', err.message);
     }
 }
 
 export const removePost = async (boardId, postId) => {
-    const token = await auth.currentUser.getIdToken();
-    const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/boardposts/${postId}/remove-post/${boardId}`, {
-        method: 'DELETE',
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    });
+    try {
+        const token = await auth.currentUser.getIdToken();
+        const { newCoverRef } = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/boardposts/${postId}/remove-post/${boardId}`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
 
-    const { newCoverRef } = await res.json();
-    return newCoverRef;
+        return newCoverRef;
+    } catch (err) {
+        console.error('Failed to fetch:', err.message);
+    }
 }
 
 export const addPost = async (boardId, postId) => {
-    const token = await auth.currentUser.getIdToken();
-    const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/boardposts/${postId}/add-post/${boardId}`, {
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    });
+    try {
+        const token = await auth.currentUser.getIdToken();
+        const { newCoverRef } = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/boardposts/${postId}/add-post/${boardId}`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
 
-    const { newCoverRef } = await res.json();
-    return newCoverRef;
+        return newCoverRef;
+    } catch (err) {
+        console.error('Failed to fetch:', err.message);
+    }
 }
 
 export const unlikePost = async (postId) => {
-    const token = await auth.currentUser.getIdToken();
-    await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/posts/${postId}/unlike`, {
-        method: 'DELETE',
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    })
+    try {
+        const token = await auth.currentUser.getIdToken();
+        await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/posts/${postId}/unlike`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+    } catch (err) {
+        console.error('Failed to fetch:', err.message);
+    }
 }
 
 export const likePost = async (postId) => {
-    const token = await auth.currentUser.getIdToken();
-    await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/posts/${postId}/like`, {
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    })
+    try {
+        const token = await auth.currentUser.getIdToken();
+        await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/posts/${postId}/like`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+    } catch (err) {
+        console.error('Failed to fetch:', err.message);
+    }
 }

@@ -6,6 +6,7 @@ import { auth } from '../../../firebase';
 import Follows from "../../popups/Follows";
 import defaultProfilePic from '../../../assets/images/icons/default-profile-pic.png';
 import Posts from "../../reusable/Posts";
+import { fetchWithError } from "../../../utils/fetchWithError";
 
 const Profile = () => {
     const {mongoUser} = useAuth();
@@ -24,9 +25,8 @@ const Profile = () => {
         const handleFetchUser = async () => {
             setLoading(true);
             try {
-                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/${username}/get-user`);           
+                const data = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/users/${username}/get-user`);           
 
-                const data = await res.json();
                 setUserData(data);
                 setFollowers(data.followers);
                 setFollowing(data.following);
@@ -45,14 +45,13 @@ const Profile = () => {
         const checkFollowing = async () => {
             try {
                 const token = await auth.currentUser.getIdToken();
-                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/follows/${userData._id}/is-following`, {
+                const data = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/follows/${userData._id}/is-following`, {
                     method: 'GET',
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
                 });
 
-                const data = await res.json();
                 setIsFollowing(data.follow);
             } catch (err) {
                 console.log('Failed to verify following status:', err);
@@ -64,23 +63,27 @@ const Profile = () => {
 
     const handleFollow = async () => {
         setIsFollowing(prev => !prev);
-        const token = await auth.currentUser.getIdToken();
-        if (!isFollowing) {
-            await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/follows/${userData._id}/create-follow`, {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            setFollowers(prev => prev += 1);
-        } else {
-            await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/follows/${userData._id}/remove-follow`, {
-                method: 'DELETE',
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            setFollowers(prev => prev -= 1);
+        try {
+            const token = await auth.currentUser.getIdToken();
+            if (!isFollowing) {
+                await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/follows/${userData._id}/create-follow`, {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                setFollowers(prev => prev += 1);
+            } else {
+                await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/follows/${userData._id}/remove-follow`, {
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                setFollowers(prev => prev -= 1);
+            }
+        } catch (err) {
+            console.error('Failed to fetch:', err.message);
         }
     }
 
