@@ -106,7 +106,11 @@ router.get('/get-items', authenticateUser, async (req, res) => {
         if (color) filter.colors = {$in: Array.isArray(color) ? color : [color]};
         if (category) filter.category = {$in: Array.isArray(category) ? category : [category]};
         if (tag) filter.tags = {$elemMatch: {name: {$in: Array.isArray(tag) ? tag : [tag]}}};
-        if (style) filter.pref = {$in: Array.isArray(style) ? style : [style]};
+        if (style) {
+            filter.pref = {$in: Array.isArray(style) ? style : [style]};
+        } else {
+            filter.pref = {$in: ['Unisex', req.user.pref]}
+        }
         if (cursor) filter._id = {$lt: cursor};
 
         if (tab === 'closet' || tab === 'wishlist') {

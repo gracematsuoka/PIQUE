@@ -76,7 +76,7 @@ const Items = ({onSelectItem, tab, handleError, colorMap, itemArray, styleArray}
 
         setStyle(styleArray.map(style => ({
             style,
-            checked: style === mongoUser?.pref ? true : false
+            checked: style === mongoUser?.pref || style === 'Unisex' ? true : false
         })))
     }, [dbTags]) 
 

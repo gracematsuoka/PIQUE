@@ -17,7 +17,8 @@ const Filter = ({
     showTags,
     style,
     setStyle,
-    onApply
+    onApply,
+    compress
     }) => {
 
     const [optionOpen, setOptionOpen] = useState({
@@ -61,120 +62,124 @@ const Filter = ({
                 </div>
             </div>
             <hr/>
-            <div className='filter-title' 
-                onClick={() => 
-                    setOptionOpen(prev => ({
-                        ...prev,
-                        colors: !prev.colors
-                    }))}>
-                <p>COLOR</p>
-                {optionOpen.colors ? <RemoveIcon/> : <AddIcon/> }
-            </div>
-            {optionOpen.colors &&
-                <div className='filter-choices'>
-                    {colors.map(entry => 
-                        <div className='color-filter' 
-                            key={entry.color} 
-                            onClick={e => toggleColorChecked(entry.color)}
-                            style={{outline: entry.checked ? '1.2px solid black' : ''}}>
-                            <div className='circle' style={{backgroundColor: entry.hex}}/>
-                            <p>{entry.color}</p>
-                        </div>
-                    )}
+            <div className='filter-wrapper'>
+                <div className='filter-title' 
+                    onClick={() => 
+                        setOptionOpen(prev => ({
+                            ...prev,
+                            colors: !prev.colors
+                        }))}>
+                    <p>COLOR</p>
+                    {optionOpen.colors ? <RemoveIcon/> : <AddIcon/> }
                 </div>
-            }
-            {showTags && 
-                <>
+                {optionOpen.colors &&
+                    <div className='filter-choices'>
+                        {colors.map(entry => 
+                            <div className='color-filter' 
+                                key={entry.color} 
+                                onClick={e => toggleColorChecked(entry.color)}
+                                style={{outline: entry.checked ? '1.2px solid black' : ''}}>
+                                <div className='circle' style={{backgroundColor: entry.hex}}/>
+                                <p>{entry.color}</p>
+                            </div>
+                        )}
+                    </div>
+                }
+                {showTags && 
+                    <>
+                    <div className='filter-title'
+                        onClick={() => 
+                            setOptionOpen(prev => ({
+                                ...prev,
+                                tags: !prev.tags
+                            }))}>
+                        <p>TAG</p>
+                        {optionOpen.tags ? <RemoveIcon/> : <AddIcon/> }
+                    </div>
+                    {optionOpen.tags && 
+                        <div className='filter-choices'>
+                            {tags.map(tag => 
+                            <>
+                                <div className='tag' 
+                                    key={tag.key} 
+                                    style={{backgroundColor: tag.hex, outline: tag.checked ? '1px solid black' : ''}} 
+                                    onClick={e => toggleTagChecked(tag.key)}> 
+                                    {!compress && 
+                                        <div className='circle-check' style={{backgroundColor: tag.checked ? 'black' : ''}}>
+                                            {tag.checked ? <Check/> : null}
+                                        </div> 
+                                    }
+                                    <p>{tag.name}</p>
+                                </div>
+                            </>
+                            )}
+                        </div>
+                    }
+                    </>
+                }
                 <div className='filter-title'
                     onClick={() => 
                         setOptionOpen(prev => ({
                             ...prev,
-                            tags: !prev.tags
+                            categories: !prev.categories
                         }))}>
-                    <p>TAG</p>
-                    {optionOpen.tags ? <RemoveIcon/> : <AddIcon/> }
+                    <p>CATEGORY</p>
+                    {optionOpen.categories ? <RemoveIcon/> : <AddIcon/> }
                 </div>
-                {optionOpen.tags && 
+                {optionOpen.categories && 
                     <div className='filter-choices'>
-                        {tags.map(tag => 
+                        {categs.map(categ => 
                         <>
                             <div className='tag' 
-                                key={tag.key} 
-                                style={{backgroundColor: tag.hex, outline: tag.checked ? '1px solid black' : ''}} 
-                                onClick={e => toggleTagChecked(tag.key)}
-                            > 
-                                <div className='circle-check' style={{backgroundColor: tag.checked ? 'black' : ''}}>
-                                    {tag.checked ? <Check/> : null}
-                                </div> 
-                                <p>{tag.name}</p>
+                                key={categ.categ} 
+                                style={{backgroundColor: 'rgba(128, 128, 128, 0.114)', outline: categ.checked ? '1px solid black' : ''}} 
+                                onClick={e => toggleCategChecked(categ.categ)}> 
+                                {!compress &&
+                                    <div className='circle-check' style={{backgroundColor: categ.checked ? 'black' : ''}}>
+                                        {categ.checked ? <Check/> : null}
+                                    </div> 
+                                }
+                                <p>{categ.categ}</p>
                             </div>
                         </>
                         )}
                     </div>
                 }
-                </>
-            }
-            <div className='filter-title'
-                onClick={() => 
-                    setOptionOpen(prev => ({
-                        ...prev,
-                        categories: !prev.categories
-                    }))}>
-                <p>CATEGORY</p>
-                {optionOpen.categories ? <RemoveIcon/> : <AddIcon/> }
-            </div>
-            {optionOpen.categories && 
-                <div className='filter-choices'>
-                    {categs.map(categ => 
-                    <>
-                        <div className='tag' 
-                            key={categ.categ} 
-                            style={{backgroundColor: 'rgba(128, 128, 128, 0.114)', outline: categ.checked ? '1px solid black' : ''}} 
-                            onClick={e => toggleCategChecked(categ.categ)}
-                        > 
-                            <div className='circle-check' style={{backgroundColor: categ.checked ? 'black' : ''}}>
-                                {categ.checked ? <Check/> : null}
-                            </div> 
-                            <p>{categ.categ}</p>
-                        </div>
-                    </>
-                    )}
+                <div className='filter-title'
+                    onClick={() => 
+                        setOptionOpen(prev => ({
+                            ...prev,
+                            styles: !prev.styles
+                        }))}>
+                    <p>CLOTHING TYPE</p>
+                    {optionOpen.styles ? <RemoveIcon/> : <AddIcon/> }
                 </div>
-            }
-            <div className='filter-title'
-                onClick={() => 
-                    setOptionOpen(prev => ({
-                        ...prev,
-                        styles: !prev.styles
-                    }))}>
-                <p>CLOTHING TYPE</p>
-                {optionOpen.styles ? <RemoveIcon/> : <AddIcon/> }
+                {optionOpen.styles && 
+                    <div className='filter-choices'>
+                        {style.map(style => 
+                        <>
+                            <div className='tag' 
+                                key={style.style} 
+                                style={{backgroundColor: 'rgba(128, 128, 128, 0.114)', outline: style.checked ? '1px solid black' : ''}} 
+                                onClick={e => toggleStyleChecked(style.style)}> 
+                                {!compress &&
+                                    <div className='circle-check' style={{backgroundColor: style.checked ? 'black' : ''}}>
+                                        {style.checked ? <Check/> : null}
+                                    </div> 
+                                }
+                                <p>{style.style}</p>
+                            </div>
+                        </>
+                        )}
+                    </div>
+                }
             </div>
-            {optionOpen.styles && 
-                <div className='filter-choices'>
-                    {style.map(style => 
-                    <>
-                        <div className='tag' 
-                            key={style.style} 
-                            style={{backgroundColor: 'rgba(128, 128, 128, 0.114)', outline: style.checked ? '1px solid black' : ''}} 
-                            onClick={e => toggleStyleChecked(style.style)}
-                        > 
-                            <div className='circle-check' style={{backgroundColor: style.checked ? 'black' : ''}}>
-                                {style.checked ? <Check/> : null}
-                            </div> 
-                            <p>{style.style}</p>
-                        </div>
-                    </>
-                    )}
-                </div>
-            }
             <div className='basic-btn-wrapper'>
                 <button className='basic-btn'
                     onClick={() => {
                         setShowFilter(false);
                         onApply();
-                    }}
-                >
+                    }}>
                     Apply
                 </button>
             </div>

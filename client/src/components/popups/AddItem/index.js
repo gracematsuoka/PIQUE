@@ -48,7 +48,7 @@ const AddItem = ({onClose,
         isLoading: itemsLoading,
         isError,
         error: itemsError
-    } = useItems({tab: 'database', stableQuery, stableFilters});
+    } = useItems({tab: 'database', query: stableQuery, filters: stableFilters});
 
     const onSearch = (input) => {
         setQuery(input);
@@ -96,7 +96,7 @@ const AddItem = ({onClose,
 
         setStyle(styleArray.map(style => ({
             style,
-            checked: style === mongoUser?.pref ? true : false
+            checked: style === mongoUser?.pref || style === 'Unisex' ? true : false
         })))
     }, []) 
 
@@ -334,6 +334,7 @@ const AddItem = ({onClose,
                                     style={style}
                                     setStyle={setStyle}
                                     onApply={onApply}
+                                    compress={{compress: true}}
                             />
                         </div>
                         }

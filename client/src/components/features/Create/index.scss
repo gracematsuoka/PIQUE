@@ -178,7 +178,8 @@
 
 .create-sidebar .basic-nav.sub {
     padding-left: 5px;
-    gap: clamp(10px, 35px, 35px);
+    padding-right: 5px;
+    justify-content: space-between;
     font-weight: 600;
     color: grey;
 }

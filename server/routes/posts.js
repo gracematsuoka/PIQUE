@@ -139,6 +139,7 @@ router.post('/saved', authenticateUser, async (req, res) => {
 
         const filter = {postRef: {$in: postIds}, userRef: mongoId};
         if (cursor) filter._id.$lt = cursor;
+        if (boardId) filter.boardRef = boardId; 
 
         const allData = await model
                     .find(filter)

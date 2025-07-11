@@ -27,10 +27,11 @@
     position: absolute;
     left: 20px;
     cursor: pointer;
+    outline: 1px rgb(237, 237, 237) solid;
 }
 
 .post-header img:hover {
-    box-shadow: 0 0px 8px rgba(0, 0, 0, 0.327); 
+    box-shadow: 0 0px 4px rgba(0, 0, 0, 0.1); 
 }
 
 .post-header p {
