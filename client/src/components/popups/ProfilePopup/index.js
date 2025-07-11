@@ -10,7 +10,6 @@ import { useState } from 'react'
 const ProfilePopup = ({setIsPopupVisible}) => {
     const [error, setError] = useState();
     const {mongoUser, logout} = useAuth();
-    console.log('monogo', mongoUser)
     const navigate = useNavigate();
     
     async function handleLogout() {

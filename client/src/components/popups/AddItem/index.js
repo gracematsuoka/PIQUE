@@ -36,8 +36,8 @@ const AddItem = ({onClose,
     const createCopy = useCreateCopy();
     const [query, setQuery] = useState('');
     const stableQuery = useMemo(() => query, [query])
-    const stableFilters = useMemo(() => filters, [filters]);
     const [filters, setFilters] = useState([]);
+    const stableFilters = useMemo(() => filters, [filters]);
     const [input, setInput] = useState('');
 
     const {
