@@ -5,7 +5,7 @@ export const useItems = ({tab, query, filters}) => {
     return useInfiniteQuery({
         queryKey: ['items', tab, query, filters],
         queryFn: ({pageParam = null}) => fetchItems({cursor: pageParam, tab, query, filters}),
-        getNextPageParam: last => last.cursor ?? undefined,
+        getNextPageParam: last => last?.nextCursor ?? undefined,
         keepPreviousData: true
     })
 }

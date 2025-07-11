@@ -4,13 +4,14 @@ import { createItem, updateItems, deleteItem, createUserCopy } from "../../api/i
 export const useCreateItem = () => {
     const qc = useQueryClient();
     return useMutation({
-        mutationFn: ({name, colors, category, brand, price, link, tags, tab, processedUrl}) => {
-            return createItem({name, colors, category, brand, price, link, tags, tab, processedUrl})
+        mutationFn: ({name, colors, category, brand, price, link, tags, tab, processedUrl, pref}) => {
+            return createItem({name, colors, category, brand, price, link, tags, tab, processedUrl, pref})
         },
         onSuccess: (userItem, vars) => {
             const {tab} = vars;
-            console.log('created', userItem)
-            qc.setQueryData(['items', tab], prev => 
+            console.log('created', userItem) 
+            console.log('tab', tab)
+            qc.setQueriesData({queryKey: ['items', tab], exact: false}, prev => 
                 prev && {
                     ...prev,
                     pages: prev.pages.map((page, index) => {
@@ -36,7 +37,7 @@ export const useCreateCopy = () => {
         },
         onSuccess: (userItems, vars) => {
             const {tab} = vars;
-            qc.setQueryData(['items', tab], prev => 
+            qc.setQueriesData({queryKey: ['items', tab], exact: false}, prev => 
                 prev && {
                     ...prev,
                     pages: prev.pages.map((page, index) => {
@@ -61,7 +62,7 @@ export const useUpdateItem = () => {
         onSuccess: (updatedItem, vars) => {
             console.log('updated item', updatedItem)
             const {tab} = vars
-            qc.setQueryData(['items', tab], prev => 
+            qc.setQueriesData({queryKey: ['items', tab], exact: false}, prev => 
                 prev && {
                     ...prev, 
                     pages: prev.pages.map(page => ({

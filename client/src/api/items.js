@@ -56,9 +56,11 @@ export const deleteItem = async ({itemId}) => {
     }
 }
 
-export const createItem = async ({name, colors, category, brand, price, link, tags, tab, processedUrl}) => {
+export const createItem = async ({name, colors, category, brand, price, link, tags, tab, processedUrl, pref}) => {
     try {
+        console.log('proc url', processedUrl)
         const imageURL = await getImageURL({processedUrl});
+        console.log('img url', imageURL)
         const token = await auth.currentUser.getIdToken();
 
         const {userItem} = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/useritems/create-item`, {
@@ -76,7 +78,8 @@ export const createItem = async ({name, colors, category, brand, price, link, ta
                 link,
                 tags,
                 tab,
-                imageURL
+                imageURL,
+                pref
             })
         });
 
@@ -108,11 +111,13 @@ export const createUserCopy = async ({itemRefs, tab}) => {
 export const getImageURL = async ({processedUrl}) => {
     try {
         const {uploadURL} = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/images/get-upload-url`);
-        
-        const blob = await fetch(processedUrl).then(res => res.blob());
+        console.log('upl url', uploadURL)
 
-        if (!blob.ok) throw new Error('Failed to fetch blob');
+        const res = await fetch(processedUrl);
 
+        if (!res.ok) throw new Error('Failed to fetch');
+
+        const blob = await res.blob();
         const formData = new FormData();
         formData.append('file', blob);
 

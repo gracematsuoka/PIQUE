@@ -9,7 +9,7 @@ router.post('/get-items', authenticateUser, async (req, res) => {
 
         const items = await Item
             .find({_id: {$in: itemIds}})
-            .select('_id name category brand link colors');
+            .select('_id name category price brand link colors');
 
         res.status(200).json({items});
     } catch (err) {

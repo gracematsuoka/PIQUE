@@ -3,7 +3,8 @@ const router = express.Router();
 const multer = require('multer');
 const axios = require('axios');
 const FormData = require('form-data');
-const fs = require('fs/promises');
+const fs = require('fs');
+const fsp = require('fs/promises');
 const fetch = require('node-fetch');
 
 const upload = multer({ dest: 'uploads/' });
@@ -21,10 +22,22 @@ router.post('/upload', upload.single('image'), async (req, res) => {
         response.data.pipe(res);
 
         response.data.on('end', async () => {
-            await fs.unlink(req.file.path);
+            try {
+                await fsp.unlink(req.file.path);
+            } catch (err) {
+                console.error('File cleanup failed:', err);
+            }
         });
 
-        res.status(200).json({message: 'Processed image'})
+        response.data.on('error', async (err) => {
+            console.error('Stream error:', err);
+            res.end(); // ensure response is closed if an error happens
+            try {
+                await fsp.unlink(req.file.path);
+            } catch (e) {
+                console.error('File cleanup failed after stream error:', e);
+            }
+        });
     } catch (err) {
         console.error('Error sending image to Python service:', err.message);
         res.status(500).json({ error: 'Failed to process image' });

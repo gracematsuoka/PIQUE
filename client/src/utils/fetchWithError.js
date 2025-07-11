@@ -15,6 +15,10 @@ export async function fetchWithError(url, options = {}) {
         throw new Error(`Error ${res.status}: ${message}`);
     }
 
+    if (res.status === 204) {
+        return null;
+    }
+    
     return await res.json(); 
 }
   

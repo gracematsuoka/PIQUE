@@ -13,6 +13,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchSelectedItem } from '../../../api/items';
 import TagDetails from '../TagDetails';
 import {createPortal} from 'react-dom';
+import { useAuth } from '../../../contexts/AuthContext'
 
 const ItemDetails = ({ mode, 
                     setShowItemDetails,
@@ -23,9 +24,10 @@ const ItemDetails = ({ mode,
                     setLoading,
                     handleError,
                     itemArray,
-                    colorMap
+                    colorMap,
+                    styleArray
                  }) => {
-
+    const {mongoUser} = useAuth();
     const createItem = useCreateItem();
     const updateItem = useUpdateItem();
     const addTag = useAddTag();
@@ -51,6 +53,7 @@ const ItemDetails = ({ mode,
     const [changedField, setChangedField] = useState({});
     const [editLink, setEditLink] = useState(false);
     const [colors, setColors] = useState([]);
+    const [pref, setPref] = useState(mongoUser?.pref);
     const detailsRefs = useRef({});
     const [tagDetailsPos, setTagDetailsPos] = useState({});
 
@@ -72,8 +75,9 @@ const ItemDetails = ({ mode,
                 mongoId: tag.id,
                 updated: false
             })));
+            setPref(selectedItem.pref)
+            console.log('selected', selectedItem)
         }
-
     }, [mode, selectedItem])
 
     useEffect(() => {
@@ -93,6 +97,7 @@ const ItemDetails = ({ mode,
 
     const handleChange = (field, value) => {
         if (originalField[field] !== value) {
+            console.log('changed', field, value)
             setChangedField(prev => ({...prev, [field]: value}))
         } else {
             setChangedField(prev => {
@@ -142,8 +147,9 @@ const ItemDetails = ({ mode,
         }))
 
         try {
+            console.log('item pref', pref)
             await createItem.mutateAsync(
-                {processedUrl, name, colors, category, brand, price, link, tags: itemTags, tab},
+                {processedUrl, name, colors, category, brand, price, link, tags: itemTags, tab, pref},
                 {
                     onSettled: () => setLoading(false),
                     onError: (err) => handleError(err)
@@ -165,6 +171,7 @@ const ItemDetails = ({ mode,
         await handleSaveTags();
         try {
             if (Object.keys(changedField).length > 0) {
+                console.log('changed field', changedField)
                 await updateItem.mutateAsync(
                     {itemId, tab, changedField: changes},
                     {
@@ -227,7 +234,10 @@ const ItemDetails = ({ mode,
         }
     }, [])
 
-    
+    const styleOptions = styleArray.map(style => ({
+        label: style,
+        value: style
+    }))
 
     const itemOptions = itemArray.map(item => ({
         label: item,
@@ -303,7 +313,7 @@ const ItemDetails = ({ mode,
         }),
         valueContainer: (provided) => ({
             ...provided,
-            padding: '0',
+            padding: '0 4px',
             display: 'flex',
             flexWrap: 'wrap',
         }),
@@ -543,6 +553,19 @@ const ItemDetails = ({ mode,
                                         </a>
                                     )}
                                     <label htmlFor='link' ref={editLinkRef} className='right-icon' onClick={() => setEditLink(true)}><Edit/></label>
+                                </div>
+                                <div className='item-field category'>
+                                    <h1 className='field-name'>TYPE</h1>
+                                    <Select 
+                                        placeholder='Select...'
+                                        value={{label: pref, value: pref}}
+                                        options={styleOptions}
+                                        styles={customStyles}
+                                        onChange={(selected) => {
+                                            setPref(selected.value);
+                                            mode === 'edit' && handleChange('pref', selected.value);
+                                        }}
+                                    />
                                 </div>
                             </div>
                         </div>

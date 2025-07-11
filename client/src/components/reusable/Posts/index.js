@@ -13,11 +13,13 @@ import { useEffect, useState, useRef } from 'react';
 import { useQueryClient } from "@tanstack/react-query";
 import AddBoard from '../../popups/AddBoard';
 import Masonry from 'react-masonry-css';
+import { useAuth } from '../../../contexts/AuthContext';
 
 const Posts = ({
     mode,
     boardId,
-    userId
+    userId,
+    isSelf
     }) => {
     const [activePostId, setActivePostId] = useState(null);
     const { mutate } = useToggleLike();
@@ -25,6 +27,7 @@ const Posts = ({
     const [selectedPost, setSelectedPost] = useState(null);
     const [showAddBoard, setShowAddBoard] = useState(false);
     const queryClient = useQueryClient();
+    const {mongoUser} = useAuth();
 
     let query;
     if (mode === 'board') {
@@ -53,9 +56,9 @@ const Posts = ({
         if (!hasNextPage) return;
 
         const observer = new IntersectionObserver(
-            ([entry]) => {
+            async ([entry]) => {
                 if (entry.isIntersecting) {
-                    fetchNextPage();
+                    await fetchNextPage();
                 }
             },
             {

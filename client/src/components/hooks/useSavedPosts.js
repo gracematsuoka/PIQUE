@@ -8,7 +8,7 @@ export const useSavedPosts = ({boardId, liked, userId}) => {
 
     return useInfiniteQuery({
         queryKey: (['savedPosts', {boardId, liked, userId}]),
-        enabled: (!!boardId || liked || userId) && boardIds.length > 0 && !isLoading,
+        enabled: (!!boardId || liked || userId) && !isLoading,
         queryFn: ({pageParam = null}) => fetchBoardPosts({cursor: pageParam, boardId, liked, userId, boardIds}),
         getNextPageParam: last => last.nextCursor ?? undefined
     })

@@ -6,19 +6,21 @@ const authenticateUser = require("../middleware/authenticateUser");
 
 router.post('/create-item', authenticateUser, async (req, res) => {
     const { mongoId } = req.user;
-    const {name, colors, category, brand, price, link, tags, tab, imageURL} = req.body;
-
+    const {name, colors, category, brand, price, link, tags, tab, imageURL, pref} = req.body;
+    console.log('pref', pref)
+    const admin = (mongoId.toString() === '684d0be8f70d8ad161c94960' || mongoId.toString() === '686c0f256b6eac2cc7bb92c1') ? true : false;
     try {
         const item = await Item.create({
             uploaderId: mongoId,
             imageURL,
-            public: false,
+            public: admin ? true : false,
             name,
             colors,
             category,
             brand,
             price,
-            link
+            link,
+            pref
         })
 
         const userItem = new UserItem({
@@ -31,7 +33,8 @@ router.post('/create-item', authenticateUser, async (req, res) => {
             price,
             link,
             tags,
-            tab
+            tab,
+            pref
         })
 
         await userItem.save();
@@ -73,7 +76,8 @@ router.post('/create-user-copy', authenticateUser, async (req, res) => {
                 tags: [],
                 price: global.price,
                 link: global.link,
-                tab: tab
+                tab: tab,
+                pref: global.pref
             }
         });
 
@@ -102,8 +106,8 @@ router.get('/get-items', authenticateUser, async (req, res) => {
         if (color) filter.colors = {$in: Array.isArray(color) ? color : [color]};
         if (category) filter.category = {$in: Array.isArray(category) ? category : [category]};
         if (tag) filter.tags = {$elemMatch: {name: {$in: Array.isArray(tag) ? tag : [tag]}}};
-        if (style) filter.style = {$in: Array.isArray(style) ? style : [style]};
-        if (cursor) filter._id.$lt = cursor;
+        if (style) filter.pref = {$in: Array.isArray(style) ? style : [style]};
+        if (cursor) filter._id = {$lt: cursor};
 
         if (tab === 'closet' || tab === 'wishlist') {
             filter.ownerId = mongoId;
@@ -154,6 +158,7 @@ router.get('/:itemId/get-item', authenticateUser, async (req,res) => {
 router.patch('/update-item/:id', authenticateUser, async (req, res) => {
     const { id } = req.params;
     const changedField = req.body;
+    console.log('changed', changedField)
 
     try {
         const item = await UserItem
@@ -170,6 +175,7 @@ router.patch('/update-item/:id', authenticateUser, async (req, res) => {
         if (changedField.tags) item.tags = changedField.tags;
         if (changedField.price !== undefined) item.price = changedField.price;
         if (changedField.link) item.link = changedField.link;
+        if (changedField.pref) item.pref = changedField.pref;
 
         await item.save();
 

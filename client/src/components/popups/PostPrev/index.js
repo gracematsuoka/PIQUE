@@ -63,10 +63,11 @@ const PostPrev = ({canvasJSON,
         try {
             const {uploadURL} = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/images/get-upload-url`);
             
-            const blob = await fetch(postURL).then(res => res.blob());
+            const res = await fetch(postURL);
 
-            if (!blob.ok) throw new Error('Failed to fetch blob');
+            if (!res.ok) throw new Error('Failed to fetch');
 
+            const blob = await res.blob();
             const formData = new FormData();
             formData.append('file', blob);
 

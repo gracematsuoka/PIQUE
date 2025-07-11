@@ -20,7 +20,8 @@ const UserItem = new mongoose.Schema({
     tags: [TagSchema],
     price: Number,
     link: String,
-    tab: String // closet, wishlist, ...
+    tab: String,
+    pref: String
 }, { timestamps: true })
 
 module.exports = mongoose.model('UserItem', UserItem);

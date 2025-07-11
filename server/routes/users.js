@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
+const Follow = require('../models/Follow');
 const authenticateUser = require("../middleware/authenticateUser");
 const admin = require('../firebase');
 
@@ -112,7 +113,7 @@ router.delete('/delete-account', authenticateUser, async (req, res) => {
 
         await admin.auth().deleteUser(firebaseUid);
         await User.findByIdAndDelete(mongoId);
-        
+    
         res.status(200).json({message: 'Deleted account'});
     } catch (err) {
         console.error('Failed to delete account:', err);

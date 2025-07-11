@@ -132,3 +132,4 @@ This project uses the following libraries/services:
 * Canvas: <a href="https://fabricjs.com/">Fabric JS</a>
 * Caching: [TanStack Query](https://tanstack.com/query/latest)
 * Image storage: [CloudFlare Images](https://www.cloudflare.com/)
+* Masonry UI: [React Masonry CSS](https://www.npmjs.com/package/react-masonry-css)

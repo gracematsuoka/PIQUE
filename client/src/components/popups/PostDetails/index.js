@@ -76,7 +76,6 @@ const PostDetails = ({
                         Authorization: `Bearer ${token}`
                     }
                 })
-
                 setPost(postData);
                 setUsername(postData.userRef?.username);
                 setProfileURL(postData.userRef?.profileURL);
@@ -137,6 +136,7 @@ const PostDetails = ({
                     itemIds.push(obj.itemId);
                 })
 
+                console.log()
                 fonts.forEach(font => loadGoogleFont(font))
                 fetchItemDetails(itemIds);
 

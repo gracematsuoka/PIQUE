@@ -56,9 +56,9 @@ const Explore = () => {
         if (!hasNextPage) return;
 
         const observer = new IntersectionObserver(
-            ([entry]) => {
+            async ([entry]) => {
                 if (entry.isIntersecting) {
-                    fetchNextPage();
+                    await fetchNextPage();
                 }
             },
             {

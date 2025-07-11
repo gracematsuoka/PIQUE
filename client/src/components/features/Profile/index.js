@@ -122,6 +122,7 @@ const Profile = () => {
                     <Posts
                         mode='profile'
                         userId={userData?._id}
+                        isSelf={isSelf}
                     />
                 </div>
 

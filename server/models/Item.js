@@ -14,7 +14,8 @@ const ItemSchema = new mongoose.Schema({
     category: String,
     brand: String,
     price: Number,
-    link: String
+    link: String,
+    pref: String
 }, { timestamps: true })
 
 module.exports = mongoose.model('Item', ItemSchema);

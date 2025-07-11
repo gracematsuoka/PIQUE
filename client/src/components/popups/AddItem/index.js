@@ -35,6 +35,8 @@ const AddItem = ({onClose,
     const [style, setStyle] = useState([]);
     const createCopy = useCreateCopy();
     const [query, setQuery] = useState('');
+    const stableQuery = useMemo(() => query, [query])
+    const stableFilters = useMemo(() => filters, [filters]);
     const [filters, setFilters] = useState([]);
     const [input, setInput] = useState('');
 
@@ -46,7 +48,7 @@ const AddItem = ({onClose,
         isLoading: itemsLoading,
         isError,
         error: itemsError
-    } = useItems({tab: 'database', query, filters})
+    } = useItems({tab: 'database', stableQuery, stableFilters});
 
     const onSearch = (input) => {
         setQuery(input);
@@ -103,12 +105,12 @@ const AddItem = ({onClose,
     const sentinelRef = useRef(null);
 
     useEffect(() => {
-        if (!hasNextPage) return;
-
+        if (!hasNextPage || !sentinelRef.current) return;
+        
         const observer = new IntersectionObserver(
-            ([entry]) => {
+            async ([entry]) => {
                 if (entry.isIntersecting) {
-                    fetchNextPage();
+                    await fetchNextPage();
                 }
             },
             {
@@ -306,11 +308,10 @@ const AddItem = ({onClose,
                                             </div>
                                         </div>
                                     )
-                            }
-                                
-                                {hasNextPage && 
+                                } 
+                                {/* {hasNextPage && 
                                     <div ref={sentinelRef}/>
-                                }
+                                } */}
                             </div>
                             {(selectedItems.length > 0) && 
                             <>
@@ -359,6 +360,10 @@ const AddItem = ({onClose,
                     </div>
                 }
                 </div>
+
+                {hasNextPage && 
+                    <div ref={sentinelRef}/>
+                }
             </div>
             {isLoading && 
                 <div className='loading closet'>

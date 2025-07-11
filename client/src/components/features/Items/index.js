@@ -14,7 +14,7 @@ import { useTag } from '../../hooks/useTag';
 import Filter from '../../popups/Filter';
 import { useAuth } from '../../../contexts/AuthContext';
 
-const Items = ({onSelectItem, tab, handleError, colorMap, itemArray}) => {
+const Items = ({onSelectItem, tab, handleError, colorMap, itemArray, styleArray}) => {
     const [query, setQuery] = useState('');
     const [filters, setFilters] = useState([]);
     const [input, setInput] = useState('');
@@ -41,7 +41,7 @@ const Items = ({onSelectItem, tab, handleError, colorMap, itemArray}) => {
     }, [tab])
 
     const deleteItem = useDeleteItem();
-    const items = data?.pages.flatMap(page => page.items) || [];
+    const items = data?.pages.flatMap(page => page?.items) || [];
     const [selectedId, setSelectedId] = useState(null);
     const [deleteId, setDeleteId] = useState(null);
     const sentinelRef = useRef(null);
@@ -50,8 +50,6 @@ const Items = ({onSelectItem, tab, handleError, colorMap, itemArray}) => {
     const [categs, setCategs] = useState([]);
     const [colors, setColors] = useState([]);
     const [style, setStyle] = useState([]);
-
-    const styleArray = ['Women', 'Men', 'Unisex']
 
     const {data: dbTags=[]} = useTag();
 
@@ -86,9 +84,9 @@ const Items = ({onSelectItem, tab, handleError, colorMap, itemArray}) => {
         if (!hasNextPage) return;
 
         const observer = new IntersectionObserver(
-            ([entry]) => {
+            async ([entry]) => {
                 if (entry.isIntersecting) {
-                    fetchNextPage();
+                    await fetchNextPage();
                 }
             },
             {
@@ -148,22 +146,22 @@ const Items = ({onSelectItem, tab, handleError, colorMap, itemArray}) => {
                     speed="1.75"
                     color="#6B799F"
                     />
-            ) : items.length > 0 ? (
-                items.map(item => 
-                    <div className='item-wrapper' key={item._id}>
+            ) : items?.length > 0 ? (
+                items?.map(item => 
+                    <div className='item-wrapper' key={item?._id}>
                         <img loading='lazy' 
-                            src={item.itemRef?.imageURL}
-                            alt={item.name}
+                            src={item?.itemRef?.imageURL}
+                            alt={item?.name}
                             />
                         <div className='item-label'>
                             {/* <circle style={{backgroundColor: item.colors[0].hex}}/> */}
-                            <p>{item.name}</p>
+                            <p>{item?.name}</p>
                         </div>
-                        <div className='more' onClick={e => setSelectedId(prev => prev === item._id ? null : item._id)}>
+                        <div className='more' onClick={e => setSelectedId(prev => prev === item?._id ? null : item?._id)}>
                             <More />
-                            {(selectedId === item._id) && 
+                            {(selectedId === item?._id) && 
                             <div className='mini-pop'>
-                                <div className='sub-btn' onClick={e => setDeleteId(item._id)}>
+                                <div className='sub-btn' onClick={e => setDeleteId(item?._id)}>
                                     <DeleteIcon/>
                                     <p>Delete</p>
                                 </div>

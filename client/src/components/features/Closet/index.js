@@ -42,6 +42,9 @@ const Closet = () => {
     const itemArray = ['Tops', 'Bottoms', 'Dresses/Rompers', 'Outerwear', 'Shoes', 'Swimwear', 'Loungewear',
         'Sets', 'Undergarments', 'Jewelry', 'Bags', 'Accessories', 'Other'
     ]
+    
+
+    const styleArray = ['Women', 'Men', 'Unisex']
 
     useEffect(() => {
         location.pathname === '/closet' ? setTab('closet') : setTab('wishlist');
@@ -100,6 +103,7 @@ const Closet = () => {
                 </Tooltip>
                 <div className="items-wrapper">
                     <Items 
+                        className='items-wrap'
                         tab={tab}
                         onSelectItem={(item) => {
                             setSelectedItemId(item._id);
@@ -108,6 +112,7 @@ const Closet = () => {
                         handleError={handleError}
                         itemArray={itemArray}
                         colorMap={colorMap}
+                        styleArray={styleArray}
                         />
                 </div>
                 {loading && 
@@ -133,6 +138,7 @@ const Closet = () => {
                                         handleError={handleError}
                                         itemArray={itemArray}
                                         colorMap={colorMap}
+                                        styleArray={styleArray}
                                         />}
                 {showItemDetails && selectedItemId && 
                                     <ItemDetails 
@@ -146,6 +152,7 @@ const Closet = () => {
                                         handleError={handleError}
                                         itemArray={itemArray}
                                         colorMap={colorMap}
+                                        styleArray={styleArray}
                                         />}
             </div>
         </div>

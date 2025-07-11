@@ -68,6 +68,10 @@ const Create = () => {
     const [query, setQuery] = useState('');
     const [filters, setFilters] = useState([]);
     const [input, setInput] = useState('');
+    const stableQuery = useMemo(() => query, [query])
+    const stableFilters = useMemo(() => filters, [filters]);
+    const stableTab = useMemo(() => tab, [tab]);
+    const scrollRef = useRef(null);
 
     // set items to the correct tab
     const {
@@ -78,7 +82,7 @@ const Create = () => {
         isLoading,
         isError,
         error
-    } = useItems({tab, query, filters})
+    } = useItems({tab: stableTab, query: stableQuery, filters: stableFilters})
     const items = data?.pages.flatMap(page => page.items) || [];
 
     const onSearch = (input) => {
@@ -90,9 +94,17 @@ const Create = () => {
         if (!hasNextPage) return;
 
         const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) {
-                    fetchNextPage();
+            async ([entry]) => {
+                if (entry.isIntersecting && scrollRef.current) {
+                    const prevScrollHeight = scrollRef.current.scrollHeight;
+                    const prevScrollTop = scrollRef.current.scrollTop;
+                    await fetchNextPage();
+
+                    requestAnimationFrame(() => {
+                        const newScrollHeight = scrollRef.current.scrollHeight;
+                        const diff = newScrollHeight - prevScrollHeight;
+                        scrollRef.current.scrollTop = prevScrollTop + diff;
+                    })
                 }
             },
             {
@@ -165,7 +177,6 @@ const Create = () => {
             categ: item,
             checked: false
         })));
-        console.log('pref',mongoUser)
 
         setStyle(styleArray.map(style => ({
             style,
@@ -583,7 +594,7 @@ const Create = () => {
 
         const { x, y } = canvas.getPointer(e.nativeEvent);
 
-        const img = await FabricImage.fromURL(data.itemRef?.imageURL,
+        const img = await FabricImage.fromURL(data.itemRef?.imageURL || data.imageURL,
             {crossOrigin: 'anonymous'});
 
         img.toObject = function(propertiesToInclude) {
@@ -602,14 +613,14 @@ const Create = () => {
             hasControls: true,
             scaleX:0.5,
             scaleY:0.5,
-            itemId: data.itemRef._id
+            itemId: data.itemRef?._id || data._id 
         })
 
         canvas.add(img)
     }
 
     const addImage = async (item) => {
-        const img = await FabricImage.fromURL(item.itemRef?.imageURL,
+        const img = await FabricImage.fromURL(item.itemRef?.imageURL || item.imageURL,
             {crossOrigin: 'anonymous'});
 
         img.toObject = function(propertiesToInclude) {
@@ -628,7 +639,7 @@ const Create = () => {
             hasControls: true,
             scaleX:0.5,
             scaleY:0.5,
-            itemId: item.itemRef._id
+            itemId: item.itemRef?._id || item._id 
         })
 
         canvas.add(img)
@@ -670,9 +681,13 @@ const Create = () => {
         setShowPost(true);
     }
 
+    useEffect(() => {
+        console.log('pages:', data?.pages?.length);
+        console.log('items', data)
+      }, [data?.pages]);
+
     return (
         <div className="create">
-            {/* <div className="nav-content-wrapper"> */}
                 {showCongrats && <Congrats
                                     setShowCongrats={setShowCongrats}
                                     setReload={setReload}
@@ -902,7 +917,7 @@ const Create = () => {
                                 <FilterIcon/>
                             </div>
                         </div>
-                        <div className="items">
+                        <div className="items" ref={scrollRef}>
                             {(isLoading || isFetchingNextPage) ? (
                                 <Bouncy
                                     size="45"
@@ -912,12 +927,12 @@ const Create = () => {
                             ) : items.length > 0 ? (
                                 items.map(item => 
                                     <div className="item-img-wrapper" 
-                                        key={item._id}
+                                        key={item.itemRef?._id || item._id}
                                         draggable
                                         onDragStart={e => handleDragStart(e, item)}
-                                        onClick={() => addImage(item)}
-                                        >
+                                        onClick={() => addImage(item)}>
                                         <img 
+                                            loading='lazy'
                                             src={item.itemRef?.imageURL || item.imageURL}
                                             alt={item.name}
                                         />
@@ -949,7 +964,6 @@ const Create = () => {
                     </div>
 
                 </div>
-            {/* </div> */}
         </div>
     )
 }
