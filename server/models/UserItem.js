@@ -1,15 +1,5 @@
 const mongoose = require('mongoose');
 
-// const ColorSchema = new mongoose.Schema({
-//     color: String,
-//     hex: String
-// })
-
-const TagSchema = new mongoose.Schema({
-    name: String,
-    hex: String,
-})
-
 const UserItem = new mongoose.Schema({
     ownerId: mongoose.Types.ObjectId, // user's copy (not original owner)
     itemRef: {type: mongoose.Types.ObjectId, ref: 'Item'}, 
@@ -17,11 +7,11 @@ const UserItem = new mongoose.Schema({
     colors: Array,
     category: String,
     brand: String,
-    tags: [TagSchema],
     price: Number,
     link: String,
     tab: String,
-    pref: String
+    pref: String,
+    tags: [{type: mongoose.Types.ObjectId, ref: 'Tag'}]
 }, { timestamps: true })
 
 module.exports = mongoose.model('UserItem', UserItem);

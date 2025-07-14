@@ -4,7 +4,7 @@ import { fetchWithError } from "../utils/fetchWithError";
 export const fetchTags = async () => {
     try {
         const token = await auth.currentUser.getIdToken();
-        const {tags} = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/users/get-tags`, {
+        const {tags} = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/tags/get-tags`, {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${token}`
@@ -20,7 +20,7 @@ export const fetchTags = async () => {
 export const addTags = async ({tags}) => {
     try {
         const token = await auth.currentUser.getIdToken();
-        const {addedTags} = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/users/create-tag`, {
+        const {addedTags} = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/tags/create-tag`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -38,7 +38,7 @@ export const addTags = async ({tags}) => {
 export const updateTags = async ({tags}) => {
     try {
         const token = await auth.currentUser.getIdToken();
-        const {updatedTags} = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/users/update-tags`, {
+        const {updatedTags} = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/tags/update-tags`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -56,7 +56,7 @@ export const updateTags = async ({tags}) => {
 export const deleteTag = async ({tagId}) => {
     try {
         const token = await auth.currentUser.getIdToken();
-        await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/users/delete-tag?tagId=${tagId}`, {
+        await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/tags/delete-tag?tagId=${tagId}`, {
             method: 'DELETE',
             headers: {
                 Authorization: `Bearer ${token}`

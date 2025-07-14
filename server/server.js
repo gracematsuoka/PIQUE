@@ -33,6 +33,9 @@ app.use('/api/follows', FollowRoutes);
 const boardPostRoutes = require('./routes/boardposts');
 app.use('/api/boardposts', boardPostRoutes);
 
+const tagRoutes = require('./routes/tags');
+app.use('/api/tags', tagRoutes);
+
 const chatRoutes = require('./routes/chat');
 app.use('/api/chat', chatRoutes);
 

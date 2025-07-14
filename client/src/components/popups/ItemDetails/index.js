@@ -72,7 +72,7 @@ const ItemDetails = ({ mode,
                 content: tag.name,
                 color: tag.hex,
                 showDetails: false,
-                mongoId: tag.id,
+                mongoId: tag._id,
                 updated: false
             })));
             setPref(selectedItem.pref)
@@ -81,21 +81,12 @@ const ItemDetails = ({ mode,
     }, [mode, selectedItem])
 
     useEffect(() => {
-        if (originalField?.tags) {
-            handleArrayChange(
-                originalField.tags.map(tag => ({
-                    name: tag.content,
-                    hex: tag.color
-                })), 
-                addedTags.map(tag => ({
-                    name: tag.content,
-                    hex: tag.color
-                })), 
-                'tags');
-        }
+        if (!originalField) return;
+        handleChange('tags', addedTags.map(tag => tag.mongoId))
     }, [addedTags]);
 
     const handleChange = (field, value) => {
+        console.log('original', originalField)
         if (originalField[field] !== value) {
             console.log('changed', field, value)
             setChangedField(prev => ({...prev, [field]: value}))
@@ -106,25 +97,6 @@ const ItemDetails = ({ mode,
             return fieldCopy;
             })
         }
-    }
-
-    const handleArrayChange = (originalArray, changedArray, field) => {
-        if (!arraysEqual(originalArray, changedArray)) {
-            setChangedField(prev => ({...prev, [field]: changedArray}))
-        } else {
-            setChangedField(prev => {
-                const fieldCopy = {...prev};
-                delete fieldCopy[field];
-                return fieldCopy;
-            })
-        }
-    }
-
-    const arraysEqual = (a, b) => {
-        if (a.length !== b.length) return false;
-        return a.every((item, i) => 
-            JSON.stringify(item) === JSON.stringify(b[i])
-        )
     }
 
     const handlePopulateTags = async () => {
@@ -141,15 +113,22 @@ const ItemDetails = ({ mode,
     const handleCreateItem = async () => {
         setLoading(true);
         setShowItemDetails(false);
-        const itemTags = addedTags.map(tag => ({
-            name: tag.content,
-            hex: tag.color
-        }));
-        await handleSaveTags();
+        const createdTags = await handleSaveTags();
+        console.log('created tags',createdTags)
+        console.log('added tags', addedTags)
+        const tagMap = createdTags?.reduce((acc, tag) => {
+            acc[tag.name] = tag;
+            return acc;
+        }, {});
+        console.log('map', tagMap)
+        const tagIds = addedTags.map(tag => tag.mongoId ?? tagMap[tag.content]?._id);
+        
+        const cleanedTags = tagIds.filter(tagId => tagId && tagId.trim() !== '');
+        console.log('clean',cleanedTags)
 
         try {
             await createItem.mutateAsync(
-                {processedUrl, name, colors, category, brand, price, link, tags: itemTags, tab, pref},
+                {processedUrl, name, colors, category, brand, price, link, tags: cleanedTags, tab, pref},
                 {
                     onSettled: () => setLoading(false),
                     onError: (err) => handleError(err)
@@ -208,7 +187,10 @@ const ItemDetails = ({ mode,
             promises.push(updateTag.mutateAsync({tags: tagsUpdate}));
         };
 
-        await Promise.all(promises);
+        const res = await Promise.all(promises);
+        console.log('added', res)
+        const createdTags = res[0];
+        return createdTags;
     }
 
     useEffect(() => {
@@ -406,7 +388,9 @@ const ItemDetails = ({ mode,
                         </div>
                         <hr/>
                         <div className='popup-content bottom'>
+                            <div className='item-img-wrap'>
                             <img src={processedUrl || selectedItem?.itemRef?.imageURL}/>
+                            </div>
                             <div className='item-field-wrapper'>
                                 <div className='item-field'>
                                     <h1 className='field-name'>NAME</h1>
@@ -482,8 +466,6 @@ const ItemDetails = ({ mode,
                                             setAddedTags={setAddedTags}
                                             showAddTag={showAddTag}
                                             setShowAddTag={setShowAddTag}
-                                            handleArrayChange={handleArrayChange}
-                                            setChangedField={setChangedField}
                                             ref={addTagRef}
                                             detailsRefs={detailsRefs}
                                             setTagDetailsPos={setTagDetailsPos}
@@ -498,7 +480,6 @@ const ItemDetails = ({ mode,
                                                     setAddedTags={setAddedTags} 
                                                     id={div.id} 
                                                     mongoId={div.mongoId}
-                                                    handleArrayChange={handleArrayChange}
                                                     tagDivs={tagDivs}
                                                     style={{
                                                         position: 'fixed',

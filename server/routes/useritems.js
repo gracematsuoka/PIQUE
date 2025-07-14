@@ -7,9 +7,9 @@ const authenticateUser = require("../middleware/authenticateUser");
 router.post('/create-item', authenticateUser, async (req, res) => {
     const { mongoId } = req.user;
     const {name, colors, category, brand, price, link, tags, tab, imageURL, pref} = req.body;
-    console.log('pref', pref)
     const admin = (mongoId.toString() === '684d0be8f70d8ad161c94960' || mongoId.toString() === '686c0f256b6eac2cc7bb92c1') ? true : false;
     try {
+
         const item = await Item.create({
             uploaderId: mongoId,
             imageURL,
@@ -32,8 +32,8 @@ router.post('/create-item', authenticateUser, async (req, res) => {
             brand,
             price,
             link,
-            tags,
-            tab,
+            tags: tags[0] !== '' ? tags : [],
+            tab, 
             pref
         })
 
@@ -105,7 +105,7 @@ router.get('/get-items', authenticateUser, async (req, res) => {
         if (q) filter.name = {$regex: q, $options: 'i'};
         if (color) filter.colors = {$in: Array.isArray(color) ? color : [color]};
         if (category) filter.category = {$in: Array.isArray(category) ? category : [category]};
-        if (tag) filter.tags = {$elemMatch: {name: {$in: Array.isArray(tag) ? tag : [tag]}}};
+        if (tag) filter.tags = {$in: Array.isArray(tag) ? tag : [tag]};
         if (style) {
             filter.pref = {$in: Array.isArray(style) ? style : [style]};
         } else {
@@ -149,7 +149,7 @@ router.get('/:itemId/get-item', authenticateUser, async (req,res) => {
     const {itemId} = req.params;
 
     try {
-        const item = await UserItem.findById(itemId).populate('itemRef');
+        const item = await UserItem.findById(itemId).populate('itemRef').populate('tags');
         if (!item) return res.status(404).json({message: 'Selected item not found'});
 
         res.status(200).json({item});

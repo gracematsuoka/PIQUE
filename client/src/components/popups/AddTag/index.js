@@ -42,7 +42,7 @@ const AddTag = forwardRef(({tagDivs,
             content: content || '',
             color: '#f0f0f0',
             showDetails: false,
-            mongoId: '',
+            mongoId: null,
             updated: false
         }
     }

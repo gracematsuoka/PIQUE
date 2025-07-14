@@ -105,7 +105,7 @@ const Items = ({onSelectItem, tab, handleError, colorMap, itemArray, styleArray}
     const filterObj = useMemo(() => ({
         colors: colors.filter(color => color.checked).map(color => color.color),
         categories: categs.filter(categ => categ.checked).map(categ => categ.categ),
-        tags: tags.filter(tag => tag.checked).map(tag => tag.name),
+        tags: tags.filter(tag => tag.checked).map(tag => tag.key),
         styles: style.filter(style => style.checked).map(style => style.style)
     }), [colors, categs, tags, style]);
 
