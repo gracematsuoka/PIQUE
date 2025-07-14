@@ -149,7 +149,7 @@ const Create = () => {
         'Rose Gold': '#D6AA90'
     }
 
-    const itemArray = ['Tops', 'Bottoms', 'Dresses/Rompers', 'Outerwear', 'Shoes', 'Swimwear', 'Loungewear',
+    const itemArray = ['Tops', 'Bottoms', 'Dresses/Rompers', 'Outerwear', 'Shoes', 'Swimwear',
         'Sets', 'Undergarments', 'Jewelry', 'Bags', 'Accessories', 'Other'
     ]
 

@@ -144,10 +144,10 @@ const ItemDetails = ({ mode,
         const itemTags = addedTags.map(tag => ({
             name: tag.content,
             hex: tag.color
-        }))
+        }));
+        await handleSaveTags();
 
         try {
-            console.log('item pref', pref)
             await createItem.mutateAsync(
                 {processedUrl, name, colors, category, brand, price, link, tags: itemTags, tab, pref},
                 {
@@ -188,13 +188,15 @@ const ItemDetails = ({ mode,
     const handleSaveTags = async () => {
         const tagsCreate = [];
         const tagsUpdate = [];
+        console.log('tagdivs', tagDivs)
         tagDivs.map(div => {
             if (div.mongoId && div.updated) {
                 tagsUpdate.push({name: div.content, hex: div.color, mongoId: div.mongoId});
             } else if (!div.mongoId) {
                 tagsCreate.push({name: div.content, hex: div.color});
             }
-        })
+        });
+        console.log('create', tagsCreate, 'update', tagsUpdate)
 
         const promises = [];
 

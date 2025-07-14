@@ -19,7 +19,7 @@ const Home = () => {
                 <div className="left-home">
                     <p className="bg-text">PIQ<br/>.UE</p>
                     <div className="front-text">
-                        <p className="main-text">Made for style,<br/> powered by <br/>community.</p>
+                        <p className="main-text">Your personal stylist, <br/>look book, and <br/>digital wardrobe <br/> ... all in one.</p>
                         <div className="sub-text">
                             <Link to='/sign-up' id='sign-up'>
                                 <p>GET STARTED</p>

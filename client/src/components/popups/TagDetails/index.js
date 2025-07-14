@@ -39,7 +39,7 @@ const TagDetails = forwardRef(({name,
 
     const handleChangeColor = (hex) => {
         setTagDivs(prev => prev.map(div => 
-            div.id === id ? {...div, color: hex, showDetails: false} : div
+            div.id === id ? {...div, color: hex, showDetails: false, updated: true} : div
         ));
         setAddedTags(prev => prev.map(div => 
             div.id === id ? {...div, color: hex, showDetails: false} : div

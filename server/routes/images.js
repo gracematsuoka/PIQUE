@@ -6,6 +6,7 @@ const FormData = require('form-data');
 const fs = require('fs');
 const fsp = require('fs/promises');
 const fetch = require('node-fetch');
+const Jimp = require('jimp');
 
 const upload = multer({ dest: 'uploads/' });
 
@@ -16,33 +17,64 @@ router.post('/upload', upload.single('image'), async (req, res) => {
         const response = await axios.post(`${process.env.PYTHON_SERVICE_API}/remove-bg`, formData,
         {
             headers: formData.getHeaders(),
-            responseType: 'stream',
+            responseType: 'arraybuffer',
         });
+
+        const imageBuffer = Buffer.from(response.data);
+
+        const croppedImg = await cropImage(imageBuffer);
+
         res.setHeader('Content-Type', 'image/png');
-        response.data.pipe(res);
+        res.send(croppedImg);
 
-        response.data.on('end', async () => {
-            try {
-                await fsp.unlink(req.file.path);
-            } catch (err) {
-                console.error('File cleanup failed:', err);
-            }
-        });
+        await fsp.unlink(req.file.path);
 
-        response.data.on('error', async (err) => {
-            console.error('Stream error:', err);
-            res.end(); // ensure response is closed if an error happens
-            try {
-                await fsp.unlink(req.file.path);
-            } catch (e) {
-                console.error('File cleanup failed after stream error:', e);
-            }
-        });
+        // response.data.on('end', async () => {
+        //     try {
+        //         await fsp.unlink(req.file.path);
+        //     } catch (err) {
+        //         console.error('File cleanup failed:', err);
+        //     }
+        // });
+
+        // response.data.on('error', async (err) => {
+        //     console.error('Stream error:', err);
+        //     res.end(); 
+        //     try {
+        //         await fsp.unlink(req.file.path);
+        //     } catch (e) {
+        //         console.error('File cleanup failed after stream error:', e);
+        //     }
+        // });
     } catch (err) {
         console.error('Error sending image to Python service:', err.message);
         res.status(500).json({ error: 'Failed to process image' });
     }
 });
+
+const cropImage = async (img) => {
+    const input = await Jimp.read(img);
+
+    const {width, height} = input.bitmap;
+
+    let minX = width, minY = height, maxX = 0, maxY = 0;
+
+    input.scan(0, 0, width, height, function (x, y, idx) {
+        const alpha = input.bitmap.data[idx + 3];
+        if (alpha > 0) {
+            minX = Math.min(minX, x);
+            maxX = Math.max(maxX, x);
+            minY = Math.min(minY, y);
+            maxY = Math.max(maxY, y);
+        }
+    });
+
+    const cropWidth = maxX - minX + 1;
+    const cropHeight = maxY - minY + 1;
+
+    const cropped = input.clone().crop(minX, minY, cropWidth, cropHeight);
+    return await cropped.getBufferAsync(Jimp.MIME_PNG);
+}
 
 router.get('/get-upload-url', async (req, res) => {
     try {

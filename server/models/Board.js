@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const BoardScema = mongoose.Schema({
+const BoardSchema = mongoose.Schema({
     userId: {type: mongoose.Types.ObjectId, ref: 'User'},
     title: String,
     description: String,
@@ -8,4 +8,4 @@ const BoardScema = mongoose.Schema({
     numSaved: Number
 }, {timestamps: true});
 
-module.exports = mongoose.model('Board', BoardScema)
+module.exports = mongoose.model('Board', BoardSchema)

@@ -1,0 +1,112 @@
+.loading-result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 17px;
+
+    p {
+        font-weight: 600;
+        font-size: 15px;
+    }
+}
+
+.results {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    .post-item-det {
+        position: fixed;
+        transform: none;
+        top: auto;
+        left: auto;
+        width: 300px;
+        height: fit-content;
+        background-color: white;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+        padding: 10px 30px;
+
+        .close svg{
+            top: 20px;
+        }
+
+        .item-mid p {
+            font-size: 15px;
+        }
+    }
+
+    .outfit-text {
+        // background-color: blanchedalmond;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+        max-width: 300px;
+
+        h1 {
+            font-size: 40px;
+        }
+    }
+
+    .res-item {
+        transform: scale(1);
+        transition: transform 0.3s ease-in-out;
+        cursor: pointer;
+
+        &:hover {
+           transform: scale(1.05); 
+           transition: transform 0.3s ease-in-out;
+        }
+
+        &.full img{
+            height: 350px;
+        }
+
+        &.top img{
+            height: 270px;
+        }
+
+        &.bottom img{
+            height: 300px;
+        }
+
+        &.shoe img {
+            height: 200px;
+            position: absolute;
+            left: 20px;
+            // background-color: goldenrod;
+            bottom: -50px;
+        }
+    }
+
+    .outfit-res {
+        display: flex;
+        align-items: center;
+        // gap: 20px;
+    }
+
+    .main-fit {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        max-width: 400px;
+        // background-color: palegoldenrod;
+    }
+
+    .extra-fit {
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        // background-color: palevioletred;
+        max-width: 160px;
+        position: absolute;
+        right: -50px;
+    }
+
+    .spacer {
+        width: 140px;
+    }
+}

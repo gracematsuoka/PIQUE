@@ -21,7 +21,7 @@ import CreateOutlet from './components/outlets/CreateOutlet';
 import { useAuth } from './contexts/AuthContext';
 
 function App() {
-  const { currentUser, loading } = useAuth();
+  const { loading } = useAuth();
 
   if (loading) return null;
 
@@ -59,16 +59,7 @@ function App() {
                 <AccountSetup mode='setup'/>
               </PrivateRoute>
             }
-          />        
-          
-          {/* <Route
-            path="/style"
-            element={
-              <PrivateRoute>
-                <Style />
-              </PrivateRoute>
-            }
-          /> */}
+          />    
         
           <Route 
             element={
@@ -76,6 +67,14 @@ function App() {
                 <MainOutlet/>
               </PrivateRoute>
             }>
+              <Route
+                path="/style"
+                element={
+                  <PrivateRoute>
+                    <Style />
+                  </PrivateRoute>
+                }
+              />
               <Route 
                 path='/saved/boards/:boardId'
                 element={
