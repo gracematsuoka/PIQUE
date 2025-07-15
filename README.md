@@ -58,7 +58,7 @@ PIQUE is a social media and creative application for users who want to digitize 
 
 <img src='./assets/canvas-editor.gif' width='500'/>
 
-- ### Dynamic Posts and Saving
+- #### Dynamic Posts and Saving
   - View outfit item metadata by clicking the item
   - User interaction with liking and saving posts to boards
 
@@ -71,7 +71,7 @@ PIQUE is a social media and creative application for users who want to digitize 
 
 <img src='./assets/auth.gif' width='500'/>
 
-- ### Efficiency
+- #### Efficiency
   - Cached outfit and image to reduce backend calls and improve performance
 
 ## 🔓 Installation
