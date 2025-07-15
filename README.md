@@ -40,7 +40,7 @@ PIQUE is a social media and creative application for users who want to digitize 
 ## 💻 Demo
 #### AI Styling
 
-![AI-Styling](https://github.com/gracematsuoka/PIQUE/blob/main/assets/ai-styling.gif)
+<img src='./assets/ai-styling.gif' width='500'>
 
 
 
