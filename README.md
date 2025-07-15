@@ -7,6 +7,7 @@
 <p align="center">🔗 <a href="https://pique-ten.vercel.app/">https://pique-ten.vercel.app/</a></p>
 <p align="center">
   <a href="#-about-the-project">About</a> •
+  <a href="#-about-the-project">Demo</a> •
   <a href="#installation">Installation</a> •
   <a href="#-key-features">Key Features</a> •
   <a href="#roadmap">Roadmap</a> •
@@ -35,6 +36,13 @@ PIQUE is a social media and creative application for users who want to digitize 
 - Backend: Node.js, Express, Python microservice (Flask)
 - Database: MongoDB
 - Hosting: Vercel (frontend), Render (backend), Railway (microservice)
+
+## 💻 Demo
+#### AI Styling
+
+![AI-Styling](https://github.com/gracematsuoka/PIQUE/blob/main/assets/ai-styling.gif)
+
+
 
 ## 🔓 Installation
 
@@ -118,7 +126,7 @@ npm start
 ## 📍 Roadmap 
 PIQUE is an ongoing project, the following are some of the features that are being/will be implemented...
 - [ ] Feed that reflects user's preferences
-- [ ] AI-integrated styling feedback/recommendations
+- [x] AI-integrated styling feedback/recommendations
 - [ ] Calender feature to plan outfits
 - [ ] Messaging and commenting system to increase collaboration
 - [ ] Allowing images to be uploaded in bulk
@@ -132,4 +140,4 @@ This project uses the following libraries/services:
 * Canvas: <a href="https://fabricjs.com/">Fabric JS</a>
 * Caching: [TanStack Query](https://tanstack.com/query/latest)
 * Image storage: [CloudFlare Images](https://www.cloudflare.com/)
-* Masonry UI: [React Masonry CSS](https://www.npmjs.com/package/react-masonry-css)
+* Image processing: [Jimp](https://www.npmjs.com/package/jimp)
