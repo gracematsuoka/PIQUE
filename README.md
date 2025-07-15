@@ -7,9 +7,8 @@
 <p align="center">🔗 <a href="https://pique-ten.vercel.app/">https://pique-ten.vercel.app/</a></p>
 <p align="center">
   <a href="#-about-the-project">About</a> •
-  <a href="#-about-the-project">Demo</a> •
+  <a href="#demo">Demo/Features</a> •
   <a href="#installation">Installation</a> •
-  <a href="#-key-features">Key Features</a> •
   <a href="#roadmap">Roadmap</a> •
   <a href="#credit">Credit</a>
 </p>
@@ -38,11 +37,42 @@ PIQUE is a social media and creative application for users who want to digitize 
 - Hosting: Vercel (frontend), Render (backend), Railway (microservice)
 
 ## 💻 Demo
-#### AI Styling
+### Key Features:
+- #### AI Styling
+  - Integrated generative AI styling, translating user prompts and wardrobe data into realistic outfit mockups
+  - Interactive outfit results allowing users to see outfit metadata right away
 
-<img src='./assets/ai-styling.gif' width='500'>
+<img src='./assets/ai-styling.gif' width='500'/>
 
+- #### Image Processing and Storage
+  - AI-powered image processing microservice (Rembg)
+  - Implemented Jimp to detect and remove excess 'white-space' from images 
+  - Integrated Cloudflare Images for secure, performant image storage
+  - Database of pre-processed images to easily add to closet/wishlist
+  - Item organization with dynamic tagging and filtering system
 
+<img src='./assets/img-storage.gif' width='500'/>
+
+- #### Canvas Editor
+  - Interactive canvas editor for users to create outfits using Fabric.js
+
+<img src='./assets/canvas-editor.gif' width='500'/>
+
+- ### Dynamic Posts and Saving
+  - View outfit item metadata by clicking the item
+  - User interaction with liking and saving posts to boards
+
+<img src='./assets/posts.gif' width='500'/>
+
+- #### Secure Authentication
+  - Google OAuth and manual login via Firebase
+  - Protected API routes with token-based authentication and middleware handling
+  - User engagement through viewing profiles, following, customizing profile, etc.
+
+<img src='./assets/auth.gif' width='500'/>
+
+- ### Efficiency
+  - Cached outfit and image to reduce backend calls and improve performance
 
 ## 🔓 Installation
 
@@ -113,15 +143,6 @@ npm start
 
 
 🎉 You're all set! Visit [http://localhost:3000](http://localhost:3000/closet) to get started.
-
-## 🔑 Key Features
-* Google OAuth login via Firebase for secure authentication
-* AI-powered image processing microservice (Rembg)
-* Protected API routes with token-based authentication and middleware handling
-* Cached outfit and image to reduce backend calls and improve performance
-* Interactive canvas editor for users to create outfits
-* Intuitive UI design with dynamic filtering options
-* Integrated Cloudflare Images for secure, performant image storage
 
 ## 📍 Roadmap 
 PIQUE is an ongoing project, the following are some of the features that are being/will be implemented...
