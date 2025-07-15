@@ -13,13 +13,18 @@ import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 const Results = ({input, selected, setShowResults}) => {
     const [loading, setLoading] = useState(false);
     const [outfitItems, setOutfitItems] = useState([]);
-    const [full, setFull] = useState({});
-    const [top, setTop] = useState({});
-    const [bottom, setBottom] = useState({});
+    const [full, setFull] = useState(null);
+    const [top, setTop] = useState(null);
+    const [bottom, setBottom] = useState(null);
     const [shoe, setShoe] = useState({});
     const [selectedItem, setSelectedItem] = useState('');
     const [cursorPos, setCursorPos] = useState([]);
     const fetchedRef = useRef(false);
+    const [messages, setMessages] = useState(null);
+
+    useEffect(() => {
+        console.log('selected', selectedItem)
+    }, [selectedItem])
 
     let param;
     if (selected.length == 2) {
@@ -38,9 +43,10 @@ const Results = ({input, selected, setShowResults}) => {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({input})
+                body: JSON.stringify({input, prevMessages: messages})
             });
             const response = res.response;
+            setMessages(res.messages) ;
             console.log('res', response)
 
             let count = 0;
@@ -109,36 +115,47 @@ const Results = ({input, selected, setShowResults}) => {
             </div>
             <div className="outfit-res">
                 <div className="main-fit">
-                    {top &&
+                    {!full && top &&
                         <div className="res-item top" onClick={e => handleSelect(top, e)}>
                             <img src={top.itemRef?.imageURL}/>
                         </div>
                     }
-                    {bottom &&
+                    {!full && bottom &&
                         <div className="res-item bottom" onClick={e => handleSelect(bottom, e)}>
                             <img src={bottom.itemRef?.imageURL}/>
                         </div>
                     }
-                    {!top && !bottom && full &&
+                    {full &&
                         <div className="res-item full" onClick={e => handleSelect(full, e)}>
                             <img src={full.itemRef?.imageURL}/>
                         </div>
                     }
+                    {/* {shoe &&
+                        <div className="res-item shoe" 
+                            // style={{bottom: full ? '-160px' : '-80px'}}
+                            onClick={e => handleSelect(shoe, e)}>
+                            <img src={shoe.itemRef?.imageURL}/>
+                        </div>
+                    } */}
+                    
+                </div>
+                <div className="extra-fit">
+                    {outfitItems.map(item => 
+                        <div className="res-item extra" 
+                            style={{width: item.category === 'Jewelry' ? '90px' : '150px', height: item.category === 'Jewelry' ? '90px' : '160px'}}
+                            onClick={e => handleSelect(item, e)}
+                            key={item._id}>
+                            <img src={item.itemRef?.imageURL}/>
+                        </div>
+                    )}
                     {shoe &&
-                        <div className="res-item shoe" onClick={e => handleSelect(shoe, e)}>
+                        <div className="res-item shoe" 
+                            // style={{bottom: full ? '-160px' : '-80px'}}
+                            onClick={e => handleSelect(shoe, e)}>
                             <img src={shoe.itemRef?.imageURL}/>
                         </div>
                     }
-                    <div className="extra-fit">
-                        {outfitItems.map(item => 
-                            <div className="res-item extra" 
-                                onClick={e => handleSelect(item, e)}
-                                key={item._id}>
-                                <img src={item.itemRef?.imageURL}
-                                    style={{height: item.category === 'Jewelry' ? '80px' : '150px'}}/>
-                            </div>
-                        )}
-                    </div>
+                </div>
                     {selectedItem &&
                         <div className='post-item-det' style={{left: `${cursorPos[0]}px`, top: `${cursorPos[1]}px`}}>
                             <div className='close' onClick={() => setSelectedItem(null)}>
@@ -180,15 +197,19 @@ const Results = ({input, selected, setShowResults}) => {
                             </div>
                             <hr/>
                             <div className="item-tags">
+                                <div className="tag-title">
+                                    <p>TAGS</p>
+                                </div>
+                                <div className="tags-wrapper">
                                 {selectedItem.tags.map(tag => 
                                     <div className="tag" style={{backgroundColor: tag.hex}}>
                                         <p>{tag.name}</p>
                                     </div>
                                 )}
+                                </div>
                             </div>
                         </div>
                     }
-                </div>
                 <div className="spacer"/>
             </div>
         </div>
