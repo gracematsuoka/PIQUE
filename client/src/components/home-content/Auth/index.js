@@ -13,11 +13,9 @@ const Auth = ({ mode }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [firebaseUser, setFirebaseUser] = useState('');
-    const [mongoUser, setMongoUser] = useState('');
     const [loading, setLoading] = useState(false);
-    const { signup, login, googleLogin } = useAuth();
-    const navigate = useNavigate();
+    const { signup, login, googleLogin, firebaseUser, mongoUser, loading: authLoading } = useAuth();
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -35,19 +33,24 @@ const Auth = ({ mode }) => {
         try {
             setError('');
             setLoading(true);
+
             if (isLogin) {
                 await login(email, password);
             } else {
                 await signup(email, password);
                 
-                const token = await auth.currentUser.getIdToken();
+                if (!auth.currentUser) {
+                    console.error('auth.currentUser is null');
+                    return;
+                }
+                const token = await auth.currentUser.getIdToken(true);
 
                 await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/users/create-user`, {
                     method: 'POST',
                     headers: {
                         Authorization: `Bearer ${token}`
                     },
-                })
+                });
             }
         } catch (err) {
             console.error('Error:', err.message)
@@ -55,45 +58,15 @@ const Auth = ({ mode }) => {
         }
 
         setLoading(false);
-        redirectSignIn();
     }
 
     const handleGoogleSignIn = async () => {
         try {
-            const { firebaseUser, mongoUser } = await googleLogin();
-            setFirebaseUser(firebaseUser);
-            setMongoUser(mongoUser);
+            await googleLogin();
         } catch (e){
             console.error('Google sign in failed: ', e.message)
             setError('Failed to sign in with Google')
         }
-
-        redirectSignIn();
-    }
-
-    const redirectSignIn = async () => {
-        const currentUser = getAuth().currentUser;
-
-        if (!currentUser) return;
-        try {
-            const token = await currentUser.getIdToken();
-
-            const data = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/users/me`, {
-                method: 'GET',
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-
-            if (data.username) {
-                navigate('/explore');
-            } else {
-                navigate('/account-setup');
-            }
-        } catch (err) {
-            console.error('Failed to fetch:', err.message);
-        }
-
     }
 
     return (

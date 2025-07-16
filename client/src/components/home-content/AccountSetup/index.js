@@ -7,11 +7,11 @@ import UploadProfilePic from '../../reusable/UploadProfilePic';
 import WarningPopup from '../../popups/WarningPopup';
 import { fetchWithError } from '../../../utils/fetchWithError';
 import {ReactComponent as Check} from '../../../assets/images/icons/check.svg';
+import { Bouncy } from 'ldrs/react';
 
 const AccountSetup = ({ mode }) => {
     const isSetup = mode === 'setup';
-    const user = auth.currentUser;
-    const {mongoUser, resetPassword} = useAuth();
+    const {mongoUser, resetPassword, loading: authLoading, refreshMongoUser} = useAuth();
     const email = mongoUser?.email || '';
     const [loading, setLoading] = useState('');
     const [message, setMessage] = useState('');
@@ -25,6 +25,16 @@ const AccountSetup = ({ mode }) => {
     const [isWarningVisible, setIsWarningVisible] = useState(false);
     const styleArray = ['Women', 'Men', 'Unisex']
     const navigate = useNavigate();
+
+    if (authLoading || !mongoUser) {
+        return (
+            <Bouncy
+                size="45"
+                speed="1.75"
+                color="#6B799F"
+            />
+        )
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -47,10 +57,12 @@ const AccountSetup = ({ mode }) => {
                     Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify({name, username, pref})
-            })
+            });
         } catch (err) {
             console.error('Failed to fetch:', err.message);
         }
+
+        await refreshMongoUser();
 
         if (isSetup) {
             navigate('/'); 

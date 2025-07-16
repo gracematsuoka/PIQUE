@@ -162,12 +162,14 @@ const Posts = ({
                     )}
                 </Masonry>
                 ) : (
-                    <div className='empty'>
-                        <p>You have no saved posts yet...</p>
-                        <div className='empty-h1'>
-                            <h1>Click <i>{mode === 'profile' ? 'Create' : 'Explore'}</i> to get started</h1>
+                    mode === 'board' && 
+                        <div className='empty'>
+                            <p>You have no saved posts yet...</p>
+                            <div className='empty-h1'>
+                                <h1>Click <i>Explore</i> to get started</h1>
+                            </div>
                         </div>
-                    </div>
+                    
                 ))}
             {hasNextPage && 
                 <div ref={sentinelRef}/>

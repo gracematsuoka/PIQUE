@@ -8,8 +8,14 @@ import Blouse from '../../../assets/images/home/whitetankblouse.png'
 import './index.scss'
 import { Link } from 'react-router-dom';
 import EastIcon from '@mui/icons-material/East';
+import { useEffect } from "react";
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 const Home = () => {
+    useEffect(() => {
+        AOS.init({duration: 1500});
+    })
 
     return (
         <div className="home"> 
@@ -19,8 +25,13 @@ const Home = () => {
                 <div className="left-home">
                     <p className="bg-text">PIQ<br/>.UE</p>
                     <div className="front-text">
-                        <p className="main-text">Your personal stylist, <br/>look book, and <br/>digital wardrobe <br/> ... all in one.</p>
-                        <div className="sub-text">
+                        <div className="main-text">
+                            <p data-aos='fade-right'>Your personal stylist </p>  
+                            <p data-aos='fade-right' data-aos-delay='200'>look book, and </p>
+                            <p data-aos='fade-right' data-aos-delay='400'>digital wardrobe </p>
+                            <p data-aos='fade-right' data-aos-delay='600'><i>⎯ all in one.</i></p>
+                        </div>
+                        <div className="sub-text"  data-aos="fade-in" data-aos-duration="4000" data-aos-delay='2000'>
                             <Link to='/sign-up' id='sign-up'>
                                 <p>GET STARTED</p>
                                 <EastIcon/>
@@ -30,28 +41,18 @@ const Home = () => {
                     </div>
                 </div>
                 <div className="right-home">
-                    <div className="sample-fit">
+                    <div className="sample-fit" data-aos="zoom-in" data-aos-duration="4000" data-aos-delay="200">
                         <img id="knit" src={WhiteKnit}/>
                         <img id="sweats" src={Sweats}/>
                     </div>
-                    <div className="sample-fit">
+                    <div className="sample-fit" data-aos="zoom-in" data-aos-duration="4000">
                         <img id="blouse" src={Blouse}/>
                         <img id="jeans" src={Jeans}/>
                     </div>
-                    <div className="sample-fit">
+                    <div className="sample-fit" data-aos="zoom-in" data-aos-duration="4000" data-aos-delay="200">
                         <img id="tank" src={Tank}/>
                         <img id="skirt" src={Skirt}/>
                     </div>
-                    {/* <div className="tops">
-                        <img id="knit" src={WhiteKnit}></img>
-                        <img id="blouse" src={Blouse}></img>
-                        <img id="tank" src={Tank}></img>
-                    </div>
-                    <div className="bottoms">
-                        <img id="sweats" src={Sweats}></img>
-                        <img id="jeans" src={Jeans}></img>
-                        <img id="skirt" src={Skirt}></img>
-                    </div> */}
                 </div>
             </div>
         </div>

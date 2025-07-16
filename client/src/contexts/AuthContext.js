@@ -14,7 +14,6 @@ export function AuthProvider({ children }) {
     const [firebaseUser, setFirebaseUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [mongoUser, setMongoUser] = useState(null);
-
     const signup = async (email, password) => {
         return await createUserWithEmailAndPassword(auth, email, password);
     }
@@ -31,12 +30,30 @@ export function AuthProvider({ children }) {
         return await sendPasswordResetEmail(auth, email);
     }
 
+    const refreshMongoUser = async () => {
+        try {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const token = await user.getIdToken(true);
+            const data = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/users/me`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            setMongoUser(data);
+        } catch (err) {
+            console.log('Failed to refresh mongoUser:', err);
+        }
+    }
+
     const googleLogin = async () => {
         try {
             await setPersistence(auth, browserLocalPersistence);
             const res = await signInWithPopup(auth, googleProvider);
             const user = res.user;
-            const token = await getAuth().currentUser.getIdToken();
+            const token = await getAuth().currentUser.getIdToken(true);
             
             const backendUser = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/users/google-signin`, {
                 method: "POST",
@@ -45,6 +62,9 @@ export function AuthProvider({ children }) {
                     Authorization: `Bearer ${token}`
                 },
             });
+
+            setFirebaseUser(user);
+            setMongoUser(backendUser);
 
             return { firebaseUser: user, mongoUser: backendUser };
         } catch (err) {
@@ -55,9 +75,9 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             setFirebaseUser(user);
-            if (user) {
-
                 try {
+                    if (!user) throw new Error('No firebase user');
+
                     const token = await getIdToken(user, true);
                     const data = await fetchWithError(`${process.env.REACT_APP_API_BASE_URL}/api/users/me`, {
                         headers: {
@@ -67,9 +87,10 @@ export function AuthProvider({ children }) {
                     setMongoUser(data);
                 } catch (err) {
                     console.error('Failed to fetch user from backend:', err);
+                    setMongoUser(null);
+                } finally {
+                    setLoading(false);
                 }
-            }
-            setLoading(false);
         })
 
         return unsubscribe;
@@ -86,7 +107,8 @@ export function AuthProvider({ children }) {
         logout,
         resetPassword,
         googleLogin,
-        loading
+        loading,
+        refreshMongoUser
     }
 
     return (
