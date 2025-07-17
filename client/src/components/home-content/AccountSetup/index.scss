@@ -80,8 +80,17 @@
 .feedback {
     display: flex;
     align-items: center;
+    justify-content: center;
     flex-direction: column;
     gap: 5px;
-    padding-top: 10px;
-    color: rgb(42, 42, 42)
+    color: rgb(0, 0, 0, 0.5);
+    background-color: rgb(233, 233, 233);
+    padding: 20px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    
+    svg {
+        height: 14px;
+        width: 14px;
+    }
 }

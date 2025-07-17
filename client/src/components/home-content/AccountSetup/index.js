@@ -216,7 +216,7 @@ const AccountSetup = ({ mode }) => {
                                     Delete Account
                                 </div>
                                 <div className='feedback'>
-                                    <div style={{display: 'flex', gap: '5px'}}>
+                                    <div style={{display: 'flex', gap: '5px', alignItems: 'center'}}>
                                         <FeedbackIcon/>
                                         <p>Have feedback?</p>
                                     </div>
