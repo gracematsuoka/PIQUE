@@ -897,7 +897,7 @@ const Create = () => {
                         </div>
                         <div className="button-wrapper">
                             <button className="sub-btn bold" onClick={() => handlePost()} >Next</button>
-                            <button className="sub-btn" onClick={handleSave}>Save</button>
+                            {/* <button className="sub-btn" onClick={handleSave}>Save</button> */}
                         </div>
                     </div>
                     <div className="create-sidebar">
