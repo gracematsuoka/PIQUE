@@ -56,6 +56,8 @@
 
 .sub-btn {
     display: flex;
+    align-items: center;
+    justify-content: center;
     white-space: nowrap;
     gap: 5px;
     font-size: 15px;
@@ -83,4 +85,5 @@
 .sub-btn svg {
     fill: black;
     width: 15px;
+    height: 15px;
 }

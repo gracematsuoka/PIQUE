@@ -14,7 +14,10 @@ const UserSchema = new mongoose.Schema({
     tags: [TagSchema],
     followers: Number,
     following: Number,
-    preference: String
+    preference: String,
+    plus: Boolean,
+    stripeCustomerId: String,
+    tries: Number
 }, { timestamps: true })
 
 module.exports = mongoose.model("User", UserSchema);

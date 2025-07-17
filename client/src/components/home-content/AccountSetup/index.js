@@ -8,6 +8,8 @@ import WarningPopup from '../../popups/WarningPopup';
 import { fetchWithError } from '../../../utils/fetchWithError';
 import {ReactComponent as Check} from '../../../assets/images/icons/check.svg';
 import { Bouncy } from 'ldrs/react';
+import Tooltip from '@mui/material/Tooltip';
+import FeedbackIcon from '@mui/icons-material/Feedback';
 
 const AccountSetup = ({ mode }) => {
     const isSetup = mode === 'setup';
@@ -119,6 +121,20 @@ const AccountSetup = ({ mode }) => {
         setIsWarningVisible(!isWarningVisible);
     }
 
+    const handleShowPortal = async () => {
+        const token = await auth.currentUser.getIdToken();
+        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/plus/create-customer-portal-session`, {
+            method: "POST",
+            credentials: 'include',
+            headers: { 
+                Authorization: `Bearer ${token}`
+            }
+        });
+        
+        const { url } = await res.json();
+        window.location.href = url;
+    };      
+
     return (
         <div className="account-setup">
             {isSetup && (
@@ -138,6 +154,11 @@ const AccountSetup = ({ mode }) => {
                 <div className='auth-fields'>
                     <form onSubmit={handleSubmit}>
                         <UploadProfilePic/>
+                        {/* {mongoUser?.plus &&
+                            <Tooltip title='View Subscription Details'>
+                            <p className='plus-msg' onClick={handleShowPortal}>You have PIQUE Plus ✦</p>
+                            </Tooltip>
+                        } */}
                         {error && <p className='error'>{error}</p>}
                         <div className='auth-field'>
                             <label htmlFor='name'>Name</label>
@@ -193,6 +214,13 @@ const AccountSetup = ({ mode }) => {
                                 {passwordError && <p className='error'>{passwordError}</p>}
                                 <div className='sub-btn alert' onClick={toggleIsWarningVisible}>
                                     Delete Account
+                                </div>
+                                <div className='feedback'>
+                                    <div style={{display: 'flex', gap: '5px'}}>
+                                        <FeedbackIcon/>
+                                        <p>Have feedback?</p>
+                                    </div>
+                                    <p>Send an email to <b>pique.fashion.app@gmail.com</b> and we'll get back to you shortly.</p>
                                 </div>
                             </>
                         )}

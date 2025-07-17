@@ -25,7 +25,8 @@ const authenticateUser = async (req, res, next) => {
             name: mongoUser.name,
             username: mongoUser.username,
             profileURL: mongoUser.profileURL,
-            pref: mongoUser.preference
+            pref: mongoUser.preference,
+            plus: mongoUser.plus
         };
     } else {
         req.user = {

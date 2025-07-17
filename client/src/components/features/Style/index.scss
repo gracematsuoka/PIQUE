@@ -25,7 +25,6 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        // background-color: white;
         width: 550px;
         height: 400px;
         padding: 50px 40px;
@@ -48,6 +47,7 @@
             font-weight: 600;
             color: rgba(0, 0, 0, 0.2);
             padding-bottom: 25px;
+            padding-top: 10px;
         }
 
         .ai-input {
@@ -103,8 +103,7 @@
         }
 
         .style-select {
-            position: absolute;
-            bottom: 15px;
+            padding-top: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -138,5 +137,42 @@
             }
         }
     }
+
+    .subscription {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        padding-bottom: 20px;
+
+        .basic-btn {
+            width: fit-content;
+            background-color: black;
+            color: white;
+            font-weight: 700;
+
+            &:hover {
+                background-color: rgba(0, 0, 0, 0.928);
+            }
+        }
+    }
 }
 
+.beta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 5px 10px;
+    border-radius: 50px;
+
+    svg {
+        width: 17px;
+        height: 17px;
+    }
+
+    font-size: 15px;
+    color: rgba(0, 0, 0, 0.2);
+}

@@ -1,0 +1,46 @@
+.success-pg {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    gap: 10px;
+
+    h1 {
+        padding-top: 100px;
+    }
+
+    p {
+        padding-bottom: 10px;
+    }
+
+    .basic-btn {
+        background-color: black;
+        color: white;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 10px 20px;
+        transition: outline 0.3s ease-in-out;
+
+        &:hover {
+            outline: 10px solid rgba(128, 128, 128, 0.162);
+        }
+    }
+}
+
+.plus-success {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #30af2d;
+    border-radius: 50%;
+    width: 90px;
+    height: 90px;
+    border: 35px solid #a9e1a8;
+    outline: 70px solid #2faf2d2a;
+
+    p {
+        color: white;
+        font-size: 70px;
+    }
+}

@@ -26,6 +26,8 @@
     flex-direction: column;
     gap: 19px;
     overflow-y: scroll;
+    padding: 0 2px;
+    box-sizing: border-box;
 }
 
 .follow-row {
@@ -39,6 +41,7 @@
     width: 30px;
     height: 30px;
     border-radius: 50%;
+    outline: 0.5px solid rgb(230, 230, 230);
 }
 
 .user-info {

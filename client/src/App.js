@@ -1,6 +1,6 @@
 import Home from './components/home-content/Home';
 import './App.scss';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Auth from './components/home-content/Auth';
 import Explore from './components/features/Explore';
 import AccountSetup from './components/home-content/AccountSetup';
@@ -18,6 +18,7 @@ import Favorites from './components/features/Favorites';
 import Board from './components/features/Board';
 import MainOutlet from './components/outlets/MainOutlet';
 import CreateOutlet from './components/outlets/CreateOutlet';
+import Success from './components/reusable/Success';
 import { useAuth } from './contexts/AuthContext';
 
 function App() {
@@ -60,7 +61,14 @@ function App() {
               </PrivateRoute>
             }
           />    
-        
+          {/* <Route
+            path="/success"
+            element={
+              <PrivateRoute>
+                <Success/>
+              </PrivateRoute>
+            }
+          />    */}
           <Route 
             element={
               <PrivateRoute>

@@ -25,7 +25,10 @@ const ProfilePopup = ({setIsPopupVisible}) => {
     
     return (
         <div className="popup-container profile">
-            <p className='popup-name'>{mongoUser?.name || 'Name'}</p>
+            <div className='profile-name'>
+                <p className='popup-name'>{mongoUser?.name || 'Name'}</p>
+                <p className="spark">{mongoUser?.plus ? '✦' : ''}</p>
+            </div>
             <p className='popup-username'>@{mongoUser?.username || 'username'}</p>
             <hr/>
             <div className='sub-btn' onClick={() => setIsPopupVisible(false)}>

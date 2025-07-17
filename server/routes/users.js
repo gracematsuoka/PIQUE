@@ -18,7 +18,9 @@ router.post("/google-signin", authenticateUser, async (req, res) => {
                 email, 
                 profileURL,
                 followers: 0,
-                following: 0
+                following: 0,
+                plus: false,
+                tries: 5
             });
             await user.save().catch(err => console.error("Mongo save error:", err));
         }
@@ -43,7 +45,9 @@ router.post('/create-user', authenticateUser, async(req, res) => {
             firebaseUid,
             email,
             followers: 0,
-            following: 0
+            following: 0,
+            plus: false,
+            tries: 5
         });
         await user.save();
 
@@ -61,8 +65,19 @@ router.get('/me', authenticateUser, async (req, res) => {
         username: req.user.username,
         profileURL: req.user.profileURL,
         email: req.user.email,
-        pref: req.user.pref
+        pref: req.user.pref,
+        plus: req.user.plus
     });
+})
+
+router.get('/check-plus', authenticateUser, async (req, res) => {
+    const {mongoId} = req.user;
+
+    const user = await User.findById(mongoId);
+
+    if (!user) return res.status(404).json({message: 'User not found'});
+
+    res.status(200).json({plusStat: user.plus, triesLeft: user.tries})
 })
 
 router.post("/check-username", authenticateUser, async (req, res) => {
@@ -126,7 +141,7 @@ router.get('/:username/get-user', async (req, res) => {
 
     try {
         const user = await User.findOne({username})
-                                .select('name username profileURL followers following _id')
+                                .select('name username profileURL followers following _id plus')
                                 .lean();
 
         if (!user) {

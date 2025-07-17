@@ -97,7 +97,10 @@ const Profile = () => {
                         <img className='profile-pic' src={userData?.profileURL || defaultProfilePic}/>
                     </div>
                     <div className="profile-text">
-                        <p className='popup-name'>{userData?.name}</p>
+                        <div className="profile-name">
+                            <p className='popup-name'>{userData?.name}</p>
+                            <p className="spark">{userData?.plus ? '✦' : ''}</p>
+                        </div>
                         <p className='popup-username'>@{userData?.username}</p>
                         <div className='follow'>
                             <div className="sub-btn" onClick={() => setShowFollowers(true)}>

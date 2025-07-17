@@ -10,7 +10,7 @@ import Tooltip from "@mui/material/Tooltip";
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 
-const Results = ({input, selected, setShowResults}) => {
+const Results = ({input, selected, setShowResults, setTries, tries, plus}) => {
     const [loading, setLoading] = useState(false);
     const [outfitItems, setOutfitItems] = useState([]);
     const [full, setFull] = useState(null);
@@ -21,10 +21,7 @@ const Results = ({input, selected, setShowResults}) => {
     const [cursorPos, setCursorPos] = useState([]);
     const fetchedRef = useRef(false);
     const [messages, setMessages] = useState(null);
-
-    useEffect(() => {
-        console.log('selected', selectedItem)
-    }, [selectedItem])
+    const [error, setError] = useState('');
 
     let param;
     if (selected.length == 2) {
@@ -34,6 +31,7 @@ const Results = ({input, selected, setShowResults}) => {
     }
 
     const fetchAIRes = async () => {
+        setTries(prev => prev - 1);
         setLoading(true);
         try {
             const token = await auth.currentUser.getIdToken();
@@ -47,7 +45,6 @@ const Results = ({input, selected, setShowResults}) => {
             });
             const response = res.response;
             setMessages(res.messages) ;
-            console.log('res', response)
 
             let count = 0;
             response.forEach(item => {
@@ -64,10 +61,11 @@ const Results = ({input, selected, setShowResults}) => {
                     count += 1;
                 }
             });
-
-            setLoading(false);
         } catch (err) {
             console.error('Failed to fetch:', err.message);
+            setError('Failed to generate outfit. Please make sure your closet/wishlist has enough items to form a full outfit (ie at minimum, a bottom + top (or dress), and shoes) and try again.')
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -94,6 +92,12 @@ const Results = ({input, selected, setShowResults}) => {
         </div>
     )
 
+    if (error) return (
+        <div className="error" style={{width: '400px', textAlign: 'center', fontSize: '15px'}}>
+            <p>{error}</p>
+        </div>
+    )
+
     return (
         <div className="results">
             <div className="outfit-text">
@@ -102,7 +106,14 @@ const Results = ({input, selected, setShowResults}) => {
                 <p style={{color: '#B9B9B9'}}><i>click item to view details</i></p>
                 <div className="quick-add">
                     <Tooltip title='Try again'>
-                    <div className="toolbar-icon" onClick={fetchAIRes}>
+                    <div className="toolbar-icon" 
+                        onClick={() => {
+                            if (!plus && tries == 0) {
+                                setShowResults(false)
+                            } else {
+                                fetchAIRes();
+                            }
+                        }}>
                         <CachedIcon/>
                     </div>
                     </Tooltip>
@@ -130,14 +141,6 @@ const Results = ({input, selected, setShowResults}) => {
                             <img src={full.itemRef?.imageURL}/>
                         </div>
                     }
-                    {/* {shoe &&
-                        <div className="res-item shoe" 
-                            // style={{bottom: full ? '-160px' : '-80px'}}
-                            onClick={e => handleSelect(shoe, e)}>
-                            <img src={shoe.itemRef?.imageURL}/>
-                        </div>
-                    } */}
-                    
                 </div>
                 <div className="extra-fit">
                     {outfitItems.map(item => 
@@ -150,7 +153,6 @@ const Results = ({input, selected, setShowResults}) => {
                     )}
                     {shoe &&
                         <div className="res-item shoe" 
-                            // style={{bottom: full ? '-160px' : '-80px'}}
                             onClick={e => handleSelect(shoe, e)}>
                             <img src={shoe.itemRef?.imageURL}/>
                         </div>

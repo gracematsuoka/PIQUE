@@ -3,6 +3,7 @@ const router = express.Router();
 const authenticateUser = require('../middleware/authenticateUser');
 const OpenAI = require('openai');
 const UserItem = require('../models/UserItem');
+const User = require('../models/User');
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
@@ -12,7 +13,7 @@ router.post('/result', authenticateUser, async (req, res) => {
     const {input, prevMessages} = req.body;
     const {mongoId} = req.user;
     const {all, tab} = req.query;
-    
+
     let items;
     try {
         if (all) {
@@ -40,6 +41,8 @@ router.post('/result', authenticateUser, async (req, res) => {
 
     let messages;
     try {
+        await User.findByIdAndUpdate(mongoId, {$inc: {tries: -1}});
+
         if (!prevMessages) {
             messages = [{
                 role: 'user',
@@ -189,6 +192,5 @@ const checkResult = async (chat, mongoId) => {
         return ({correct: true, selectedItems});
     };
 }
-
 
 module.exports = router;

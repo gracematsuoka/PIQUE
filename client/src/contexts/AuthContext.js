@@ -108,7 +108,7 @@ export function AuthProvider({ children }) {
         resetPassword,
         googleLogin,
         loading,
-        refreshMongoUser
+        refreshMongoUser 
     }
 
     return (
